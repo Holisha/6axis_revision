@@ -29,7 +29,8 @@ def train(model, device, train_loader, optimizer, criterion, args):
             loss.backward()
             optimizer.step()
 
-        print(err)
+        err /= len(train_loader)
+        print(f'loss: {err:.4f}')
         # update every epoch
         if best_err is None or err < best_err:
             best_err = err
