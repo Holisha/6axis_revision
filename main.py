@@ -1,4 +1,5 @@
 import argparse
+import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -28,6 +29,7 @@ def train(model, device, train_loader, optimizer, criterion, args):
             loss.backward()
             optimizer.step()
 
+        print(err)
         # update every epoch
         if best_err is None or err < best_err:
             best_err = err
@@ -60,7 +62,7 @@ def main():
     parser.add_argument('--num-workers', type=int, default=4)
     parser.add_argument('--lr', type=float, default=1e-3)
     parser.add_argument('--scale', type=int, default=1)
-    parser.add_argument('--num-epochs', type=int, default=50)
+    parser.add_argument('--num-epochs', type=int, default=500)
 
     args = parser.parse_args()
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -80,6 +82,9 @@ def main():
                              pin_memory=True)
 
     model = FSRCNN(args.scale).to(device)
+    if os.path.exists(f'fsrcnn_{args.scale}x.pt'):
+        model.load_state_dict(torch.load(f'fsrcnn_{args.scale}x.pt'))
+
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     criterion = nn.MSELoss()
 
