@@ -1,2 +1,6 @@
 __pycache__
 *.zip
+output*
+epoch*
+2to6.py
+.vscode
