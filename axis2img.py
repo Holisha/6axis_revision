@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import re
 
-PATH = r'char00436_stroke'
+PATH = r'output_'
 
 def angle2deg(angle):
     return angle * np.pi / 180
@@ -73,7 +73,7 @@ def get_3d(path, length=185):
     return data
 
 
-def vis_2d(data):
+def vis_2d(data, PATH):
     """ 
     input: xyz data, character name
     data: x, y, z, stroke num (n * 4)
@@ -97,8 +97,8 @@ def vis_2d(data):
         elif tmp_x and tmp_y:
             plt.figure(previous_stroke)
             plt.plot(tmp_x, tmp_y, color='black')
-            plt.title(f'{int(previous_stroke)}')
-            plt.savefig(f'{int(previous_stroke)}.png')
+            plt.title(PATH+'_'+f'{int(previous_stroke)}')
+            plt.savefig(PATH+'_'+f'{int(previous_stroke)}.png')
             plt.close()
 
             previous_stroke = data[row, 3]
@@ -106,22 +106,25 @@ def vis_2d(data):
 
     plt.figure(previous_stroke + 1)
     plt.plot(tmp_x, tmp_y, color='black')
-    plt.title(f'{int(previous_stroke)}')
-    plt.savefig(f'{int(previous_stroke)}.png')
+    plt.title(PATH+'_'+f'{int(previous_stroke)}')
+    plt.savefig(PATH+'_'+f'{int(previous_stroke)}.png')
     plt.close()
     
     plt.figure(previous_stroke + 2)
     plt.plot(x, y, color='black')
-    plt.title('all')
-    plt.savefig('all.png')
+    plt.title(PATH)
+    plt.savefig(PATH+'.png')
     plt.close()
 
 
 def main():
-    path = PATH + '.csv'
-    data = get_3d(path)
-    vis_2d(data)
-
+    for i in range(1,11):
+        path = PATH + str(i)+'_output.csv'
+        data = get_3d(path)
+        vis_2d(data, PATH + str(i)+'_output')
+        path = PATH + str(i)+'_input.csv'
+        data = get_3d(path)
+        vis_2d(data, PATH + str(i)+'_input')
 
 if __name__ == '__main__':
     main()
