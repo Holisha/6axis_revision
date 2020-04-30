@@ -3,6 +3,8 @@ import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import csv
+import numpy as np
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
@@ -20,11 +22,12 @@ def train(model, device, train_loader, optimizer, criterion, args):
         for data in tqdm(train_loader, desc=f'epoch: {epoch+1}/{args.num_epochs}'):
             inputs, target = data
             inputs, target = inputs.to(device), target.to(device)
-
+            outtocsv(inputs, str(epoch+1)+'_input') ############################
             pred = model(inputs)
             loss = criterion(pred, target)
             err += loss.sum().item()
-
+            # if(epoch % 2 == 1):
+            outtocsv(pred, str(epoch+1)+'_output') ############################
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -52,9 +55,21 @@ def test(model, device, test_loader, criterion, args):
             pred = model(inputs)
             loss = criterion(pred, target)
             err += loss.sum().item()
-
+            # outtocsv(pred) ############################
+    
     print(f'test error:{err:.4f}')
 
+def outtocsv(pred, epoch):
+    # print(pred.size())
+    output = np.squeeze(pred.cpu().detach().numpy())
+    table = output[0]
+    with open('output_'+epoch+'.csv', 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        for i in range(59):
+            row=[]*7
+            row[1:6] = table[i][:]
+            row.append('stroke'+str(1))
+            writer.writerow(row)
 
 def main():
     parser = argparse.ArgumentParser()
@@ -63,11 +78,11 @@ def main():
     parser.add_argument('--num-workers', type=int, default=4)
     parser.add_argument('--lr', type=float, default=1e-3)
     parser.add_argument('--scale', type=int, default=1)
-    parser.add_argument('--num-epochs', type=int, default=500)
+    parser.add_argument('--num-epochs', type=int, default=10)
 
     args = parser.parse_args()
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-
+    print('device='+str(device))
     train_set = AxisDataSet(args.path)
     train_loader = DataLoader(train_set,
                               batch_size=args.batch_size,
@@ -93,5 +108,5 @@ def main():
     test(model, device, test_loader, criterion, args)
 
 
-if __name__ is '__main__':
+if __name__ == '__main__':
     main()
