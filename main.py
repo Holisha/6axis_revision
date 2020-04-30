@@ -22,12 +22,17 @@ def train(model, device, train_loader, optimizer, criterion, args):
         for data in tqdm(train_loader, desc=f'epoch: {epoch+1}/{args.num_epochs}'):
             inputs, target = data
             inputs, target = inputs.to(device), target.to(device)
-            outtocsv(inputs, str(epoch+1)+'_input') ############################
+
             pred = model(inputs)
             loss = criterion(pred, target)
             err += loss.sum().item()
-            # if(epoch % 2 == 1):
-            outtocsv(pred, str(epoch+1)+'_output') ############################
+
+            if ((epoch + 1) % 50 == 0):
+                # output the 6-axis to csv file
+                out2csv(inputs, str(epoch + 1) + '_input')
+                out2csv(pred, str(epoch + 1) + '_output')
+                out2csv(target, str(epoch + 1) + '_target')
+            
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -55,12 +60,11 @@ def test(model, device, test_loader, criterion, args):
             pred = model(inputs)
             loss = criterion(pred, target)
             err += loss.sum().item()
-            # outtocsv(pred) ############################
+            # outtocsv(pred, target) ############################
     
     print(f'test error:{err:.4f}')
 
-def outtocsv(pred, epoch):
-    # print(pred.size())
+def out2csv(pred, epoch):
     output = np.squeeze(pred.cpu().detach().numpy())
     table = output[0]
     with open('output_'+epoch+'.csv', 'w', newline='') as csvfile:
@@ -78,11 +82,11 @@ def main():
     parser.add_argument('--num-workers', type=int, default=4)
     parser.add_argument('--lr', type=float, default=1e-3)
     parser.add_argument('--scale', type=int, default=1)
-    parser.add_argument('--num-epochs', type=int, default=10)
+    parser.add_argument('--num-epochs', type=int, default=500)
 
     args = parser.parse_args()
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    print('device='+str(device))
+    # print('device='+str(device))
     train_set = AxisDataSet(args.path)
     train_loader = DataLoader(train_set,
                               batch_size=args.batch_size,

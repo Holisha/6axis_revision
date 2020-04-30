@@ -73,7 +73,7 @@ def get_3d(path, length=185):
     return data
 
 
-def vis_2d(data, PATH):
+def vis_2d(data, PATH, target_data=None):
     """ 
     input: xyz data, character name
     data: x, y, z, stroke num (n * 4)
@@ -110,21 +110,74 @@ def vis_2d(data, PATH):
     plt.savefig(PATH+'_'+f'{int(previous_stroke)}.png')
     plt.close()
     
-    plt.figure(previous_stroke + 2)
+    """ plt.figure(previous_stroke + 2)
     plt.plot(x, y, color='black')
     plt.title(PATH)
     plt.savefig(PATH+'.png')
+    plt.close() """
+
+def vis_2d_compare(target, inputs, outputs, idx=1):
+    r""" 
+    compare only one stroke
+
+    input: xyz data, character name
+    data: x, y, z, stroke num (n * 4)
+    output: img of each stroke
+    """
+
+    inputs = np.array(inputs).reshape(-1, 4)
+    outputs = np.array(outputs).reshape(-1, 4)
+    target = np.array(target).reshape(-1, 4)
+
+    inputs_x, inputs_y = [], []
+    outputs_x, outputs_y = [], []
+    target_x, target_y = [], []
+    for row in range(target.shape[0]):
+        # z > 5 mean the brush is dangling
+        if target[row, 2] > 5:
+            continue
+
+        inputs_x.append(inputs[row, 0])
+        inputs_y.append(inputs[row, 1])
+
+        outputs_x.append(outputs[row, 0])
+        outputs_y.append(outputs[row, 1])
+
+        target_x.append(target[row, 0])
+        target_y.append(target[row, 1])
+            
+    # plot line
+    plt.plot(inputs_x, inputs_y, color='blue', label='noised data')
+    plt.plot(outputs_x, outputs_y, color='black', label='revised data')
+    plt.plot(target_x, target_y, color='red', label='ground truth')
+
+    # save image
+    plt.legend(loc='best')
+    plt.title(f'epoch{idx}_compare')
+    plt.savefig(f'epoch{idx}_compare.png')
+
+    # plt.show()
     plt.close()
 
-
 def main():
-    for i in range(1,11):
+    for i in range(50,501,50):
+
+        # output
         path = PATH + str(i)+'_output.csv'
-        data = get_3d(path)
-        vis_2d(data, PATH + str(i)+'_output')
+        output_data = get_3d(path)
+        # vis_2d(output_data, PATH + str(i)+'_output')
+
+        # input
         path = PATH + str(i)+'_input.csv'
-        data = get_3d(path)
-        vis_2d(data, PATH + str(i)+'_input')
+        input_data = get_3d(path)
+        # vis_2d(input_data, PATH + str(i)+'_input')
+
+        # target
+        target_path = f'{PATH}{i}_target.csv'
+        target_data = get_3d(target_path)
+
+        # compare
+        vis_2d_compare(target_data, input_data, output_data, idx=i)
 
 if __name__ == '__main__':
     main()
