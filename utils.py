@@ -4,6 +4,9 @@ import os
 from argparse import ArgumentParser
 from glob import glob
 
+def stroke_statistics(path='6d/'):
+    max_cnt = np.int64(0)
+    mean_cnt = np.int64(0)
 
 def argument_setting():
     r"""
