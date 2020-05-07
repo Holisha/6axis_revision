@@ -1,3 +1,3 @@
 all:
-	nohup python main.py > model_solution.txt
+	python main.py
 	python axis2img.py

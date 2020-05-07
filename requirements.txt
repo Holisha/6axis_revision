@@ -1,0 +1,7 @@
+argparse
+matplotlib
+numpy
+pandas
+pillow
+tensorflow
+tqdm

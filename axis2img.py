@@ -3,7 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import re
 
-PATH = r'output_'
+PATH = r'output/output_'
+NUM_EPOCHS = 10     # number of epochs
 
 def angle2deg(angle):
     return angle * np.pi / 180
@@ -153,14 +154,14 @@ def vis_2d_compare(target, inputs, outputs, idx=1):
 
     # save image
     plt.legend(loc='best')
-    plt.title(f'epoch{idx}_compare')
-    plt.savefig(f'epoch{idx}_compare.png')
+    plt.title(f'output/epoch_{idx}_compare')
+    plt.savefig(f'output/epoch_{idx}_compare.png')
 
     # plt.show()
     plt.close()
 
 def main():
-    for i in range(50,501,50):
+    for i in range(int(NUM_EPOCHS / 10), NUM_EPOCHS + 1, int(NUM_EPOCHS / 10)):
 
         # output
         path = PATH + str(i)+'_output.csv'
@@ -175,6 +176,7 @@ def main():
         # target
         target_path = f'{PATH}{i}_target.csv'
         target_data = get_3d(target_path)
+        # vis_2d(target_data, PATH + str(i)+'_target')
 
         # compare
         vis_2d_compare(target_data, input_data, output_data, idx=i)
