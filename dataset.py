@@ -11,12 +11,12 @@ class AxisDataSet(Dataset):
         self.csv_list = []
         self.stroke_type = []
 
-        for idx, dir_name in enumerate(os.listdir(path)):
+        for idx, dir_name in enumerate(sorted(os.listdir(path))):
             for csv_name in glob(os.path.join(path, dir_name, '*.csv')):
                 self.csv_list.append(csv_name)
                 self.stroke_type.append(idx)
 
-        for csv_name in glob(os.path.join(target_path, '*.csv')):
+        for csv_name in sorted(glob(os.path.join(target_path, '*.csv'))):
             tmp = pd.read_csv(csv_name, header=None)
             data = tmp.iloc[:, :-1].to_numpy()
             data = torch.from_numpy(data).unsqueeze(0).float()

@@ -1,5 +1,14 @@
+# FSRCNN
 import math
-from torch import nn
+import torch.nn as nn
+
+# Light
+import pytorch_lightning as pl
+import torch
+from torch.utils.data import DataLoader
+
+# self defined
+from dataset import AxisDataSet
 
 
 class FSRCNN(nn.Module):
@@ -40,3 +49,81 @@ class FSRCNN(nn.Module):
         x = self.mid_part(x)
         x = self.last_part(x)
         return x
+
+
+class LightFSRCNN(pl.LightningModule):
+    def __init__(self, args, scale_factor=1, num_channels=1, d=56, s=12, m=4, criterion=nn.MSELoss()):
+        super(LightFSRCNN, self).__init__()
+
+        self.args = args
+        self.criterion = criterion
+        self.model = FSRCNN(scale_factor, num_channels, d, s, m)
+
+    def forward(self, x):
+        return self.model(x)
+
+    def prepare_data(self):
+        self.train_set = AxisDataSet(self.args.train_path)
+        self.test_set = AxisDataSet(self.args.test_path)
+
+    def configure_optimizers(self):
+        return torch.optim.Adam(self.model.parameters(),
+                                lr=self.args.lr)
+    # training
+    def train_dataloader(self):
+        return DataLoader(self.train_set,
+                          batch_size=self.args.batch_size,
+                          shuffle=True,
+                          num_workers=self.args.num_workers,
+                          pin_memory=True)
+
+    def training_step(self, data, idx):
+        inputs, target = data
+        outputs = self(inputs)
+
+        loss = self.criterion(outputs, target)
+
+        if self.logger is not None:
+            self.logger.experiment.add_scalar('train/loss', loss)
+
+        return {'loss': loss}
+
+    def training_epoch_end(self, outputs):
+        loss_mean = torch.stack([
+            x['loss'] for x in outputs
+        ]).mean()
+
+        logs = {'loss': loss_mean}
+        return {
+            'progress_bar': logs,
+            'loss': loss_mean
+        }
+
+    # test
+    def test_dataloader(self):
+        return DataLoader(self.test_set,
+                          batch_size=self.args.batch_size,
+                          shuffle=False,
+                          num_workers=self.args.num_workers,
+                          pin_memory=True)
+
+    def test_step(self, data, idx):
+        inputs, target = data
+        outputs = self(inputs)
+
+        loss = self.criterion(outputs, target)
+        if self.logger is not None:
+            self.logger.experiment.add_scalar('test/loss', loss)
+
+        return {'test_loss': loss}
+
+    def test_epoch_end(self, outputs):
+        loss_mean = torch.stack([
+            x['test_loss'] for x in outputs
+        ]).mean()
+
+        logs = {'test_loss': loss_mean}
+        return {
+            'progress_bar': logs,
+            'test_loss': loss_mean
+        }
