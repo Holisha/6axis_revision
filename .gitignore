@@ -1,5 +1,4 @@
 __pycache__
 *.zip
 gui.py
-output/*
-logs/*
+logs/FSRCNN_light/*
