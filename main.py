@@ -37,16 +37,26 @@ def out2csv(input, file_string, stroke_length):
             writer.writerow(row)
 
 def main():
+
+    # can call the lightning model in linux
+    if sys.platform.startswith('linux') and args.light is True:
+        light()
+    else:
+        normal()
+
+
+def normal():
+
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    # print('device='+str(device))
-    train_set = AxisDataSet(args.path)
+
+    train_set = AxisDataSet(args.train_path)
     train_loader = DataLoader(train_set,
                               batch_size=args.batch_size,
                               shuffle=True,
                               num_workers=args.num_workers,
                               pin_memory=True)
 
-    test_set = AxisDataSet('test')
+    test_set = AxisDataSet(args.test_path)
     test_loader = DataLoader(test_set,
                              batch_size=args.batch_size,
                              shuffle=False,
@@ -82,8 +92,4 @@ def light():
 
 if __name__ == '__main__':
     args = argument_setting()
-
-    if sys.platform.startswith('win'):
-        main()
-    else:
-        light()
+    main()
