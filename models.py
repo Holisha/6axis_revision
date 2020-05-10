@@ -9,6 +9,7 @@ from torch.utils.data import DataLoader
 
 # self defined
 from dataset import AxisDataSet
+from utils import out2csv
 
 
 class FSRCNN(nn.Module):
@@ -69,6 +70,7 @@ class LightFSRCNN(pl.LightningModule):
     def configure_optimizers(self):
         return torch.optim.Adam(self.model.parameters(),
                                 lr=self.args.lr)
+
     # training
     def train_dataloader(self):
         return DataLoader(self.train_set,
@@ -84,7 +86,12 @@ class LightFSRCNN(pl.LightningModule):
         loss = self.criterion(outputs, target)
 
         if self.logger is not None:
-            self.logger.experiment.add_scalar('train/loss', loss)
+            self.logger.experiment.add_scalar('train_loss', loss)
+
+        if self.current_epoch % self.args.check_interval:
+            out2csv(inputs, f'{self.current_epoch}_input', self.args.stroke_length)
+            out2csv(outputs, f'{self.current_epoch}_output', self.args.stroke_length)
+            out2csv(target, f'{self.current_epoch}_target', self.args.stroke_length)
 
         return {'loss': loss}
 
@@ -113,7 +120,7 @@ class LightFSRCNN(pl.LightningModule):
 
         loss = self.criterion(outputs, target)
         if self.logger is not None:
-            self.logger.experiment.add_scalar('test/loss', loss)
+            self.logger.experiment.add_scalar('test_loss', loss)
 
         return {'test_loss': loss}
 
