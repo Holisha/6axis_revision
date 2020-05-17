@@ -1,11 +1,13 @@
 import numpy as np
 import csv
+import os
 from argparse import ArgumentParser
+from glob import glob
 
 
 def argument_setting():
     r"""
-    return the arguments
+    return arguments
     """
     parser = ArgumentParser()
 
@@ -38,6 +40,10 @@ def argument_setting():
                         help='set the logger path of pytorch model (default: ./logs/FSRCNN)')
     parser.add_argument('--light-path', type=str, default='./logs/FSRCNN_light',
                         help='set the logger path of pytorch-lightning model (default: ./logs/FSRCNN_light)')
+    
+    # save setting
+    parser.add_argument('--save-path', type=str, default='./output',
+                        help='set the output file (csv or txt) path (default: ./output)')
 
     return parser.parse_args()
 
@@ -62,3 +68,28 @@ def out2csv(inputs, file_string, stroke_length):
             row[1:6] = table[i][:]
             row.append('stroke' + str(1))
             writer.writerow(row)
+
+
+def csv2txt(path='./output'):
+    r"""
+	Convert all CSV files to txt files.
+
+    path: store the csv files (default: './output')
+    """
+    for csv_name in sorted(glob(os.path.join(path, '*.csv'))):
+
+        # read csv file content
+		with open(csv_name, newline='') as csv_file:
+			rows = csv.reader(csv_file)
+			txt_name = f'{csv_name[:-4]}.txt'
+
+            # store in txt file
+			with open(txt_name, "w") as txt_file:
+				for row in rows:
+					txt_file.write("movl 0 ")
+
+					for j in range(len(row) - 1):
+						txt_file.write(f'{float(row[j]):0.4f} ')
+                    
+					txt_file.write("100.0000 ")
+					txt_file.write(f'{row[6]}\n')

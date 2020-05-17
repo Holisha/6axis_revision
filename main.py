@@ -46,9 +46,8 @@ def normal():
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     criterion = nn.MSELoss()
 
-    for epoch in args.epochs:
-        train(model, device, train_loader, optimizer, criterion, args)
-        test(model, device, test_loader, criterion, args)
+    train(model, device, train_loader, optimizer, criterion, args)
+    # test(model, device, test_loader, criterion, args)
 
 
 def light():
