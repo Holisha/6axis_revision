@@ -1,4 +1,5 @@
 __pycache__
 *.zip
-test.*
-6d/
+gui.py
+output/*
+logs/*
