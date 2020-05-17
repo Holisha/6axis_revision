@@ -4,6 +4,17 @@ import os
 from argparse import ArgumentParser
 from glob import glob
 
+def stroke_statistics(path='6d/', mode='max'):
+    r""" 
+    parameter:
+    path: path of the 6d axis csv file
+    mode: output statstic. i.e. mode:max means return the maximum stroke number
+    count the mean, maximum, minimum of the stroke statistics
+    output: use parameter 
+    """
+    max_cnt = np.int64(0)
+    mean_cnt = np.int64(0)
+    min_cnt = np.int64(100)
 
 def argument_setting():
     r"""
