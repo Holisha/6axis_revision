@@ -10,6 +10,7 @@ from torch.utils.data import DataLoader
 # self defined
 from dataset import AxisDataSet
 from utils import out2csv
+from loss.models import FeatureExtractor
 
 
 class FSRCNN(nn.Module):
@@ -60,6 +61,9 @@ class LightFSRCNN(pl.LightningModule):
         self.criterion = criterion
         self.model = FSRCNN(scale_factor, num_channels, d, s, m)
 
+        self.feature_extractor = FeatureExtractor()
+        self.feature_extractor.eval()
+
     def forward(self, x):
         return self.model(x)
 
@@ -82,8 +86,17 @@ class LightFSRCNN(pl.LightningModule):
     def training_step(self, data, idx):
         inputs, target = data
         outputs = self(inputs)
+        
+        # mse loss
+        mse_loss = self.criterion(outputs, target)
 
-        loss = self.criterion(outputs, target)
+        # content loss
+        gen_features = self.feature_extractor(outputs)
+        real_features = self.feature_extractor(target)
+        content_loss = self.criterion(gen_features, real_features)
+
+        # total loss
+        loss = mse_loss + content_loss
 
         if self.logger is not None:
             self.logger.experiment.add_scalar('train_loss', loss)
@@ -117,8 +130,17 @@ class LightFSRCNN(pl.LightningModule):
     def test_step(self, data, idx):
         inputs, target = data
         outputs = self(inputs)
+        
+        # mse loss
+        mse_loss = self.criterion(outputs, target)
 
-        loss = self.criterion(outputs, target)
+        # content loss
+        gen_features = self.feature_extractor(outputs)
+        real_features = self.feature_extractor(target)
+        content_loss = self.criterion(gen_features, real_features)
+
+        # total loss
+        loss = mse_loss + content_loss
         if self.logger is not None:
             self.logger.experiment.add_scalar('test_loss', loss)
 

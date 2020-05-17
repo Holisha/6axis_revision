@@ -44,6 +44,8 @@ def train(model, device, train_loader, optimizer, criterion, args):
             loss.backward()
             optimizer.step()
 
+            
+
         err /= len(train_loader)
         print(f'loss: {err:.4f}')
 
