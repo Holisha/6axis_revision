@@ -3,8 +3,6 @@ import sys
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import csv
-import numpy as np
 from torch.utils.data import DataLoader
 
 from models import FSRCNN, LightFSRCNN
