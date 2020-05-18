@@ -13,28 +13,6 @@ from train import train
 from test import test
 from utils import argument_setting
 
-def out2csv(input, file_string, stroke_length):
-    '''
-    store input to csv file.
-    
-    input: tensor data, with cuda device and size = [batch 1 stroke_length 6]
-    file_string: string, filename
-    stroke_length: length of each stroke
-
-    no output
-    '''
-    output_dir = './output/'
-    if not os.path.exists(output_dir):
-        os.mkdir(output_dir)
-    output = np.squeeze(input.cpu().detach().numpy())
-    table = output[0]
-    with open(output_dir + 'output_' + file_string + '.csv', 'w', newline = '') as csvfile:
-        writer = csv.writer(csvfile)
-        for i in range(stroke_length):
-            row=[]*7
-            row[1:6] = table[i][:]
-            row.append('stroke' + str(1))
-            writer.writerow(row)
 
 def main():
 
