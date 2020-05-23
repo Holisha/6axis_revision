@@ -6,8 +6,6 @@ from utils import out2csv, inverse_scaler_transform
 
 def test(model, device, test_loader, criterion, args):
 
-    writer = SummaryWriter(args.log_path)
-
     # call model
     model.load_state_dict(torch.load(f'fsrcnn_{args.scale}x.pt'))
     model.eval()
@@ -50,9 +48,6 @@ def test(model, device, test_loader, criterion, args):
 
     err /= len(test_loader)
     print(f'test error:{err:.4f}')
-    writer.add_scalar('loss/test', err)
-
-    writer.close()
 
 
 def test_gan(model, device, test_loader, criterion, args):

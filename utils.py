@@ -35,8 +35,10 @@ def argument_setting():
                         help='set the learning rate (default: 1e-3)')
     parser.add_argument('--scale', type=int, default=1,
                         help='set the scale factor for the SR model (default: 1)')
-    parser.add_argument('--epochs', type=int, default=1000,
-                        help='set the epochs (default: 1000)')
+    parser.add_argument('--epochs', type=int, default=50,
+                        help='set the epochs (default: 50)')
+    parser.add_argument('--holdout-p', type=float, default=0.8,
+                        help='set hold out CV probability (default: 0.8)')
 
     # logger setting
     parser.add_argument('--log-path', type=str, default='./logs/FSRCNN',
@@ -100,6 +102,7 @@ def out2csv(inputs, file_string, stroke_length):
     output = np.squeeze(inputs.cpu().detach().numpy())
     table = output[0]
 
+    # with open('output/' + file_string + '.csv', 'w', newline='') as csvfile:
     with open(f'output/{file_string}.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         for i in range(stroke_length):
