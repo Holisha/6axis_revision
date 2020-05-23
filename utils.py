@@ -1,10 +1,9 @@
-import os
-import csv
 import numpy as np
 import pandas as pd
-from glob import glob
+import csv
+import os
 from argparse import ArgumentParser
-
+from glob import glob
 
 def argument_setting():
     r"""
@@ -35,6 +34,8 @@ def argument_setting():
                         help='set the scale factor for the SR model (default: 1)')
     parser.add_argument('--epochs', type=int, default=50,
                         help='set the epochs (default: 50)')
+    parser.add_argument('--holdout-p', type=float, default=0.8,
+                        help='set hold out CV probability (default: 0.8)')
 
     # logger setting
     parser.add_argument('--log-path', type=str, default='./logs/FSRCNN',
@@ -99,7 +100,7 @@ def out2csv(inputs, file_string, stroke_length):
     output = np.squeeze(inputs.cpu().detach().numpy())
     table = output[0]
 
-    # with open('output/' +  file_string + '.csv', 'w', newline='') as csvfile:
+    # with open('output/' + file_string + '.csv', 'w', newline='') as csvfile:
     with open(f'output/{file_string}.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         for i in range(stroke_length):
@@ -111,24 +112,25 @@ def out2csv(inputs, file_string, stroke_length):
 
 def csv2txt(path='./output'):
     r"""
-	Convert all CSV files to txt files.
+    Convert all CSV files to txt files.
 
     path: store the csv files (default: './output')
     """
     for csv_name in sorted(glob(os.path.join(path, '*.csv'))):
 
         # read csv file content
-		with open(csv_name, newline='') as csv_file:
-			rows = csv.reader(csv_file)
-			txt_name = f'{csv_name[:-4]}.txt'
+        with open(csv_name, newline='') as csv_file:
+            rows = csv.reader(csv_file)
+            txt_name = f'{csv_name[:-4]}.txt'
 
             # store in txt file
-			with open(txt_name, "w") as txt_file:
-				for row in rows:
-					txt_file.write("movl 0 ")
+            with open(txt_name, "w") as txt_file:
+                for row in rows:
+                    txt_file.write("movl 0 ")
 
-					for j in range(len(row) - 1):
-						txt_file.write(f'{float(row[j]):0.4f} ')
-                    
-					txt_file.write("100.0000 ")
-					txt_file.write(f'{row[6]}\n')
+                    for j in range(len(row) - 1):
+                        txt_file.write(f'{float(row[j]):0.4f} ')
+
+                    txt_file.write("100.0000 ")
+                    txt_file.write(f'{row[6]}\n')
+

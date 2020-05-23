@@ -119,6 +119,14 @@ class LightFSRCNN(pl.LightningModule):
             'loss': loss_mean
         }
 
+    # valid
+    def val_dataloader(self):
+        return DataLoader(self.train_set,
+                          batch_size=self.args.batch_size,
+                          shuffle=True,
+                          num_workers=self.args.num_workers,
+                          pin_memory=True)
+
     # test
     def test_dataloader(self):
         return DataLoader(self.test_set,
