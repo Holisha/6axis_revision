@@ -158,16 +158,17 @@ def vis_2d_compare(target, inputs, outputs, idx=1):
 
     # save image
     plt.legend(loc='best')
-    plt.title(f'output/epoch_{idx}_compare')
-    plt.savefig(f'output/epoch_{idx}_compare.png')
+    plt.title(f'output/{idx}_compare')
+    plt.savefig(f'output/{idx}_compare.png')
 
     # plt.show()
     plt.close()
 
 
 def main():
+    # axis2img training outputs
+    csv_list = set([int(re.search(r'\d+', file_name).group()) for file_name in glob(os.path.join(PATH, '*00_*.csv'))])
 
-    csv_list = set([int(re.search(r'\d+', file_name).group()) for file_name in glob(os.path.join(PATH, '*.csv'))])
     for file_idx in sorted(csv_list):
 
         # get 3d data from csv
@@ -180,7 +181,24 @@ def main():
             target=target,
             inputs=inputs,
             outputs=outputs,
-            idx=file_idx
+            idx=f'epoch_{file_idx}'
+        )
+
+    # axis2img test outputs
+    csv_list = set([int(re.search(r'\d+', file_name).group()) for file_name in glob(os.path.join(PATH, 'test_*.csv'))])
+    for file_idx in sorted(csv_list):
+        print(f'test file indx = {file_idx}')
+        # get 3d data from csv
+        target  = get_3d(os.path.join(PATH, f'test_{file_idx}_target.csv'))
+        inputs  = get_3d(os.path.join(PATH, f'test_{file_idx}_input.csv'))
+        outputs = get_3d(os.path.join(PATH, f'test_{file_idx}_output.csv'))
+
+        # get visual 2d img from ndarray
+        vis_2d_compare(
+            target=target,
+            inputs=inputs,
+            outputs=outputs,
+            idx=f'test_{file_idx}'
         )
 
     # path = PATH + '.csv'

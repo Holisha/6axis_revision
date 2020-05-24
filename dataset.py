@@ -3,10 +3,12 @@ import torch
 from torch.utils.data import Dataset
 import os
 from glob import glob
+from utils import argument_setting
+from sklearn import preprocessing
 
 
 class AxisDataSet(Dataset):
-    def __init__(self, path, target_path='./target'):
+    def __init__(self, path, target_path=argument_setting().target_path):
         self.target = []
         self.csv_list = []
         self.stroke_type = []
@@ -30,6 +32,9 @@ class AxisDataSet(Dataset):
         csv_file = pd.read_csv(self.csv_list[idx], header=None)
 
         data = csv_file.iloc[:, :-1].to_numpy()
+        
+        data = preprocessing.MinMaxScaler(feature_range=(0, 1)).fit_transform(data)
+        
         data = torch.from_numpy(data).unsqueeze(0).float()
         index = self.stroke_type[idx]
 
