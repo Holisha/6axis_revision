@@ -3,3 +3,5 @@ __pycache__
 output*/
 gui.py
 logs/FSRCNN_light/*
+__init__.py
+logs/*

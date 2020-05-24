@@ -1,9 +1,8 @@
 import torch
 from tqdm import tqdm
-from utils import out2csv
+from utils import out2csv, inverse_scaler_transform
 from loss.models import FeatureExtractor
 from torch.utils.tensorboard import SummaryWriter
-
 
 def train(model, device, train_loader, optimizer, criterion, args):
     best_err = None
@@ -21,6 +20,9 @@ def train(model, device, train_loader, optimizer, criterion, args):
 
             pred = model(inputs)
 
+            # inverse transform pred
+            pred = inverse_scaler_transform(pred, target)
+
             # MSE loss
             mse_loss = criterion(pred, target)
 
@@ -34,9 +36,13 @@ def train(model, device, train_loader, optimizer, criterion, args):
 
             err += loss.sum().item()
 
-            # out2csv every 10 epochs
+            # out2csv each args.check_interval epochs
             if epoch % args.check_interval == 0:
-                out2csv(inputs, f'{epoch}_input', args.stroke_length)
+                # inverse transform inputs
+                inputs_inverse = inverse_scaler_transform(inputs, target)
+
+                # out2csv
+                out2csv(inputs_inverse, f'{epoch}_input', args.stroke_length)
                 out2csv(pred, f'{epoch}_output', args.stroke_length)
                 out2csv(target, f'{epoch}_target', args.stroke_length)
 

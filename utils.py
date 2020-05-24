@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from glob import glob
 from argparse import ArgumentParser
-
+import torch
 
 def argument_setting():
     r"""
@@ -13,18 +13,20 @@ def argument_setting():
     parser = ArgumentParser()
 
     # data pre-processing
-    parser.add_argument('--stroke-length', type=int, default=59,
-                        help='control the stroke length (default: 59)')
+    parser.add_argument('--stroke-length', type=int, default=150,
+                        help='control the stroke length (default: 150)')
     parser.add_argument('--check_interval', type=int, default=100,
                         help='setting output a csv file every epoch of interval (default: 100)')
 
     # model setting
     parser.add_argument('--light', action='store_true', default=False,
                         help='train by pytorch-lightning model (default: False)')
-    parser.add_argument('--train-path', type=str, default='./train',
-                        help='training dataset path (default: ./train)')
-    parser.add_argument('--test-path', type=str, default='./test',
-                        help='test dataset path (default: ./test)')
+    parser.add_argument('--train-path', type=str, default='./dataset_436/train',
+                        help='training dataset path (default: ./dataset_436/train)')
+    parser.add_argument('--test-path', type=str, default='./dataset_436/test',
+                        help='test dataset path (default: ./dataset_436/test)')
+    parser.add_argument('--target-path', type=str, default='./dataset_436/target',
+                        help='target dataset path (default: ./dataset_436/target)')
     parser.add_argument('--batch-size', type=int, default=64,
                         help='set the batch size (default: 64)')
     parser.add_argument('--num-workers', type=int, default=4,
@@ -33,8 +35,8 @@ def argument_setting():
                         help='set the learning rate (default: 1e-3)')
     parser.add_argument('--scale', type=int, default=1,
                         help='set the scale factor for the SR model (default: 1)')
-    parser.add_argument('--epochs', type=int, default=50,
-                        help='set the epochs (default: 50)')
+    parser.add_argument('--epochs', type=int, default=1000,
+                        help='set the epochs (default: 1000)')
 
     # logger setting
     parser.add_argument('--log-path', type=str, default='./logs/FSRCNN',
@@ -88,18 +90,16 @@ def stroke_statistics(path='6d/', mode='max'):
 
 
 def out2csv(inputs, file_string, stroke_length):
-    """
-    store input to csv file.
+    """Store input to csv file
 
-    input: tensor data, with cuda device and size = [batch 1 STROKE_LENGTH 6]
-    file_string: string, filename
-
-    no output
+    Arguments:
+        inputs {tensor} -- with cuda device and size = [batch 1 STROKE_LENGTH 6]
+        file_string {string} -- filename
+        stroke_length {int} -- length of each stroke
     """
     output = np.squeeze(inputs.cpu().detach().numpy())
     table = output[0]
 
-    # with open('output/' +  file_string + '.csv', 'w', newline='') as csvfile:
     with open(f'output/{file_string}.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         for i in range(stroke_length):
@@ -132,3 +132,28 @@ def csv2txt(path='./output'):
                     
                     txt_file.write("100.0000 ")
                     txt_file.write(f'{row[6]}\n')
+
+def inverse_scaler_transform(pred, target):
+    """Inverse pred from range (0, 1) to target range.
+    
+    pred_inverse = (pred * (max - min)) + min
+    
+    ---
+    Arguments:
+
+        pred {torch.tensor} -- Tensor which is inversed from range (0, 1) to target range.
+        target {torch.tensor} -- Inversion reference range.
+    ---
+    Returns:
+
+        torch.tensor -- pred after inversed.
+    """
+
+    # max and min shape is [batch_size, 1, 1, 6]
+    max = torch.max(target, 2, keepdim = True)[0]
+    min = torch.min(target, 2, keepdim = True)[0]
+    
+    # pred_inverse = (pred * (max - min)) + min
+    pred_inverse = torch.add(torch.mul(pred, torch.sub(max, min)), min)
+
+    return pred_inverse
