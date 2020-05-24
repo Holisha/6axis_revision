@@ -1,10 +1,10 @@
-import os
-import csv
 import numpy as np
 import pandas as pd
-from glob import glob
+import csv
+import os
 from argparse import ArgumentParser
 import torch
+from glob import glob
 
 def argument_setting():
     r"""
@@ -37,13 +37,15 @@ def argument_setting():
                         help='set the scale factor for the SR model (default: 1)')
     parser.add_argument('--epochs', type=int, default=1000,
                         help='set the epochs (default: 1000)')
+    parser.add_argument('--holdout-p', type=float, default=0.8,
+                        help='set hold out CV probability (default: 0.8)')
 
     # logger setting
     parser.add_argument('--log-path', type=str, default='./logs/FSRCNN',
                         help='set the logger path of pytorch model (default: ./logs/FSRCNN)')
     parser.add_argument('--light-path', type=str, default='./logs/FSRCNN_light',
                         help='set the logger path of pytorch-lightning model (default: ./logs/FSRCNN_light)')
-    
+
     # save setting
     parser.add_argument('--save-path', type=str, default='./output',
                         help='set the output file (csv or txt) path (default: ./output)')
@@ -110,7 +112,8 @@ def out2csv(inputs, file_string, stroke_length):
 
 
 def csv2txt(path='./output'):
-    """Convert all CSV files to TXT files.
+    r"""
+    Convert all CSV files to txt files.
 
     Keyword Arguments:
         path {str} -- Path to output directory (default: {'./output'})

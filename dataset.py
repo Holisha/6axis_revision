@@ -1,6 +1,8 @@
+import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import Dataset
+from torch.utils.data.sampler import SubsetRandomSampler
 import os
 from glob import glob
 from utils import argument_setting
@@ -28,6 +30,11 @@ class AxisDataSet(Dataset):
         return len(self.csv_list)
 
     def __getitem__(self, idx):
+        """
+        return:
+            input data
+            target data
+        """
         # csv to tensor
         csv_file = pd.read_csv(self.csv_list[idx], header=None)
 
@@ -40,5 +47,20 @@ class AxisDataSet(Dataset):
 
         return data, self.target[index]
 
-if __name__ == '__main__':
-    AxisDataSet('./train')
+
+def cross_validation(train_set, p=0.8):
+    """
+    hold out cross validation
+    """
+    train_len = len(train_set)
+
+    # get shuffled indices
+    indices = np.random.permutation(range(train_len))
+    split_idx = int(train_len * p)
+
+    train_idx, valid_idx = indices[:split_idx], indices[split_idx:]
+
+    train_sampler = SubsetRandomSampler(train_idx)
+    valid_sampler = SubsetRandomSampler(valid_idx)
+
+    return train_sampler, valid_sampler
