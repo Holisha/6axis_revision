@@ -69,6 +69,9 @@ def train(model, device, train_loader, valid_loader, optimizer, criterion, args)
             inputs, target = inputs.to(device), target.to(device)
 
             pred = model(inputs)
+            
+            # inverse transform pred
+            pred = inverse_scaler_transform(pred, target)
 
             # MSE loss
             mse_loss = criterion(pred, target)
