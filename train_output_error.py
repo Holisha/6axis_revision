@@ -19,31 +19,24 @@ def train(model, device, train_loader, optimizer, criterion, args):
             inputs, target = data
             inputs, target = inputs.to(device), target.to(device)
 
-            pred = model(inputs)
+            pred = model(inputs,target)
 
-            print("preds",pred.size()) ## tensor
-            model_output=np.squeeze(pred.cpu().detach().numpy())
-            table_out = model_output[0]
-            model_input = np.squeeze(inputs.cpu().detach().numpy())      
-            table_in = model_input[0]
-            diff=abs(table_out-table_in)
-            diff_t=torch.from_numpy(diff)
-            pred[0]=diff_t
-            # pred=torch.squeeze(pred)
-            print(pred.size())
-            print(pred) ## pred為誤差 type:tensor
+            # print("preds",pred.size()) ## tensor
+            # model_output=np.squeeze(pred.cpu().detach().numpy())
+            # table_out = model_output[0]
+            # model_input = np.squeeze(inputs.cpu().detach().numpy())      
+            # table_in = model_input[0]
+            # diff=abs(table_out-table_in)
+            # diff_t=torch.from_numpy(diff)
+            # pred[0]=diff_t
+            # print(pred.size())
+            # print(pred) ## pred為誤差 type:tensor
 
             # MSE loss
             mse_loss = criterion(pred, target)
 
-            # content loss
-            gen_features = feature_extractor(pred)
-            real_features = feature_extractor(target)
-            content_loss = criterion(gen_features, real_features)
-
             # for compatible
-            loss = mse_loss + content_loss
-
+            loss = mse_loss 
             err += loss.sum().item()
 
             # out2csv every 10 epochs
