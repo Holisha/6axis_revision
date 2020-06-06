@@ -5,3 +5,5 @@ pandas
 pillow
 tensorflow
 tqdm
+pytorch-lightning
+sklearn
