@@ -1,9 +1,9 @@
-import os
-import csv
 import numpy as np
 import pandas as pd
-from glob import glob
+import csv
+import os
 from argparse import ArgumentParser
+from glob import glob
 import torch
 
 def argument_setting():
@@ -105,7 +105,6 @@ def out2csv(inputs, file_string, stroke_length, index=0):
     output = np.squeeze(inputs.cpu().detach().numpy())
     table = output[index]
 
-    # with open('output/' + file_string + '.csv', 'w', newline='') as csvfile:
     with open(f'output/{file_string}.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         for i in range(stroke_length):
@@ -135,7 +134,7 @@ def csv2txt(path='./output'):
 
                     for j in range(len(row) - 1):
                         txt_file.write(f'{float(row[j]):0.4f} ')
-                    
+
                     txt_file.write("100.0000 ")
                     txt_file.write(f'{row[6]}\n')
 
