@@ -2,11 +2,16 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import re
+import os
+from glob import glob
 
-PATH = r'output_'
+# PATH = r'char00436_stroke'
+PATH = r'output'
+
 
 def angle2deg(angle):
     return angle * np.pi / 180
+
 
 def get_3d(path, length=185):
     """
@@ -73,7 +78,7 @@ def get_3d(path, length=185):
     return data
 
 
-def vis_2d(data, PATH):
+def vis_2d(data):
     """ 
     input: xyz data, character name
     data: x, y, z, stroke num (n * 4)
@@ -81,7 +86,7 @@ def vis_2d(data, PATH):
     """
     data = np.array(data).reshape(-1, 4)
     tmp_x, tmp_y = [], []
-    x ,y = [], []
+    x, y = [], []
     previous_stroke = 1 # control figure
     for row in range(data.shape[0]):
         # z > 5 mean the brush is dangling
@@ -97,8 +102,8 @@ def vis_2d(data, PATH):
         elif tmp_x and tmp_y:
             plt.figure(previous_stroke)
             plt.plot(tmp_x, tmp_y, color='black')
-            plt.title(PATH+'_'+f'{int(previous_stroke)}')
-            plt.savefig(PATH+'_'+f'{int(previous_stroke)}.png')
+            plt.title(f'{int(previous_stroke)}')
+            plt.savefig(f'{int(previous_stroke)}.png')
             plt.close()
 
             previous_stroke = data[row, 3]
@@ -106,25 +111,100 @@ def vis_2d(data, PATH):
 
     plt.figure(previous_stroke + 1)
     plt.plot(tmp_x, tmp_y, color='black')
-    plt.title(PATH+'_'+f'{int(previous_stroke)}')
-    plt.savefig(PATH+'_'+f'{int(previous_stroke)}.png')
+    plt.title(f'{int(previous_stroke)}')
+    plt.savefig(f'{int(previous_stroke)}.png')
     plt.close()
     
     plt.figure(previous_stroke + 2)
     plt.plot(x, y, color='black')
-    plt.title(PATH)
-    plt.savefig(PATH+'.png')
+    plt.title('all')
+    plt.savefig('all.png')
+    plt.close()
+
+
+def vis_2d_compare(target, inputs, outputs, idx=1):
+    r"""
+    compare only one stroke
+    input: xyz data, character name
+    data: x, y, z, stroke num (n * 4)
+    output: img of each stroke
+    """
+
+    inputs = np.array(inputs).reshape(-1, 4)
+    outputs = np.array(outputs).reshape(-1, 4)
+    target = np.array(target).reshape(-1, 4)
+
+    inputs_x, inputs_y = [], []
+    outputs_x, outputs_y = [], []
+    target_x, target_y = [], []
+    for row in range(target.shape[0]):
+        # z > 5 mean the brush is dangling
+        if target[row, 2] > 5:
+            continue
+
+        inputs_x.append(inputs[row, 0])
+        inputs_y.append(inputs[row, 1])
+
+        outputs_x.append(outputs[row, 0])
+        outputs_y.append(outputs[row, 1])
+
+        target_x.append(target[row, 0])
+        target_y.append(target[row, 1])
+
+    # plot line
+    plt.plot(inputs_x, inputs_y, color='blue', label='noised data')
+    plt.plot(outputs_x, outputs_y, color='black', label='revised data')
+    plt.plot(target_x, target_y, color='red', label='ground truth')
+
+    # save image
+    plt.legend(loc='best')
+    plt.title(f'output/{idx}_compare')
+    plt.savefig(f'output/{idx}_compare.png')
+
+    # plt.show()
     plt.close()
 
 
 def main():
-    for i in range(1,11):
-        path = PATH + str(i)+'_output.csv'
-        data = get_3d(path)
-        vis_2d(data, PATH + str(i)+'_output')
-        path = PATH + str(i)+'_input.csv'
-        data = get_3d(path)
-        vis_2d(data, PATH + str(i)+'_input')
+    # axis2img training outputs
+    csv_list = set([int(re.search(r'\d+', file_name).group()) for file_name in glob(os.path.join(PATH, '*00_*.csv'))])
+
+    for file_idx in sorted(csv_list):
+
+        # get 3d data from csv
+        target  = get_3d(os.path.join(PATH, f'{file_idx}_target.csv'))
+        inputs  = get_3d(os.path.join(PATH, f'{file_idx}_input.csv'))
+        outputs = get_3d(os.path.join(PATH, f'{file_idx}_output.csv'))
+
+        # get visual 2d img from ndarray
+        vis_2d_compare(
+            target=target,
+            inputs=inputs,
+            outputs=outputs,
+            idx=f'epoch_{file_idx}'
+        )
+
+    # axis2img test outputs
+    csv_list = set([int(re.search(r'\d+', file_name).group()) for file_name in glob(os.path.join(PATH, 'test_*.csv'))])
+    for file_idx in sorted(csv_list):
+        print(f'test file indx = {file_idx}')
+        # get 3d data from csv
+        target  = get_3d(os.path.join(PATH, f'test_{file_idx}_target.csv'))
+        inputs  = get_3d(os.path.join(PATH, f'test_{file_idx}_input.csv'))
+        outputs = get_3d(os.path.join(PATH, f'test_{file_idx}_output.csv'))
+
+        # get visual 2d img from ndarray
+        vis_2d_compare(
+            target=target,
+            inputs=inputs,
+            outputs=outputs,
+            idx=f'test_{file_idx}'
+        )
+
+    # path = PATH + '.csv'
+    # data = get_3d(path)
+    # vis_2d(data)
+
 
 if __name__ == '__main__':
     main()
