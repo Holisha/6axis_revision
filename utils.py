@@ -91,16 +91,19 @@ def stroke_statistics(path='6d/', mode='max'):
     }.get(mode, 'error')
 
 
-def out2csv(inputs, file_string, stroke_length):
+def out2csv(inputs, file_string, stroke_length, index=0):
     """Store input to csv file
 
     Arguments:
-        inputs {tensor} -- with cuda device and size = [batch 1 STROKE_LENGTH 6]
+        inputs {tensor} -- with cuda device and size = [batch, 1, STROKE_LENGTH, 6]
         file_string {string} -- filename
         stroke_length {int} -- length of each stroke
+
+    Keyword Arguments:
+        index {int} -- index of stroke (default: {0})
     """
     output = np.squeeze(inputs.cpu().detach().numpy())
-    table = output[0]
+    table = output[index]
 
     # with open('output/' + file_string + '.csv', 'w', newline='') as csvfile:
     with open(f'output/{file_string}.csv', 'w', newline='') as csvfile:
