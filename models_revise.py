@@ -46,17 +46,14 @@ class FSRCNN(nn.Module):
         nn.init.normal_(self.last_part.weight.data, mean=0.0, std=0.001)
         nn.init.zeros_(self.last_part.bias.data)
 
-    def forward(self, x, y):
-        model_input = np.squeeze(x.cpu().detach().numpy())      
-        table_in = model_input[0]
+    def forward(self, x):
+        # model_input = np.squeeze(x.cpu().detach().numpy())      
+        # table_in = model_input[0]
         x = self.first_part(x)
         x = self.mid_part(x)
         x = self.last_part(x)
-        model_output=np.squeeze(x.cpu().detach().numpy())
-        table_out = model_output[0]
-        diff=abs(table_out-table_in)
-        diff_t=torch.from_numpy(diff)
-        x[0]=diff_t
+        
+    
         return x
 
 

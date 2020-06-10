@@ -18,8 +18,9 @@ def train(model, device, train_loader, optimizer, criterion, args):
         for data in tqdm(train_loader, desc=f'epoch: {epoch}/{args.epochs}'):
             inputs, target = data
             inputs, target = inputs.to(device), target.to(device)
-
-            pred = model(inputs,target)
+            
+            pred = model(inputs)
+            diff=torch.sub(pred, inputs)
 
             # print("preds",pred.size()) ## tensor
             # model_output=np.squeeze(pred.cpu().detach().numpy())
@@ -33,7 +34,7 @@ def train(model, device, train_loader, optimizer, criterion, args):
             # print(pred) ## pred為誤差 type:tensor
 
             # MSE loss
-            mse_loss = criterion(pred, target)
+            mse_loss = criterion(diff, target-inputs)
 
             # for compatible
             loss = mse_loss 
