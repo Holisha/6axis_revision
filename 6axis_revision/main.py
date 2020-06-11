@@ -10,6 +10,7 @@ from dataset import AxisDataSet, cross_validation
 from train import train
 from test import test
 from utils import argument_setting
+from axis2img import get_result
 
 
 def main():
@@ -57,6 +58,9 @@ def normal():
     train(model, device, train_loader, valid_loader, optimizer, criterion, args)
     test(model, device, test_loader, criterion, args)
 
+    # get result image
+    get_result()
+
 
 def light():
     from pytorch_lightning import Trainer
@@ -72,6 +76,8 @@ def light():
 
     trainer.fit(model)
     trainer.test()
+
+    get_result()
 
 
 if __name__ == '__main__':

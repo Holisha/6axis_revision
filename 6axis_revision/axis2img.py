@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import re
 import os
 from glob import glob
+import csv
+from typing import Union
 
 # PATH = r'char00436_stroke'
 PATH = r'output'
@@ -122,7 +124,7 @@ def vis_2d(data):
     plt.close()
 
 
-def vis_2d_compare(target, inputs, outputs, idx=1):
+def vis_2d_compare(target, inputs, outputs, idx: Union[str, int]=1):
     r"""
     compare only one stroke
     input: xyz data, character name
@@ -158,16 +160,39 @@ def vis_2d_compare(target, inputs, outputs, idx=1):
 
     # save image
     plt.legend(loc='best')
-    plt.title(f'output/epoch_{idx}_compare')
-    plt.savefig(f'output/epoch_{idx}_compare.png')
+    plt.title(f'output/{idx}_compare')
+    plt.savefig(f'output/{idx}_compare.png')
 
     # plt.show()
     plt.close()
 
 
-def main():
+def csv2txt(path='./output'):
+    """ Convert all CSV files to TXT files.
 
-    csv_list = set([int(re.search(r'\d+', file_name).group()) for file_name in glob(os.path.join(PATH, '*.csv'))])
+    Keyword Arguments:
+        path {str} -- Path to output directory (default: './output')
+    """
+
+    for csv_name in sorted(glob(os.path.join(path, '*.csv'))):
+        # read csv file content
+        with open(csv_name, newline='') as csv_file:
+            rows = csv.reader(csv_file)
+            txt_name = f'{csv_name[:-4]}.txt'
+            # store in txt file
+            with open(txt_name, "w") as txt_file:
+                for row in rows:
+                    txt_file.write("movl 0 ")
+                    for j in range(len(row) - 1):
+                        txt_file.write(f'{float(row[j]):0.4f} ')
+                    txt_file.write("100.0000 ")
+                    txt_file.write(f'{row[6]}\n')
+
+
+def get_result():
+    # axis2img training outputs
+    csv_list = set([int(re.search(r'\d+', file_name).group()) for file_name in glob(os.path.join(PATH, '*00_*.csv'))])
+
     for file_idx in sorted(csv_list):
 
         # get 3d data from csv
@@ -180,7 +205,24 @@ def main():
             target=target,
             inputs=inputs,
             outputs=outputs,
-            idx=file_idx
+            idx=f'epoch_{file_idx}'
+        )
+
+    # axis2img test outputs
+    csv_list = set([int(re.search(r'\d+', file_name).group()) for file_name in glob(os.path.join(PATH, 'test_*.csv'))])
+    for file_idx in sorted(csv_list):
+        print(f'test file indx = {file_idx}')
+        # get 3d data from csv
+        target  = get_3d(os.path.join(PATH, f'test_{file_idx}_target.csv'))
+        inputs  = get_3d(os.path.join(PATH, f'test_{file_idx}_input.csv'))
+        outputs = get_3d(os.path.join(PATH, f'test_{file_idx}_output.csv'))
+
+        # get visual 2d img from ndarray
+        vis_2d_compare(
+            target=target,
+            inputs=inputs,
+            outputs=outputs,
+            idx=f'test_{file_idx}'
         )
 
     # path = PATH + '.csv'
@@ -189,4 +231,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    get_result()
