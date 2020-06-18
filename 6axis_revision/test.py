@@ -2,7 +2,7 @@ import torch
 from tqdm import tqdm
 from torch.utils.tensorboard import SummaryWriter
 from loss.models import FeatureExtractor
-from utils import out2csv, inverse_scaler_transform
+from utils import out2csv, inverse_scaler_transform,save_final_predict_and_new_dataset
 
 def test(model, device, test_loader, criterion, args):
 
@@ -17,8 +17,7 @@ def test(model, device, test_loader, criterion, args):
     err = 0.0
 
     with torch.no_grad():
-        i = 0   # for out2csv, count the number of loops
-        j = 0   # for out2csv, count the number of data
+        store_data_cnt=0
         for data in tqdm(test_loader, desc=f'scale: {args.scale}'):
             inputs, target = data
             inputs, target = inputs.to(device), target.to(device)
@@ -26,16 +25,10 @@ def test(model, device, test_loader, criterion, args):
             pred = model(inputs)
             pred = inverse_scaler_transform(pred, target)
 
-            # inverse transform inputs
-            inputs_inverse = inverse_scaler_transform(inputs, target)
 
-            # out2csv
-            while j - (i * 64) < pred.size(0):
-                out2csv(inputs_inverse, f'test_{int(j/30)+1}_input', args.stroke_length, j - (i * 64))
-                out2csv(pred, f'test_{int(j/30)+1}_output', args.stroke_length, j - (i * 64))
-                out2csv(target, f'test_{int(j/30)+1}_target', args.stroke_length, j - (i * 64))
-                j += 30
-            i += 1
+
+            save_final_predict_and_new_dataset(pred, f'output_test',args,store_data_cnt)
+            store_data_cnt+=args.batch_size
 
             # MSE loss
             mse_loss = criterion(pred, target)

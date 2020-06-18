@@ -82,4 +82,5 @@ def light():
 
 if __name__ == '__main__':
     args = argument_setting()
-    main()
+    for i in range(args.retrain_epochs):
+        main()

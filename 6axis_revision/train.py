@@ -1,10 +1,10 @@
 import torch
 from datetime import datetime
 from tqdm import tqdm
-from utils import out2csv, inverse_scaler_transform
+from utils import out2csv, inverse_scaler_transform ,save_final_predict,save_final_predict_and_new_dataset
 from loss.models import FeatureExtractor
 from torch.utils.tensorboard import SummaryWriter
-
+import os
 
 def train(model, device, train_loader, valid_loader, optimizer, criterion, args):
     best_err = None
@@ -19,7 +19,7 @@ def train(model, device, train_loader, valid_loader, optimizer, criterion, args)
         err = 0.0
         valid_err = 0.0
         train_cnt, valid_cnt = 0, 0         # to compute the loss
-
+        store_data_cnt = 0
         for data in tqdm(train_loader, desc=f'train epoch: {epoch}/{args.epochs}'):
             train_cnt += 1
 
@@ -47,14 +47,20 @@ def train(model, device, train_loader, valid_loader, optimizer, criterion, args)
             err += loss.sum().item()
 
             # out2csv each args.check_interval epochs
-            if epoch % args.check_interval == 0:
-                # inverse transform inputs
-                inputs_inverse = inverse_scaler_transform(inputs, target)
+            if epoch % args.check_interval == 0 and epoch!=args.epoch:
+                if not os.path.exists('new_train'):
+                    os.mkdir('new_train')
+                # store other outputs to make them become newdataset for the next train
+                save_final_predict_and_new_dataset(pred, f'new_train/{epoch}_output_train',args,store_data_cnt)
+                
+                # out2csv(pred, f'{epoch}_output', args.stroke_length)
 
-                # out2csv
-                out2csv(inputs_inverse, f'{epoch}_input', args.stroke_length)
-                out2csv(pred, f'{epoch}_output', args.stroke_length)
-                out2csv(target, f'{epoch}_target', args.stroke_length)
+
+            if epoch  == args.epochs:
+                if not os.path.exists('final_output'):
+                    os.mkdir('final_output')
+                save_final_predict_and_new_dataset(pred, f'final_output/train', args,store_data_cnt)
+                store_data_cnt+=args.batch_size
 
             optimizer.zero_grad()
             loss.backward()

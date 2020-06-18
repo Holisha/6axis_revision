@@ -49,6 +49,9 @@ def argument_setting():
     # save setting
     parser.add_argument('--save-path', type=str, default='./output',
                         help='set the output file (csv or txt) path (default: ./output)')
+    # output become input                    
+    parser.add_argument('--retrain-epochs', type=int, default=5,
+                        help='retrain the output file')
 
     return parser.parse_args()
 
@@ -113,6 +116,18 @@ def out2csv(inputs, file_string, stroke_length, index=0):
             row.append('stroke' + str(1))
             writer.writerow(row)
 
+def save_final_predict_and_new_dataset(inputs, file_string, args,store_data_cnt):
+    output = np.squeeze(inputs.cpu().detach().numpy())
+    
+    for index in range(args.batch_size):
+        table = output[index]
+        with open(f'{file_string}_{store_data_cnt+index}.csv', 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            for i in range(args.stroke_length):
+                row = [] * 7
+                row[1:6] = table[i][:]
+                row.append('stroke' + str(1))
+                writer.writerow(row)
 
 def csv2txt(path='./output'):
     """Convert all CSV files to TXT files.
