@@ -1,5 +1,6 @@
 __pycache__
 *.zip
+*.yml
 gui.py
 __init__.py
 logs/*
