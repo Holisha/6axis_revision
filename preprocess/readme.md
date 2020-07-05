@@ -4,6 +4,7 @@
 
 > 開發人員: jefflin
 
+> 已 built 的完整 [dataset](https://drive.google.com/file/d/15aUSfvorEF7wKhYrUY9h2UHpvJq06BYy/view?usp=sharing)
 - [Preprocess by Building Dataset](#preprocess-by-building-dataset)
   - [快速執行](#快速執行)
     - [生成 target 及 training data](#生成-target-及-training-data)
