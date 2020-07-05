@@ -31,11 +31,11 @@ def argument_setting():
                         help='set the path of the original datas (default: ./6axis/)')
     parser.add_argument('--root-path', type=str, default='./dataset/',
                         help='set the root path (default: ./dataset/)')
-    parser.add_argument('--target-path', type=str, default='./dataset/target/',
-                        help='set the path of the target datas (default: ./dataset/target/)')
-    parser.add_argument('--train-path', type=str, default='./dataset/train/',
-                        help='set the path of the training datas (default: ./dataset/train/)')
-    parser.add_argument('--test-path', type=str, default='./dataset/test/',
-                        help='set the path of the testing datas (default: ./dataset/test/)')
+    parser.add_argument('--target-path', type=str, default='./target/',
+                        help='set the path of the target datas (default: ./target/)')
+    parser.add_argument('--train-path', type=str, default='./train/',
+                        help='set the path of the training datas (default: ./train/)')
+    parser.add_argument('--test-path', type=str, default='./test/',
+                        help='set the path of the testing datas (default: ./test/)')
     return parser.parse_args()
 

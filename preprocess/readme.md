@@ -19,19 +19,17 @@
 
 > 詳細執行方法及參數詳見 [參數說明](#參數說明)
 
-**注意: 按照程式寫法，原本不能有相同名稱的資料夾存在 ( 預設資料夾為 `./dataset/` )**
-
 ### 生成 target 及 training data
 
-`python main.py`
+```python main.py```
 
 ### 生成 testing data
 
-`python main.py --test-char=TEST_CHAR`
+```python main.py --test-char=TEST_CHAR```
 
 #### Example
 
-`python main.py --test-char=436`
+```python main.py --test-char 436```
 
 ---
 
@@ -74,61 +72,61 @@
 
 ## 參數說明
 
-- `-h, --help`
-
+- ```-h, --help```
+  
   - show this help message and exit
 
-- `--train-num TRAIN_NUM`
+- ```--train-num TRAIN_NUM```
 
   - 設定產生 training data 之 每一 stroke 的筆數 (預設值: 100)
 
-- `--train-start-num TRAIN_START_NUM`
+- ```--train-start-num TRAIN_START_NUM```
 
   - 設定產生之 training data ，編號要從哪裡開始 (預設值: 0)
 
-- `--noise NOISE NOISE`
+- ```--noise NOISE NOISE```
 
   - 設定雜點範圍 (預設值: [-1, 1])
 
-- `--stroke-len STROKE_LEN`
+- ```--stroke-len STROKE_LEN```
 
   - 設定每一筆畫的長度 (預設值: 150)
 
-- `--test-char TEST_CHAR`
+- ```--test-char TEST_CHAR```
 
   - 設定要產生 testing data 的書法字編號 (預設值: None)
 
-- `--test-num TEST_NUM`
+- ```--test-num TEST_NUM```
 
   - 設定產生 training data 之 每一 stroke 的筆數 (預設值: 30)
 
-- `--char-idx CHAR_IDX`
+- ```--char-idx CHAR_IDX```
 
   - 設定要用多少長度來儲存書法字編號 (以補 0 的方式) (預設值: 4)
 
-- `--stroke-idx STROKE_IDX`
+- ```--stroke-idx STROKE_IDX```
 
   - 設定要用多少長度來儲存筆畫編號 (以補 0 的方式) (預設值: 2)
 
-- `--num-idx NUM_IDX`
+- ```--num-idx NUM_IDX```
 
   - 設定要用多少長度來儲存 data 筆數編號 (以補 0 的方式) (預設值: 4)
 
-- `--input-path INPUT_PATH`
+- ```--input-path INPUT_PATH```
 
   - 設定讀取機器手臂控制指令之 TXT 檔資料夾路徑 (預設值: ./6axis/)
 
-- `--root-path ROOT_PATH`
+- ```--root-path ROOT_PATH```
 
   - 設定輸出 data 的根資料夾 (預設值: ./dataset/)
+> 注意: target, train, test path 會接在 root path 底下
+- ```--target-path TARGET_PATH```
 
-- `--target-path TARGET_PATH`
+  - 設定 target datas 資料夾路徑 (預設值: ./target/)
 
-  - 設定 target datas 資料夾路徑 (預設值: ./dataset/target/)
+- ```--train-path TRAIN_PATH```
 
-- `--train-path TRAIN_PATH`
+  - 設定 training datas 資料夾路徑 (預設值: ./train/)
 
-  - 設定 training datas 資料夾路徑 (預設值: ./dataset/train/)
-
-- `--test-path TEST_PATH`
-  - 設定 testing datas 資料夾路徑 (預設值: ./dataset/test/)
+- ```--test-path TEST_PATH```
+  - 設定 testing datas 資料夾路徑 (預設值: ./test/)

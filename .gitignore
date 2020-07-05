@@ -5,3 +5,4 @@ gui.py
 __init__.py
 logs/*
 output*/
+dataset*/
