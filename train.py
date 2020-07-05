@@ -52,9 +52,9 @@ def train(model, device, train_loader, valid_loader, optimizer, criterion, args)
                 inputs_inverse = inverse_scaler_transform(inputs, target)
 
                 # out2csv
-                out2csv(inputs_inverse, f'{epoch}_input', args.stroke_length)
-                out2csv(pred, f'{epoch}_output', args.stroke_length)
-                out2csv(target, f'{epoch}_target', args.stroke_length)
+                out2csv(inputs_inverse, f'{epoch}_input', args.stroke_length, args.save_path)
+                out2csv(pred, f'{epoch}_output', args.stroke_length, args.save_path)
+                out2csv(target, f'{epoch}_target', args.stroke_length, args.save_path)
 
             optimizer.zero_grad()
             loss.backward()

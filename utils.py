@@ -15,18 +15,18 @@ def argument_setting():
     # data pre-processing
     parser.add_argument('--stroke-length', type=int, default=150,
                         help='control the stroke length (default: 150)')
-    parser.add_argument('--check_interval', type=int, default=100,
+    parser.add_argument('--check-interval', type=int, default=100,
                         help='setting output a csv file every epoch of interval (default: 100)')
 
     # model setting
     parser.add_argument('--light', action='store_true', default=False,
                         help='train by pytorch-lightning model (default: False)')
-    parser.add_argument('--train-path', type=str, default='./dataset_436/train',
-                        help='training dataset path (default: ./dataset_436/train)')
-    parser.add_argument('--test-path', type=str, default='./dataset_436/test',
-                        help='test dataset path (default: ./dataset_436/test)')
-    parser.add_argument('--target-path', type=str, default='./dataset_436/target',
-                        help='target dataset path (default: ./dataset_436/target)')
+    parser.add_argument('--train-path', type=str, default='./dataset/train',
+                        help='training dataset path (default: ./dataset/train)')
+    parser.add_argument('--test-path', type=str, default='./dataset/test',
+                        help='test dataset path (default: ./dataset/test)')
+    parser.add_argument('--target-path', type=str, default='./dataset/target',
+                        help='target dataset path (default: ./dataset/target)')
     parser.add_argument('--batch-size', type=int, default=64,
                         help='set the batch size (default: 64)')
     parser.add_argument('--num-workers', type=int, default=4,
@@ -39,6 +39,7 @@ def argument_setting():
                         help='set the epochs (default: 50)')
     parser.add_argument('--holdout-p', type=float, default=0.8,
                         help='set hold out CV probability (default: 0.8)')
+    parser.add_argument('--gpu-id', type=int, default=1)
 
     # logger setting
     parser.add_argument('--log-path', type=str, default='./logs/FSRCNN',
@@ -91,21 +92,25 @@ def stroke_statistics(path='6d/', mode='max'):
     }.get(mode, 'error')
 
 
-def out2csv(inputs, file_string, stroke_length, index=0):
+def out2csv(inputs, file_string, stroke_length, save_path, index=0):
     """Store input to csv file
 
     Arguments:
         inputs {tensor} -- with cuda device and size = [batch, 1, STROKE_LENGTH, 6]
         file_string {string} -- filename
         stroke_length {int} -- length of each stroke
+        save_path {string} -- the output file (csv or txt) path
 
     Keyword Arguments:
         index {int} -- index of stroke (default: {0})
     """
+    if not os.path.exists(save_path):
+        os.mkdir(save_path)
+    
     output = np.squeeze(inputs.cpu().detach().numpy())
     table = output[index]
 
-    with open(f'output/{file_string}.csv', 'w', newline='') as csvfile:
+    with open(f'{save_path}/{file_string}.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         for i in range(stroke_length):
             row = [] * 7
@@ -117,9 +122,9 @@ def out2csv(inputs, file_string, stroke_length, index=0):
 def csv2txt(path='./output'):
     """Convert all CSV files to TXT files.
 
-    Keyword Arguments:
-        path {str} -- Path to output directory (default: {'./output'})
-    """
+	Keyword Arguments:
+		path {str} -- Path to output directory (default: {'./output'})
+	"""
     for csv_name in sorted(glob(os.path.join(path, '*.csv'))):
 
         # read csv file content
@@ -131,10 +136,8 @@ def csv2txt(path='./output'):
             with open(txt_name, "w") as txt_file:
                 for row in rows:
                     txt_file.write("movl 0 ")
-
                     for j in range(len(row) - 1):
                         txt_file.write(f'{float(row[j]):0.4f} ')
-
                     txt_file.write("100.0000 ")
                     txt_file.write(f'{row[6]}\n')
 

@@ -23,7 +23,7 @@ def main():
 
 def normal():
 
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    device = f'cuda:{args.gpu_id}' if torch.cuda.is_available() else 'cpu'
 
     train_set = AxisDataSet(args.train_path)
     train_sampler, valid_sampler = cross_validation(train_set, args.holdout_p)
@@ -55,7 +55,7 @@ def normal():
     criterion = nn.MSELoss()
 
     train(model, device, train_loader, valid_loader, optimizer, criterion, args)
-    test(model, device, test_loader, criterion, args)
+    # test(model, device, test_loader, criterion, args)
 
 
 def light():

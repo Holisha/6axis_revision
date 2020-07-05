@@ -38,7 +38,7 @@ def add_last_line(data, stroke_len):
     return data
 
 
-def csv_parser(char_num, txt_name, args):
+def csv_parser(char_num, txt_name, target_path, train_path, args):
     """split txt file to csv file by stroke
 
     Args:
@@ -49,11 +49,10 @@ def csv_parser(char_num, txt_name, args):
 
     stroke_len = args.stroke_len
 
-    try:
-        os.mkdir(f'{args.target_path}{char_num}')
-        os.mkdir(f'{args.train_path}/{char_num}')
-    except:
-        pass
+    if not os.path.exists(f'{target_path}/{char_num}'):
+        os.mkdir(f'{target_path}/{char_num}')
+    if not os.path.exists(f'{train_path}/{char_num}'):
+        os.mkdir(f'{train_path}/{char_num}')
 
     data = pd.read_table(txt_name, header=None, sep=' ')    # read txt file to pandas dataframe
     data.drop(columns=[0, 1, 8], inplace=True)              # 把不用用到的column砍掉
@@ -65,11 +64,10 @@ def csv_parser(char_num, txt_name, args):
         stroke_idx = f'{stroke_num:0{args.stroke_idx}d}'    # string
         
         # make directory
-        try:
-            os.mkdir(f'{args.target_path}{char_num}/{stroke_idx}')
-            os.mkdir(f'{args.train_path}/{char_num}/{stroke_idx}')
-        except:
-            pass
+        if not os.path.exists(f'{target_path}/{char_num}/{stroke_idx}'):
+            os.mkdir(f'{target_path}/{char_num}/{stroke_idx}')
+        if not os.path.exists(f'{train_path}/{char_num}/{stroke_idx}'):
+            os.mkdir(f'{train_path}/{char_num}/{stroke_idx}')
         
         # index of each stroke
         each_stroke = data.groupby(data.iloc[:, -1]).groups.get(f'stroke{stroke_num}')
@@ -78,7 +76,7 @@ def csv_parser(char_num, txt_name, args):
         # build training data
         for train_num in range(args.train_num):
             filename = f'{char_num}_{stroke_idx}_{train_num + 1 + args.train_start_num:0{args.num_idx}d}.csv'
-            file_path = f'{args.train_path}/{char_num}/{stroke_idx}'
+            file_path = f'{train_path}/{char_num}/{stroke_idx}'
             train_data = addnoise(target_data, args.noise)
 
             # add train data last line
@@ -92,7 +90,7 @@ def csv_parser(char_num, txt_name, args):
 
         # store target data
         target_data.to_csv(
-            f'{args.target_path}{char_num}/{stroke_idx}/{char_num}_{stroke_idx}.csv',
+            f'{target_path}/{char_num}/{stroke_idx}/{char_num}_{stroke_idx}.csv',
             header=False, index=False
         )
 
@@ -103,39 +101,43 @@ if __name__ == '__main__':
     if args.test_char == None:
         print('Build training data ...\n')
         print(f'input path = {args.input_path}')
-        print(f'target path = {args.target_path}')
-        print(f'train path = {args.train_path}')
-        print(f'test path = {args.test_path}\n')
-
-        try:
+        print(f'root path = {args.root_path}')
+        target_path = f'{args.root_path}/{args.target_path}/'
+        train_path = f'{args.root_path}/{args.train_path}/'
+        print(f'target path = {target_path}')
+        print(f'train path = {train_path}')
+        if not os.path.exists(args.root_path):
             os.mkdir(args.root_path)
-            os.mkdir(args.target_path)
-            os.mkdir(args.train_path)
-            os.mkdir(args.test_path)
-        except:
-            pass
+        if not os.path.exists(target_path):
+            os.mkdir(target_path)
+        if not os.path.exists(train_path):
+            os.mkdir(train_path)
 
         for txt_name in sorted(glob(os.path.join(args.input_path, '*.txt'))):
             char_num = txt_name.split('_')[0][-1 * args.char_idx:]
-            print(char_num)
-            csv_parser(char_num, txt_name, args)
+            csv_parser(char_num, txt_name, target_path, train_path, args)
             print(f'{char_num} finished ...')
 
     # build testing data
     else:
         char_num = f'{args.test_char:0{args.char_idx}d}'
-        print(f'Building {char_num} testing data ...\n')
-        print(f'Test path = {args.test_path}\n')
-
-        test_path = f'{args.test_path}{char_num}/'
-        
-        try:
+        test_path = f'{args.root_path}/{args.test_path}'
+        if not os.path.exists(args.root_path):
+            os.mkdir(args.root_path)
+        if not os.path.exists(test_path):
             os.mkdir(test_path)
-        except:
-            pass
-        print(f'Build the director {test_path} success ...\n')
+        test_char_path = f'{test_path}{char_num}/'
+
+        print(f'Building {char_num} testing data ...\n')
+        print(f'input path = {args.input_path}')
+        print(f'root path = {args.root_path}')
+        print(f'test path = {test_path}\n')
+
+        if not os.path.exists(test_char_path):
+            os.mkdir(test_char_path)
+        print(f'Build the director {test_char_path} success ...\n')
         
-        txt_name = f'{args.input_path}char0{char_num}_stroke.txt'
+        txt_name = f'{args.input_path}/char0{char_num}_stroke.txt'
         data = pd.read_table(txt_name, header=None, sep=' ')        # read txt file to pandas dataframe
         data.drop(columns=[0, 1, 8], inplace=True)                  # 把不用用到的column砍掉
         data.columns = range(data.shape[1])                         # 重新排列 column
@@ -146,10 +148,8 @@ if __name__ == '__main__':
             stroke_idx = f'{stroke_num:0{args.stroke_idx}d}'    # string
 
             # make testing directory
-            try:
-                os.mkdir(f'{test_path}/{stroke_idx}')
-            except:
-                pass
+            if not os.path.exists(f'{test_char_path}/{stroke_idx}'):
+                os.mkdir(f'{test_char_path}/{stroke_idx}')
             
             # index of each stroke
             each_stroke = data.groupby(data.iloc[:, -1]).groups.get(f'stroke{stroke_num}')
@@ -165,7 +165,7 @@ if __name__ == '__main__':
                 test_data = add_last_line(test_data, args.stroke_len)
                 
                 # store training data
-                test_data.to_csv(f'{test_path}{stroke_idx}/{filename}', header=False ,index=False)
+                test_data.to_csv(f'{test_char_path}{stroke_idx}/{filename}', header=False ,index=False)
         print(f'Build {char_num} testing data finished ...\n')
 
     print('All Done!!!')
