@@ -167,10 +167,9 @@ def vis_2d_compare(target, inputs, outputs, idx=1):
 
 def main():
     # axis2img training outputs
-    csv_list = set([int(re.search(r'\d+', file_name).group()) for file_name in glob(os.path.join(PATH, '*00_*.csv'))])
-
+    csv_list = set([int(re.search(r'\d+', file_name).group()) for file_name in glob(os.path.join(PATH, '[0-9]*.csv'))])
     for file_idx in sorted(csv_list):
-
+        print(f'training file index = {file_idx}')
         # get 3d data from csv
         target  = get_3d(os.path.join(PATH, f'{file_idx}_target.csv'))
         inputs  = get_3d(os.path.join(PATH, f'{file_idx}_input.csv'))
@@ -187,7 +186,7 @@ def main():
     # axis2img test outputs
     csv_list = set([int(re.search(r'\d+', file_name).group()) for file_name in glob(os.path.join(PATH, 'test_*.csv'))])
     for file_idx in sorted(csv_list):
-        print(f'test file indx = {file_idx}')
+        print(f'test file index = {file_idx}')
         # get 3d data from csv
         target  = get_3d(os.path.join(PATH, f'test_{file_idx}_target.csv'))
         inputs  = get_3d(os.path.join(PATH, f'test_{file_idx}_input.csv'))
