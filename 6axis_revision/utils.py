@@ -5,6 +5,7 @@ import os
 from argparse import ArgumentParser
 from glob import glob
 import torch
+import shutil 
 
 def argument_setting():
     r"""
@@ -35,7 +36,7 @@ def argument_setting():
                         help='set the learning rate (default: 1e-3)')
     parser.add_argument('--scale', type=int, default=1,
                         help='set the scale factor for the SR model (default: 1)')
-    parser.add_argument('--epochs', type=int, default=50,
+    parser.add_argument('--epochs', type=int, default=1,
                         help='set the epochs (default: 50)')
     parser.add_argument('--holdout-p', type=float, default=0.8,
                         help='set hold out CV probability (default: 0.8)')
@@ -116,18 +117,24 @@ def out2csv(inputs, file_string, stroke_length, index=0):
             row.append('stroke' + str(1))
             writer.writerow(row)
 
-def save_final_predict_and_new_dataset(inputs, file_string, args,store_data_cnt):
+def save_final_predict_and_new_dataset(inputs,stroke_num, file_string, args,store_data_cnt):
     output = np.squeeze(inputs.cpu().detach().numpy())
     
     for index in range(args.batch_size):
         table = output[index]
-        with open(f'{file_string}_{store_data_cnt+index}.csv', 'w', newline='') as csvfile:
+        num = stroke_num[index]
+        if not os.path.isdir(f'new_train/{num}'):
+            os.mkdir(f'new_train/{num}')
+            os.mkdir(f'final_output/{num}')
+
+        with open(f'{file_string}/{num}/{num}_{store_data_cnt+index}.csv', 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             for i in range(args.stroke_length):
                 row = [] * 7
                 row[1:6] = table[i][:]
-                row.append('stroke' + str(1))
+                row.append('stroke' + str(num))
                 writer.writerow(row)
+        
 
 def csv2txt(path='./output'):
     """Convert all CSV files to TXT files.

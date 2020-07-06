@@ -8,44 +8,83 @@ from glob import glob
 from utils import argument_setting
 from sklearn import preprocessing
 
-
 class AxisDataSet(Dataset):
     def __init__(self, path, target_path=argument_setting().target_path):
-        self.target = []
         self.csv_list = []
-        self.stroke_type = []
 
-        for idx, dir_name in enumerate(sorted(os.listdir(path))):
-            for csv_name in glob(os.path.join(path, dir_name, '*.csv')):
-                self.csv_list.append(csv_name)
-                self.stroke_type.append(idx)
+        # list to dict to store word number
+        # {
+        #   '0001': [target_1.csv , target_2.csv ,...]
+        #   '0002': [...],
+        #    ...
+        # }
+        self.target = {}
 
-        for csv_name in sorted(glob(os.path.join(target_path, '*.csv'))):
-            tmp = pd.read_csv(csv_name, header=None)
-            data = tmp.iloc[:, :-1].to_numpy()
-            data = torch.from_numpy(data).unsqueeze(0).float()
-            self.target.append(data)
+        # list all word directory name
+        for word_dir in sorted(os.listdir(path)):
+
+            # store stroke path
+            stroke_path = os.path.join(path, word_dir)
+
+            # list all stroke number and index
+            for stroke_idx, stroke_num in enumerate(sorted(os.listdir(stroke_path))):
+
+                # store num of stroke pathA
+                file_path = os.path.join(stroke_path, stroke_num, '*.csv')
+
+                # list all csv file in stroke num
+                for csv_path in glob(file_path):
+
+                    # store tuple (csv_path, word directory name, idx of stroke)
+                    self.csv_list.append(
+                        (csv_path, word_dir, stroke_idx)
+                    )
+        
+        # store target word directory name
+        for word_dir in sorted(os.listdir(target_path)):
+            
+            # store list to control stroke_num
+            self.target[word_dir] = []
+
+            # list all csv file in target data
+            for csv_path in sorted(glob(os.path.join(target_path, word_dir, '**/*.csv'))):
+                
+                # get csv file
+                tmp = pd.read_csv(csv_path, header=None)
+
+                # last column is no longer required
+                data = tmp.iloc[:, :-1].to_numpy()
+
+                # transform data from numpy.ndarray to torch.FloatTensor
+                data = torch.from_numpy(data).unsqueeze(0).float()
+                
+                self.target[word_dir].append(data)
 
     def __len__(self):
         return len(self.csv_list)
 
     def __getitem__(self, idx):
         """
+        csv list = (csv_path, directory name,stroke_num)
         return:
             input data
             target data
         """
         # csv to tensor
-        csv_file = pd.read_csv(self.csv_list[idx], header=None)
+        csv_file = pd.read_csv(self.csv_list[idx][0], header=None)
 
         data = csv_file.iloc[:, :-1].to_numpy()
         
         data = preprocessing.MinMaxScaler(feature_range=(0, 1)).fit_transform(data)
         
+        # regard 2d array to gray scale image format (*, 6) -> (1, *, 6)
         data = torch.from_numpy(data).unsqueeze(0).float()
-        index = self.stroke_type[idx]
 
-        return data, self.target[index]
+        # store other infomation just for readability
+        word_dir = self.csv_list[idx][1]
+        index = self.csv_list[idx][2]
+
+        return data, self.target[word_dir][index],index
 
 
 def cross_validation(train_set, p=0.8):

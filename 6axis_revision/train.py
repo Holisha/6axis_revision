@@ -1,7 +1,7 @@
 import torch
 from datetime import datetime
 from tqdm import tqdm
-from utils import out2csv, inverse_scaler_transform ,save_final_predict,save_final_predict_and_new_dataset
+from utils import out2csv, inverse_scaler_transform ,save_final_predict_and_new_dataset
 from loss.models import FeatureExtractor
 from torch.utils.tensorboard import SummaryWriter
 import os
@@ -24,7 +24,7 @@ def train(model, device, train_loader, valid_loader, optimizer, criterion, args)
             train_cnt += 1
 
             # read data from data loader
-            inputs, target = data
+            inputs, target,stroke_num = data
             inputs, target = inputs.to(device), target.to(device)
 
             # predicted fixed 6 axis data
@@ -47,19 +47,18 @@ def train(model, device, train_loader, valid_loader, optimizer, criterion, args)
             err += loss.sum().item()
 
             # out2csv each args.check_interval epochs
-            if epoch % args.check_interval == 0 and epoch!=args.epoch:
-                if not os.path.exists('new_train'):
-                    os.mkdir('new_train')
-                # store other outputs to make them become newdataset for the next train
-                save_final_predict_and_new_dataset(pred, f'new_train/{epoch}_output_train',args,store_data_cnt)
-                
-                # out2csv(pred, f'{epoch}_output', args.stroke_length)
+            # if epoch % args.check_interval == 0 and epoch!=args.epoch:
+            #     if not os.path.exists('new_train'):
+            #         os.mkdir('new_train')
+            #     # store other outputs to make them become newdataset for the next train
+            #     save_final_predict_and_new_dataset(pred,stroke_num, f'new_train/',args,store_data_cnt)
+            #     store_data_cnt+=1
 
 
             if epoch  == args.epochs:
                 if not os.path.exists('final_output'):
                     os.mkdir('final_output')
-                save_final_predict_and_new_dataset(pred, f'final_output/train', args,store_data_cnt)
+                save_final_predict_and_new_dataset(pred,stroke_num, f'final_output/', args,store_data_cnt)
                 store_data_cnt+=args.batch_size
 
             optimizer.zero_grad()
