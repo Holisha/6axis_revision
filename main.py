@@ -55,7 +55,7 @@ def normal():
     criterion = nn.MSELoss()
 
     train(model, device, train_loader, valid_loader, optimizer, criterion, args)
-    # test(model, device, test_loader, criterion, args)
+    test(model, device, test_loader, criterion, args)
 
 
 def light():

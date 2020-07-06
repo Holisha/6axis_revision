@@ -39,7 +39,8 @@ def argument_setting():
                         help='set the epochs (default: 50)')
     parser.add_argument('--holdout-p', type=float, default=0.8,
                         help='set hold out CV probability (default: 0.8)')
-    parser.add_argument('--gpu-id', type=int, default=1)
+    parser.add_argument('--gpu-id', type=int, default=0,
+                        help='set the gpu od to used (default: 0)')
 
     # logger setting
     parser.add_argument('--log-path', type=str, default='./logs/FSRCNN',
