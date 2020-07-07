@@ -22,7 +22,7 @@ def argument_setting():
     # model setting
     parser.add_argument('--light', action='store_true', default=False,
                         help='train by pytorch-lightning model (default: False)')
-    parser.add_argument('--train-path', type=str, default='./dataset./train',
+    parser.add_argument('--train-path', type=str, default='./dataset/train',
                         help='training dataset path (default: ./dataset/train)')
     parser.add_argument('--test-path', type=str, default='./dataset/test',
                         help='test dataset path (default: ./dataset/test)')
@@ -37,7 +37,7 @@ def argument_setting():
     parser.add_argument('--scale', type=int, default=1,
                         help='set the scale factor for the SR model (default: 1)')
     parser.add_argument('--epochs', type=int, default=1,
-                        help='set the epochs (default: 50)')
+                        help='set the epochs (default: 1)')
     parser.add_argument('--holdout-p', type=float, default=0.8,
                         help='set hold out CV probability (default: 0.8)')
 
@@ -124,7 +124,7 @@ def save_final_predict_and_new_dataset(inputs,stroke_num, file_string, args,stor
         table = output[index]
         num = stroke_num[index]
         if not os.path.isdir(f'new_train/{num}'):
-            os.mkdir(f'new_train/{num}')
+            # os.mkdir(f'new_train/{num}')
             os.mkdir(f'final_output/{num}')
 
         with open(f'{file_string}/{num}/{num}_{store_data_cnt+index}.csv', 'w', newline='') as csvfile:
