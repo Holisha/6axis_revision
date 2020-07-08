@@ -84,7 +84,7 @@ class AxisDataSet(Dataset):
         word_dir = self.csv_list[idx][1]
         index = self.csv_list[idx][2]
 
-        return data, self.target[word_dir][index],index
+        return data, self.target[word_dir][index],index+1
 
 
 def cross_validation(train_set, p=0.8):

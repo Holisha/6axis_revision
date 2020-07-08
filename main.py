@@ -11,7 +11,7 @@ from train import train
 from test import test
 from utils import argument_setting
 from axis2img import get_result
-
+import shutil
 
 def main():
 
@@ -84,3 +84,9 @@ if __name__ == '__main__':
     args = argument_setting()
     for i in range(args.retrain_epochs):
         main()
+        ##delete
+        shutil.rmtree('./dataset/train/0436')
+        ##rename
+        os.rename("final_output", "0436")
+        ##mv
+        shutil.move("0436", "./dataset/train/")  

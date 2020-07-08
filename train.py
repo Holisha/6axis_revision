@@ -70,7 +70,7 @@ def train(model, device, train_loader, valid_loader, optimizer, criterion, args)
         for data in tqdm(valid_loader, desc=f'valid epoch: {epoch}/{args.epochs}'):
             valid_cnt += 1
 
-            inputs, target = data
+            inputs, target, stroke_num = data
             inputs, target = inputs.to(device), target.to(device)
 
             pred = model(inputs)

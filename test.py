@@ -19,7 +19,7 @@ def test(model, device, test_loader, criterion, args):
     with torch.no_grad():
         store_data_cnt=0
         for data in tqdm(test_loader, desc=f'scale: {args.scale}'):
-            inputs, target = data
+            inputs, target, stroke_num= data
             inputs, target = inputs.to(device), target.to(device)
 
             pred = model(inputs)
@@ -27,7 +27,7 @@ def test(model, device, test_loader, criterion, args):
 
 
 
-            save_final_predict_and_new_dataset(pred, f'output_test',args,store_data_cnt)
+            # save_final_predict_and_new_dataset(pred, f'output_test',args,store_data_cnt)
             store_data_cnt+=args.batch_size
 
             # MSE loss
@@ -63,7 +63,7 @@ def test_gan(model, device, test_loader, criterion, args):
     with torch.no_grad():
 
         for data in tqdm(test_loader, desc=f'scale: {args.scale}'):
-            inputs, target = data
+            inputs, target, stroke_num= data
             inputs, target = inputs.to(device), target.to(device)
 
             pred = model(inputs)

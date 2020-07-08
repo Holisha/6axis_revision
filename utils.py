@@ -14,8 +14,8 @@ def argument_setting():
     parser = ArgumentParser()
 
     # data pre-processing
-    parser.add_argument('--stroke-length', type=int, default=150,
-                        help='control the stroke length (default: 150)')
+    parser.add_argument('--stroke-length', type=int, default=59,
+                        help='control the stroke length (default: 59)')
     parser.add_argument('--check_interval', type=int, default=100,
                         help='setting output a csv file every epoch of interval (default: 100)')
 
@@ -121,9 +121,12 @@ def save_final_predict_and_new_dataset(inputs,stroke_num, file_string, args,stor
     output = np.squeeze(inputs.cpu().detach().numpy())
     
     for index in range(args.batch_size):
-        table = output[index]
+        try:
+            table = output[index]
+        except:
+            break;
         num = stroke_num[index]
-        if not os.path.isdir(f'new_train/{num}'):
+        if not os.path.isdir(f'final_output/{num}'):
             # os.mkdir(f'new_train/{num}')
             os.mkdir(f'final_output/{num}')
 
