@@ -44,7 +44,12 @@ def csv_parser(char_num, txt_name, target_path, train_path, args):
     Args:
         char_num (string): the number of the character
         txt_name (string): the txt file name of the character
+        target_path (string): the path of target data folder
+        train_path (string): the path of train data folder
         args : argument
+
+    Returns:
+        int: the number of strokes
     """
 
     stroke_len = args.stroke_len
@@ -93,9 +98,11 @@ def csv_parser(char_num, txt_name, target_path, train_path, args):
             f'{target_path}/{char_num}/{stroke_idx}/{char_num}_{stroke_idx}.csv',
             header=False, index=False
         )
+    return stroke_total
 
-if __name__ == '__main__':
-    args = argument_setting()
+def preprocess():
+    # count the number of the strokes
+    stroke_count = 0
 
     # build training data
     if args.test_char == None:
@@ -115,9 +122,12 @@ if __name__ == '__main__':
 
         for txt_name in sorted(glob(os.path.join(args.input_path, '*.txt'))):
             char_num = txt_name.split('_')[0][-1 * args.char_idx:]
-            csv_parser(char_num, txt_name, target_path, train_path, args)
+            stroke_add = csv_parser(char_num, txt_name, target_path, train_path, args)
+            stroke_count += stroke_add
             print(f'{char_num} finished ...')
 
+        print(f'there are {stroke_count} strokes in all target data.')
+    
     # build testing data
     else:
         char_num = f'{args.test_char:0{args.char_idx}d}'
@@ -169,3 +179,7 @@ if __name__ == '__main__':
         print(f'Build {char_num} testing data finished ...\n')
 
     print('All Done!!!')
+
+if __name__ == '__main__':
+    args = argument_setting()
+    preprocess()
