@@ -91,6 +91,10 @@ def train(model, device, train_loader, valid_loader, optimizer, criterion, args)
 
             valid_err += loss.sum().item()
 
+            if epoch  == args.epochs:
+                save_final_predict_and_new_dataset(pred,stroke_num, f'final_output/', args,store_data_cnt)
+                store_data_cnt+=args.batch_size
+
         err /= train_cnt
         valid_err /= valid_cnt
         print(f'train loss: {err:.4f}, valid loss: {valid_err:.4f}')

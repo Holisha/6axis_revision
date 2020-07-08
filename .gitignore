@@ -1,8 +1,1 @@
-__pycache__
-*.zip
-gui.py
-__init__.py
-logs/*
-output*/
-dataset_*/
-.idea/
+needtodo.txt

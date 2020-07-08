@@ -6,7 +6,6 @@ from argparse import ArgumentParser
 from glob import glob
 import torch
 import shutil 
-
 def argument_setting():
     r"""
     return arguments
@@ -14,9 +13,9 @@ def argument_setting():
     parser = ArgumentParser()
 
     # data pre-processing
-    parser.add_argument('--stroke-length', type=int, default=59,
-                        help='control the stroke length (default: 59)')
-    parser.add_argument('--check_interval', type=int, default=100,
+    parser.add_argument('--stroke-length', type=int, default=150,
+                        help='control the stroke length (default: 150)')
+    parser.add_argument('--check-interval', type=int, default=100,
                         help='setting output a csv file every epoch of interval (default: 100)')
 
     # model setting
@@ -36,10 +35,12 @@ def argument_setting():
                         help='set the learning rate (default: 1e-3)')
     parser.add_argument('--scale', type=int, default=1,
                         help='set the scale factor for the SR model (default: 1)')
-    parser.add_argument('--epochs', type=int, default=1,
-                        help='set the epochs (default: 1)')
+    parser.add_argument('--epochs', type=int, default=50,
+                        help='set the epochs (default: 50)')
     parser.add_argument('--holdout-p', type=float, default=0.8,
                         help='set hold out CV probability (default: 0.8)')
+    parser.add_argument('--gpu-id', type=int, default=0,
+                        help='set the gpu od to used (default: 0)')
 
     # logger setting
     parser.add_argument('--log-path', type=str, default='./logs/FSRCNN',
@@ -50,7 +51,7 @@ def argument_setting():
     # save setting
     parser.add_argument('--save-path', type=str, default='./output',
                         help='set the output file (csv or txt) path (default: ./output)')
-    # output become input                    
+# output become input                    
     parser.add_argument('--retrain-epochs', type=int, default=5,
                         help='retrain the output file')
 
@@ -95,21 +96,23 @@ def stroke_statistics(path='6d/', mode='max'):
     }.get(mode, 'error')
 
 
-def out2csv(inputs, file_string, stroke_length, index=0):
+def out2csv(inputs, file_string, stroke_length, save_path, index=0):
     """Store input to csv file
-
     Arguments:
         inputs {tensor} -- with cuda device and size = [batch, 1, STROKE_LENGTH, 6]
         file_string {string} -- filename
         stroke_length {int} -- length of each stroke
-
+        save_path {string} -- the output file (csv or txt) path
     Keyword Arguments:
         index {int} -- index of stroke (default: {0})
     """
+    if not os.path.exists(save_path):
+        os.mkdir(save_path)
+    
     output = np.squeeze(inputs.cpu().detach().numpy())
     table = output[index]
 
-    with open(f'output/{file_string}.csv', 'w', newline='') as csvfile:
+    with open(f'{save_path}/{file_string}.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         for i in range(stroke_length):
             row = [] * 7
@@ -135,16 +138,14 @@ def save_final_predict_and_new_dataset(inputs,stroke_num, file_string, args,stor
             for i in range(args.stroke_length):
                 row = [] * 7
                 row[1:6] = table[i][:]
-                row.append('stroke' + str(num))
+                row.append(f'stroke{num}')
                 writer.writerow(row)
-        
 
 def csv2txt(path='./output'):
     """Convert all CSV files to TXT files.
-
-    Keyword Arguments:
-        path {str} -- Path to output directory (default: {'./output'})
-    """
+	Keyword Arguments:
+		path {str} -- Path to output directory (default: {'./output'})
+	"""
     for csv_name in sorted(glob(os.path.join(path, '*.csv'))):
 
         # read csv file content
@@ -156,10 +157,8 @@ def csv2txt(path='./output'):
             with open(txt_name, "w") as txt_file:
                 for row in rows:
                     txt_file.write("movl 0 ")
-
                     for j in range(len(row) - 1):
                         txt_file.write(f'{float(row[j]):0.4f} ')
-
                     txt_file.write("100.0000 ")
                     txt_file.write(f'{row[6]}\n')
 
@@ -170,12 +169,10 @@ def inverse_scaler_transform(pred, target):
     
     ---
     Arguments:
-
         pred {torch.tensor} -- Tensor which is inversed from range (0, 1) to target range.
         target {torch.tensor} -- Inversion reference range.
     ---
     Returns:
-
         torch.tensor -- pred after inversed.
     """
 

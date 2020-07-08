@@ -10,7 +10,6 @@ from dataset import AxisDataSet, cross_validation
 from train import train
 from test import test
 from utils import argument_setting
-from axis2img import get_result
 import shutil
 
 def main():
@@ -24,7 +23,7 @@ def main():
 
 def normal():
 
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    device = f'cuda:{args.gpu_id}' if torch.cuda.is_available() else 'cpu'
 
     train_set = AxisDataSet(args.train_path)
     train_sampler, valid_sampler = cross_validation(train_set, args.holdout_p)
@@ -58,9 +57,6 @@ def normal():
     train(model, device, train_loader, valid_loader, optimizer, criterion, args)
     test(model, device, test_loader, criterion, args)
 
-    # get result image
-    get_result()
-
 
 def light():
     from pytorch_lightning import Trainer
@@ -76,8 +72,6 @@ def light():
 
     trainer.fit(model)
     trainer.test()
-
-    get_result()
 
 
 if __name__ == '__main__':
