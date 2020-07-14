@@ -8,8 +8,8 @@ from tqdm import tqdm
 from argparse import ArgumentParser
 
 # self defined
-from model import FeatureExtractor
-from utils import writer_builder, model_builder, out2csv, inverse_scaler_transform
+# from model import FeatureExtractor
+from utils import out2csv, csv2txt, writer_builder, model_builder
 from dataset import AxisDataSet, cross_validation
 
 def test_argument():
@@ -52,49 +52,32 @@ def test(model, test_loader, criterion, args):
     model.load_state_dict(checkpoint['state_dict'])
     model.eval()
 
-    # declare content loss
-    feature_extractor = FeatureExtractor().cuda()
-    feature_extractor.eval()
+    # decalre content loss
+    # feature_extractor = FeatureExtractor().cuda()
+    # feature_extractor.eval()
 
     err = 0.0
-
-    # out2csv
-    i = 0   # count the number of loops
-    j = 0   # count the number of data
 
     for data in tqdm(test_loader, desc=f'scale: {args.scale}'):
         inputs, target, _ = data
         inputs, target = inputs.cuda(), target.cuda()
 
         pred = model(inputs)
-        pred = inverse_scaler_transform(pred, target)
-
-        # inverse transform inputs
-        inputs_inverse = inverse_scaler_transform(inputs, target)
-
-        # out2csv
-        while j - (i * 64) < pred.size(0):
-            out2csv(inputs_inverse, f'test_{int(j/30)+1}_input', args.stroke_length, args.save_path, j - (i * 64))
-            out2csv(pred, f'test_{int(j/30)+1}_output', args.stroke_length, args.save_path, j - (i * 64))
-            out2csv(target, f'test_{int(j/30)+1}_target', args.stroke_length, args.save_path, j - (i * 64))
-            j += 30
-        i += 1
 
         # MSE loss
-        mse_loss = criterion(pred, target)
+        mse_loss = criterion(pred - inputs, target - inputs)
 
         # content loss
-        gen_feature = feature_extractor(pred)
-        real_feature = feature_extractor(target)
-        content_loss = criterion(gen_feature, real_feature)
+        # gen_feature = feature_extractor(pred)
+        # real_feature = feature_extractor(target)
+        # content_loss = criterion(gen_feature, real_feature)
 
         # for compatible
-        loss = content_loss + mse_loss
+        loss = mse_loss
         err += loss.sum().item() * inputs.size(0)
 
     err /= len(test_loader.dataset)
     print(f'test error:{err:.4f}')
-
 
 if __name__ == '__main__':
     # argument setting

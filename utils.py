@@ -1,53 +1,10 @@
+import os
+import csv
+import torch
 import numpy as np
 import pandas as pd
-import csv
-import os
 from argparse import ArgumentParser
 from glob import glob
-
-def argument_setting():
-    r"""
-    return arguments
-    """
-    parser = ArgumentParser()
-
-    # data pre-processing
-    parser.add_argument('--stroke-length', type=int, default=59,
-                        help='control the stroke length (default: 59)')
-    parser.add_argument('--check_interval', type=int, default=100,
-                        help='setting output a csv file every epoch of interval (default: 100)')
-
-    # model setting
-    parser.add_argument('--light', action='store_true', default=False,
-                        help='train by pytorch-lightning model (default: False)')
-    parser.add_argument('--train-path', type=str, default='./train',
-                        help='training dataset path (default: ./train)')
-    parser.add_argument('--test-path', type=str, default='./test',
-                        help='test dataset path (default: ./test)')
-    parser.add_argument('--batch-size', type=int, default=64,
-                        help='set the batch size (default: 64)')
-    parser.add_argument('--num-workers', type=int, default=4,
-                        help='set the number of processes to run (default: 4)')
-    parser.add_argument('--lr', type=float, default=1e-3,
-                        help='set the learning rate (default: 1e-3)')
-    parser.add_argument('--scale', type=int, default=1,
-                        help='set the scale factor for the SR model (default: 1)')
-    parser.add_argument('--epochs', type=int, default=50,
-                        help='set the epochs (default: 50)')
-    parser.add_argument('--holdout-p', type=float, default=0.8,
-                        help='set hold out CV probability (default: 0.8)')
-
-    # logger setting
-    parser.add_argument('--log-path', type=str, default='./logs/FSRCNN',
-                        help='set the logger path of pytorch model (default: ./logs/FSRCNN)')
-    parser.add_argument('--light-path', type=str, default='./logs/FSRCNN_light',
-                        help='set the logger path of pytorch-lightning model (default: ./logs/FSRCNN_light)')
-    
-    # save setting
-    parser.add_argument('--save-path', type=str, default='./output',
-                        help='set the output file (csv or txt) path (default: ./output)')
-
-    return parser.parse_args()
 
 
 def stroke_statistics(path='6d/', mode='max'):
@@ -87,6 +44,86 @@ def stroke_statistics(path='6d/', mode='max'):
         'min' : min_cnt
     }.get(mode, 'error')
 
+def writer_builder(log_root, load=False):
+    """Build writer acording to exist or new logs
+
+    Args:
+        log_root (str): logs root
+        load (bool, optional): load existed Tensorboard. Defaults to False.
+        
+    Returns:
+        SummaryWriter: tensorboard
+    """
+
+    from torch.utils.tensorboard import SummaryWriter
+
+    version = os.listdir(log_root)
+
+    # make sure logs directories exist
+    if not os.path.exists('./logs'):
+        os.mkdir('logs')
+
+    if not os.path.exists(log_root):
+        os.mkdir(log_root)
+
+    # load exist logs
+    if version and load == True:
+        log_path = os.path.join(log_root, version[-1])
+
+    # create new log directory indexed by exist directories
+    else:
+        log_path = os.path.join(log_root, f'version_{len(version)}')
+        os.mkdir(
+            log_path
+        )
+    
+    return SummaryWriter(log_path)
+
+def model_builder(model_name, *args, **kwargs):
+    """choose which model would be training
+
+    Args:
+        model_name (str): FSRCNN, DDBPN 
+
+    Returns:
+        model(torch.nn.module): Call module
+    """
+    
+    # FSRCNN
+    if model_name.lower() == 'fsrcnn':
+        from model.FSRCNN import FSRCNN
+        model = FSRCNN(*args, **kwargs)
+
+    # D-DBPN
+    elif model_name.lower() == 'ddbpn':
+        return NotImplemented
+
+    return model
+
+##### training #####
+
+def inverse_scaler_transform(pred, target):
+    """Inverse pred from range (0, 1) to target range.
+    
+    pred_inverse = (pred * (max - min)) + min
+    
+    ---
+    Arguments:
+        pred {torch.tensor} -- Tensor which is inversed from range (0, 1) to target range.
+        target {torch.tensor} -- Inversion reference range.
+    ---
+    Returns:
+        torch.tensor -- pred after inversed.
+    """
+
+    # max and min shape is [batch_size, 1, 1, 6]
+    max = torch.max(target, 2, keepdim = True)[0]
+    min = torch.min(target, 2, keepdim = True)[0]
+    
+    # pred_inverse = (pred * (max - min)) + min
+    pred_inverse = torch.add(torch.mul(pred, torch.sub(max, min)), min)
+
+    return pred_inverse
 
 def out2csv(inputs, file_string, stroke_length):
     """
@@ -108,7 +145,6 @@ def out2csv(inputs, file_string, stroke_length):
             row[1:6] = table[i][:]
             row.append('stroke' + str(1))
             writer.writerow(row)
-
 
 def csv2txt(path='./output'):
     r"""
@@ -134,3 +170,24 @@ def csv2txt(path='./output'):
                     txt_file.write("100.0000 ")
                     txt_file.write(f'{row[6]}\n')
 
+
+def save_final_predict_and_new_dataset(inputs,stroke_num, file_string, args,store_data_cnt):
+    output = np.squeeze(inputs.cpu().detach().numpy())
+    
+    for index in range(args.batch_size):
+        try:
+            table = output[index]
+        except:
+            break
+        num = stroke_num[index]
+        if not os.path.isdir(f'final_output/{num}'):
+            # os.mkdir(f'new_train/{num}')
+            os.mkdir(f'final_output/{num}')
+
+        with open(f'{file_string}/{num}/{num}_{store_data_cnt+index}.csv', 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            for i in range(args.stroke_length):
+                row = [] * 7
+                row[1:6] = table[i][:]
+                row.append(f'stroke{num}')
+                writer.writerow(row)

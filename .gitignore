@@ -1,4 +1,13 @@
 __pycache__
 *.zip
 gui.py
+
+# FSRCNN log
 logs/FSRCNN_light/*
+
+# temporary file
+tmp.*
+
+# model parameter
+*.pt
+*.pth
