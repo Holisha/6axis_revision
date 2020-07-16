@@ -4,10 +4,9 @@ import matplotlib.pyplot as plt
 import re
 import os
 from glob import glob
-from argparse import ArgumentParser
 
 # PATH = r'char00436_stroke'
-# PATH = r'output'
+PATH = r'output'
 
 
 def angle2deg(angle):
@@ -123,7 +122,7 @@ def vis_2d(data):
     plt.close()
 
 
-def vis_2d_compare(target, inputs, outputs, path_name, idx=1):
+def vis_2d_compare(target, inputs, outputs, idx=1):
     r"""
     compare only one stroke
     input: xyz data, character name
@@ -159,51 +158,18 @@ def vis_2d_compare(target, inputs, outputs, path_name, idx=1):
 
     # save image
     plt.legend(loc='best')
-    plt.title(f'{path_name}/{idx}_compare')
-    plt.savefig(f'{path_name}/{idx}_compare.png')
+    plt.title(f'output/epoch_{idx}_compare')
+    plt.savefig(f'output/epoch_{idx}_compare.png')
 
     # plt.show()
     plt.close()
 
 
 def main():
-    PATH = args.path
-    csv_list = sorted(glob(os.path.join(PATH, '*.csv')))
 
-    if len(csv_list) % 3 != 0:
-        print("Error!!! csv file numbers can't be divided by 3 !!!")
-        return
-
-    file_len = int(len(csv_list) / 3)
-    print(f'there are {file_len} different csv file')
-
-    for file_idx in range(file_len):
-
-        # get feature of file name
-        file_feature = re.split(r'[\\/]', csv_list[file_idx * 3])[-1]
-        file_feature = re.split(r'_input.csv', file_feature)[0]
-
-        # get 3d data from csv
-        target  = get_3d(os.path.join(PATH, f'{file_feature}_target.csv'))
-        inputs  = get_3d(os.path.join(PATH, f'{file_feature}_input.csv'))
-        outputs = get_3d(os.path.join(PATH, f'{file_feature}_output.csv'))
-
-        # get visual 2d img from ndarray
-        vis_2d_compare(
-            target=target,
-            inputs=inputs,
-            outputs=outputs,
-            path_name=PATH,
-            idx=f'{file_feature}'
-        )
-        print(f'{file_feature} finished ...')
-    print('All Done !!!')
-
-    '''
-    # axis2img training outputs
-    csv_list = set([int(re.search(r'\d+', file_name).group()) for file_name in glob(os.path.join(PATH, '[0-9]*.csv'))])
+    csv_list = set([int(re.search(r'\d+', file_name).group()) for file_name in glob(os.path.join(PATH, '*.csv'))])
     for file_idx in sorted(csv_list):
-        print(f'training file index = {file_idx}')
+
         # get 3d data from csv
         target  = get_3d(os.path.join(PATH, f'{file_idx}_target.csv'))
         inputs  = get_3d(os.path.join(PATH, f'{file_idx}_input.csv'))
@@ -214,42 +180,13 @@ def main():
             target=target,
             inputs=inputs,
             outputs=outputs,
-            idx=f'epoch_{file_idx}'
+            idx=file_idx
         )
 
-    # axis2img test outputs
-    csv_list = set([int(re.search(r'\d+', file_name).group()) for file_name in glob(os.path.join(PATH, 'test_[0-9]*.csv'))])
-    for file_idx in sorted(csv_list):
-        print(f'test file index = {file_idx}')
-        # get 3d data from csv
-        target  = get_3d(os.path.join(PATH, f'test_{file_idx}_target.csv'))
-        inputs  = get_3d(os.path.join(PATH, f'test_{file_idx}_input.csv'))
-        outputs = get_3d(os.path.join(PATH, f'test_{file_idx}_output.csv'))
-
-        # get visual 2d img from ndarray
-        vis_2d_compare(
-            target=target,
-            inputs=inputs,
-            outputs=outputs,
-            idx=f'test_{file_idx}'
-        )
-        
     # path = PATH + '.csv'
     # data = get_3d(path)
     # vis_2d(data)
-    '''
 
-def argument_setting():
-    r"""
-    return arguments
-    """
-    parser = ArgumentParser()
-
-    parser.add_argument('--path', type=str, default='./output/',
-                        help='set the input data path (default: ./output/)')
-
-    return parser.parse_args()
 
 if __name__ == '__main__':
-    args = argument_setting()
     main()

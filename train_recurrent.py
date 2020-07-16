@@ -9,7 +9,7 @@ from argparse import ArgumentParser
 
 # self defined
 from model import FeatureExtractor
-from utils import writer_builder, model_builder, out2csv, inverse_scaler_transform
+from utils import writer_builder, model_builder, out2csv, inverse_scaler_transform, save_final_predict_and_new_dataset
 from dataset import AxisDataSet, cross_validation
 
 # TODO: change path name, add other args
@@ -58,7 +58,7 @@ def train_argument():
     return parser.parse_args()
 
 def train(model, train_loader, valid_loader, optimizer, criterion, args):
-    # call content_loss
+    # declare content loss
     best_err = None
     feature_extractor = FeatureExtractor().cuda()
     feature_extractor.eval()
@@ -87,9 +87,11 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         err = 0.0
         valid_err = 0.0
 
+        store_data_cnt = 0  # to create new dataset
+
         for data in tqdm(train_loader, desc=f'train epoch: {epoch}/{args.epochs}'):
-            # load data from data loader
-            inputs, target, _ = data
+            # read data from data loader
+            inputs, target, stroke_num = data
             inputs, target = inputs.cuda(), target.cuda()
 
             # predicted fixed 6 axis data
@@ -117,6 +119,12 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
                 out2csv(pred, f'{epoch}_output', args.stroke_length)
                 out2csv(target, f'{epoch}_target', args.stroke_length)
 
+            if epoch  == args.epochs:
+                if not os.path.exists('final_output'):
+                    os.mkdir('final_output')
+                save_final_predict_and_new_dataset(pred, stroke_num, f'final_output/', args, store_data_cnt)
+                store_data_cnt+=args.batch_size
+            
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -146,6 +154,10 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
                 loss = mse_loss + content_loss
 
                 valid_err += loss.sum().item() * inputs.size(0)
+
+        if epoch  == args.epochs:
+            save_final_predict_and_new_dataset(pred, stroke_num, f'final_output/', args, store_data_cnt)
+            store_data_cnt+=args.batch_size
 
         # compute loss
         err /= len(train_loader.dataset)

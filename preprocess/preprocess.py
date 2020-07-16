@@ -182,4 +182,9 @@ def preprocess():
 
 if __name__ == '__main__':
     args = argument_setting()
+
+    # checking
+    if not os.path.isdir('6axis'):
+        os.mkdir('6axis')
+    
     preprocess()

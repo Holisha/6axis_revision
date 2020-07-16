@@ -1,8 +1,13 @@
 __pycache__
 *.zip
-*.yml
 gui.py
-__init__.py
-logs/*
-output*/
-dataset*/
+
+# FSRCNN log
+logs/FSRCNN_light/*
+
+# temporary file
+tmp.*
+
+# model parameter
+*.pt
+*.pth

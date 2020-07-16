@@ -1,15 +1,14 @@
+import os
 import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import Dataset
 from torch.utils.data.sampler import SubsetRandomSampler
-import os
 from glob import glob
-from utils import argument_setting
-from sklearn import preprocessing
+from sklearn.preprocessing import MinMaxScaler
 
 class AxisDataSet(Dataset):
-    def __init__(self, path, target_path=argument_setting().target_path):
+    def __init__(self, path, target_path):
         self.csv_list = []
 
         # list to dict to store word number
@@ -65,7 +64,7 @@ class AxisDataSet(Dataset):
 
     def __getitem__(self, idx):
         """
-        csv list = (csv_path, directory name,stroke_num)
+        csv list = (csv_path, directory name, stroke_num)
 
         return:
             input data
@@ -76,7 +75,7 @@ class AxisDataSet(Dataset):
 
         data = csv_file.iloc[:, :-1].to_numpy()
         
-        data = preprocessing.MinMaxScaler(feature_range=(0, 1)).fit_transform(data)
+        data = MinMaxScaler(feature_range=(0, 1)).fit_transform(data)
         
         # regard 2d array to gray scale image format (*, 6) -> (1, *, 6)
         data = torch.from_numpy(data).unsqueeze(0).float()
@@ -85,18 +84,37 @@ class AxisDataSet(Dataset):
         word_dir = self.csv_list[idx][1]
         index = self.csv_list[idx][2]
 
-        return data, self.target[word_dir][index]
+        return data, self.target[word_dir][index], index+1
 
 
-def cross_validation(train_set, p=0.8):
+def cross_validation(train_set, mode='hold', **kwargs):
+    """split dataset into train and valid dataset
+
+    hold out:
+        A key word argument 'p' to control hold probability
+
+    Args:
+        train_set (torch.utils.data.Dataset): dataset to be split
+        mode (str, optional): control the valid method. Defaults to 'hold'.
+
+    Returns:
+        train, valid: return train and valid sampler
     """
-    hold out cross validation
-    """
+
     train_len = len(train_set)
 
     # get shuffled indices
     indices = np.random.permutation(range(train_len))
-    split_idx = int(train_len * p)
+
+    # hold out validation
+    if mode == 'hold':
+        p = kwargs['p']
+        split_idx = int(train_len * p)
+
+    # k fold
+    elif mode == 'fold':
+        k = kwargs['k']
+        return NotImplemented
 
     train_idx, valid_idx = indices[:split_idx], indices[split_idx:]
 

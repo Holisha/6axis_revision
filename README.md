@@ -1,8 +1,54 @@
 # 6 Axis Revision 
 
+## Folder structure
+
+```
+6axis_revision
+|   .gitignore
+|   axis2img.py
+|   dataset.py
+|   get_6d_3d.py
+|   README.md
+|   stroke2char.py
+|   test.py
+|   test_error.py
+|   tmp.py
+|   tmp.txt
+|   train.py
+|   train_error.py
+|   train_recurrent.py
+|   utils.py
+|   __init__.py
+|   
++---axis2result
++---light
+|       fsrcnn.py
+|       
++---model
+|   |   loss.py
+|   |   __init__.py
+|   |   
+|   \---FSRCNN
+|           models.py
+|           __init__.py
+|           
+\---preprocess
+    |   .gitignore
+    |   preprocess.py
+    |   readme.md
+    |   requirement.txt
+    |   utils.py
+    |   
+    \---6axis
+```
+
+## TODO
+
+- update readme file
+
 ## Dependencies
 - CUDA 10.1
-- Python 3
+- Python 3.6 or upper version
 
 ## Python Packages Installation
 PyTorch, see: https://pytorch.org/get-started/locally/

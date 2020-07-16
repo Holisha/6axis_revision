@@ -8,8 +8,8 @@ from tqdm import tqdm
 from argparse import ArgumentParser
 
 # self defined
-from model import FeatureExtractor
-from utils import writer_builder, model_builder, out2csv, inverse_scaler_transform
+# from model import FeatureExtractor
+from utils import out2csv, csv2txt, writer_builder, model_builder
 from dataset import AxisDataSet, cross_validation
 
 # TODO: change path name, add other args
@@ -58,10 +58,10 @@ def train_argument():
     return parser.parse_args()
 
 def train(model, train_loader, valid_loader, optimizer, criterion, args):
-    # call content_loss
+    # content_loss
     best_err = None
-    feature_extractor = FeatureExtractor().cuda()
-    feature_extractor.eval()
+    # feature_extractor = FeatureExtractor().cuda()
+    # feature_extractor.eval()
 
     # load data
     model_path = f'fsrcnn_{args.scale}x.pt'
@@ -95,19 +95,16 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
             # predicted fixed 6 axis data
             pred = model(inputs)
 
-            # inverse transform
-            pred = inverse_scaler_transform(pred, inputs)
-
             # MSE loss
-            mse_loss = criterion(pred, target)
+            mse_loss = criterion(pred - inputs, target - inputs)
 
             # content loss
-            gen_features = feature_extractor(pred)
-            real_features = feature_extractor(target)
-            content_loss = criterion(gen_features, real_features)
+            # gen_features = feature_extractor(pred)
+            # real_features = feature_extractor(target)
+            # content_loss = criterion(gen_features, real_features)
 
             # for compatible but bad for memory usage
-            loss = mse_loss + content_loss
+            loss = mse_loss
 
             err += loss.sum().item() * inputs.size(0)
 
@@ -131,26 +128,23 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
                 pred = model(inputs)
 
-                # inverse transform
-                pred = inverse_scaler_transform(pred, inputs)
-
                 # MSE loss
-                mse_loss = criterion(pred, target)
+                mse_loss = criterion(pred - inputs, target - inputs)
 
                 # content loss
-                gen_features = feature_extractor(pred)
-                real_features = feature_extractor(target)
-                content_loss = criterion(gen_features, real_features)
+                # gen_features = feature_extractor(pred)
+                # real_features = feature_extractor(target)
+                # content_loss = criterion(gen_features, real_features)
 
                 # for compatible
-                loss = mse_loss + content_loss
+                loss = mse_loss
 
                 valid_err += loss.sum().item() * inputs.size(0)
 
-        # compute loss
-        err /= len(train_loader.dataset)
-        valid_err /= len(valid_loader.dataset)
-        print(f'train loss: {err:.4f}, valid loss: {valid_err:.4f}')
+            # compute loss
+            err /= len(train_loader.dataset)
+            valid_err /= len(valid_loader.dataset)
+            print(f'train loss: {err:.4f}, valid loss: {valid_err:.4f}')
 
         # update every epoch
         # save model as pickle file
@@ -170,7 +164,6 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
                                           'valid loss': valid_err}, epoch)
 
     writer.close()
-
 
 if __name__ == '__main__':
     # argument setting
