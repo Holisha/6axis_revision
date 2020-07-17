@@ -91,12 +91,17 @@ def model_builder(model_name, *args, **kwargs):
     
     # FSRCNN
     if model_name.lower() == 'fsrcnn':
-        from model.FSRCNN import FSRCNN
+        from model import FSRCNN
+
+        # scale_factor, num_channels=1, d=56, s=12, m=4
         model = FSRCNN(*args, **kwargs)
 
     # D-DBPN
     elif model_name.lower() == 'ddbpn':
-        return NotImplemented
+        from model import DDBPN
+
+        # num_channels, scale_factor, stages=7, n0=256, nr=64
+        model = DDBPN(*args, **kwargs)
 
     return model
 
