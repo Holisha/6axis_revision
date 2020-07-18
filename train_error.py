@@ -32,6 +32,8 @@ def train_argument():
                         help='set hold out CV probability (default: 0.8)')
 
     # model setting
+    parser.add_argument('--model-args', nargs='*', default=['FSRCNN', 1],
+                        help="set model name and args (default: ['FSRCNN', 1])")
     parser.add_argument('--load', action='store_true', default=False,
                         help='load model parameter from exist .pt file (default: False)')
     parser.add_argument('--gpu-id', type=int, default=0,
@@ -176,7 +178,8 @@ if __name__ == '__main__':
     torch.cuda.set_device(train_args.gpu_id)
 
     # model
-    model = model_builder('FSRCNN', train_args.scale).cuda()
+    model = model_builder(*train_args.model_args).cuda()
+
 
     # optimizer and criteriohn
     optimizer = optim.Adam(model.parameters(), lr=train_args.lr)

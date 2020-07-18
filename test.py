@@ -27,6 +27,8 @@ def test_argument():
                         help='set the number of processes to run (default: 8)')
 
     # model setting
+    parser.add_argument('--model-args', nargs='*', default=['FSRCNN', 1],
+                        help="set model name and args (default: ['FSRCNN', 1])")
     parser.add_argument('--load', action='store_false', default=True,
                         help='load model parameter from exist .pt file (default: True)')
     parser.add_argument('--gpu-id', type=int, default=0,
@@ -107,7 +109,8 @@ if __name__ == '__main__':
     torch.cuda.set_device(test_args.gpu_id)
 
     # model
-    model = model_builder('FSRCNN', test_args.scale).cuda()
+    model = model_builder(*test_args.model_args).cuda()
+
 
     # optimizer and criteriohn
     optimizer = optim.Adam(model.parameters(), lr=test_args.lr)
