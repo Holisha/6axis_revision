@@ -9,7 +9,7 @@ from argparse import ArgumentParser
 
 # self defined
 # from model import FeatureExtractor
-from utils import out2csv, csv2txt, writer_builder, model_builder
+from utils import out2csv, csv2txt, writer_builder, model_builder, model_config
 from dataset import AxisDataSet, cross_validation
 
 # TODO: change path name, add other args
@@ -169,6 +169,9 @@ if __name__ == '__main__':
     # argument setting
     train_args = train_argument()
 
+    # config
+    model_config(train_args, save=True)     # save model configuration before training
+
     # set cuda
     torch.cuda.set_device(train_args.gpu_id)
 
@@ -204,3 +207,7 @@ if __name__ == '__main__':
 
     # training
     train(model, train_loader, valid_loader, optimizer, criterion, train_args)
+
+    # config
+    model_config(train_args, save=False)     # print model configuration after training
+

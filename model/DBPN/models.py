@@ -30,11 +30,6 @@ class Projection(nn.Module):
         scale_1 = self.block2(scale_0)
         scale_2 = self.block3(scale_1 - x)
 
-        print(x.shape)
-        print(scale_0.shape)
-        print(scale_1.shape)
-        print(scale_2.shape)
-
         # resampling + error
         return scale_0 + scale_2
 
@@ -53,8 +48,6 @@ class DenseProjection(nn.Module):
 
     def forward(self, x):
         # bottle neck
-        print(x.shape)
-
         x = self.block1(x)
 
         # resampling
@@ -63,18 +56,13 @@ class DenseProjection(nn.Module):
         # errror
         scale_1 = self.block3(scale_0)
         scale_2 = self.block4(scale_1 - x)
-
-        print(x.shape)
-        print(scale_0.shape)
-        print(scale_1.shape)
-        print(scale_2.shape)
         
         # resampling + error
         return scale_0 + scale_2
 
 
 class DDBPN(nn.Module):
-    def __init__(self, num_channels, scale_factor, stages=7, n0=256, nr=64):
+    def __init__(self, scale_factor, num_channels=1, stages=7, n0=256, nr=64):
         super(DDBPN, self).__init__()
         self.num_stages = stages
 
@@ -134,8 +122,8 @@ class DDBPN(nn.Module):
         x = self.feature(x)
 
         # Dense Connection
-        h_list = []
-        l_list = []
+        h_list = []     # HR image
+        l_list = []     # LR image
         for i in range(self.num_stages - 1):
 
             h_list.append(
@@ -147,9 +135,7 @@ class DDBPN(nn.Module):
             )
 
             x = torch.cat(l_list, dim=1)
-            print(x.shape)
 
-        # print(self.up_projection[-1])
         h_list.append(
             self.up_projection[-1](torch.cat(l_list, dim=1))
         )
@@ -160,7 +146,6 @@ class DDBPN(nn.Module):
 
 if __name__ == '__main__':
     model = DDBPN(1, 1, 7)
-    # print(model)
 
     torch.manual_seed(1)
 

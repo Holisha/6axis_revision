@@ -1,5 +1,6 @@
 import os
 import csv
+import json
 import torch
 import numpy as np
 import pandas as pd
@@ -43,6 +44,7 @@ def stroke_statistics(path='6d/', mode='max'):
         'mean': mean_cnt,
         'min' : min_cnt
     }.get(mode, 'error')
+
 
 def writer_builder(log_root, load=False):
     """Build writer acording to exist or new logs
@@ -104,6 +106,26 @@ def model_builder(model_name, *args, **kwargs):
         model = DDBPN(*args, **kwargs)
 
     return model
+
+def model_config(args, save=False):
+    """record model configuration
+
+    Args:
+        args (Argparse object): Model setting
+        save (bool, optional): save as json file or just print to stdout. Defaults to False.
+    """
+    assert len(args.model_args) >= 2, r'model args at least contain model name and scale factor'
+
+    print('\n####### model arguments #######\n')
+    for key, value in vars(args).items():
+        print(f'{key}: {value}')
+    print('\n####### model arguments #######\n')
+
+    # save config as .json file        
+    if save is True:
+        config = open('config.json', 'w')
+        json.dump(vars(args), config, indent=4)
+        config.close()
 
 ##### training #####
 
@@ -174,7 +196,6 @@ def csv2txt(path='./output'):
 
                     txt_file.write("100.0000 ")
                     txt_file.write(f'{row[6]}\n')
-
 
 def save_final_predict_and_new_dataset(inputs,stroke_num, file_string, args,store_data_cnt):
     output = np.squeeze(inputs.cpu().detach().numpy())

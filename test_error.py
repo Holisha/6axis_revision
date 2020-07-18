@@ -9,7 +9,7 @@ from argparse import ArgumentParser
 
 # self defined
 # from model import FeatureExtractor
-from utils import out2csv, csv2txt, writer_builder, model_builder
+from utils import out2csv, csv2txt, writer_builder, model_builder, model_config
 from dataset import AxisDataSet, cross_validation
 
 def test_argument():
@@ -82,6 +82,9 @@ def test(model, test_loader, criterion, args):
 if __name__ == '__main__':
     # argument setting
     test_args = test_argument()
+
+    # config
+    model_config(test_args, save=False)     # print model configuration of evaluation
 
     # set cuda
     torch.cuda.set_device(test_args.gpu_id)
