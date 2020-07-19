@@ -88,24 +88,17 @@ def model_builder(model_name, *args, **kwargs):
         model_name (str): FSRCNN, DDBPN 
 
     Returns:
-        model(torch.nn.module): Call module
+        model(torch.nn.module): instantiate model
     """
-    
-    # FSRCNN
-    if model_name.lower() == 'fsrcnn':
-        from model import FSRCNN
+    from model import FSRCNN, DDBPN
 
-        # scale_factor, num_channels=1, d=56, s=12, m=4
-        model = FSRCNN(*args, **kwargs)
+    # class object, yet instantiate
+    model = {
+        'fsrcnn': FSRCNN,    # scale_factor, num_channels=1, d=56, s=12, m=4
+        'ddbpn': DDBPN,      # scale_factor, num_channels=1, stages=7, n0=256, nr=64
+    }.get(model_name.lower())
 
-    # D-DBPN
-    elif model_name.lower() == 'ddbpn':
-        from model import DDBPN
-
-        # num_channels, scale_factor, stages=7, n0=256, nr=64
-        model = DDBPN(*args, **kwargs)
-
-    return model
+    return model(*args, **kwargs)
 
 def model_config(args, save=False):
     """record model configuration
@@ -114,7 +107,6 @@ def model_config(args, save=False):
         args (Argparse object): Model setting
         save (bool, optional): save as json file or just print to stdout. Defaults to False.
     """
-    assert len(args.model_args) >= 2, r'model args at least contain model name and scale factor'
 
     print('\n####### model arguments #######\n')
     for key, value in vars(args).items():

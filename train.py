@@ -13,11 +13,21 @@ from utils import writer_builder, model_builder, out2csv, inverse_scaler_transfo
 from dataset import AxisDataSet, cross_validation
 
 # TODO: change path name, add other args
-def train_argument():
-    r"""
-    return training arguments
+def train_argument(inhert=False):
+    """return train arguments
+
+    Args:
+        inhert (bool, optional): return parser for compatiable. Defaults to False.
+
+    Returns:
+        parser_args(): if inhert is false, return parser's arguments
+        parser(): if inhert is true, then return parser
     """
-    parser = ArgumentParser()
+
+    if inhert is True:
+        parser = ArgumentParser(add_help=False)
+    else:
+        parser = ArgumentParser(add_help=True)
 
     # dataset setting
     parser.add_argument('--stroke-length', type=int, default=150,
@@ -32,16 +42,18 @@ def train_argument():
                         help='set hold out CV probability (default: 0.8)')
 
     # model setting
-    parser.add_argument('--model-args', nargs='*', default=['FSRCNN', 1],
-                        help="set model name and args (default: ['FSRCNN', 1])")
+    parser.add_argument('--model-name', type=str, default='FSRCNN',
+                        metavar='FSRCNN, DDBPN' ,help="set model name (default: 'FSRCNN')")
+    parser.add_argument('--scale', type=int, default=1,
+                        help='set the scale factor for the SR model (default: 1)')
+    parser.add_argument('--model-args', nargs='*', type=int, default=[],
+                        help="set other args (default: [])")
     parser.add_argument('--load', action='store_true', default=False,
                         help='load model parameter from exist .pt file (default: False)')
     parser.add_argument('--gpu-id', type=int, default=0,
                         help='set the model to run on which gpu (default: 0)')
     parser.add_argument('--lr', type=float, default=1e-3,
                         help='set the learning rate (default: 1e-3)')
-    parser.add_argument('--scale', type=int, default=1,
-                        help='set the scale factor for the SR model (default: 1)')
 
     # training setting
     parser.add_argument('--epochs', type=int, default=50,
@@ -57,6 +69,10 @@ def train_argument():
     parser.add_argument('--save-path', type=str, default='../output',
                         help='set the output file (csv or txt) path (default: ../output)')
 
+    # for the compatiable
+    if inhert is True:
+        return parser
+    
     return parser.parse_args()
 
 def train(model, train_loader, valid_loader, optimizer, criterion, args):
@@ -185,9 +201,9 @@ if __name__ == '__main__':
     torch.cuda.set_device(train_args.gpu_id)
 
     # model
-    model = model_builder(*train_args.model_args).cuda()
-
-    optimizer and criteriohn
+    model = model_builder(train_args.model_name, train_args.scale, *train_args.model_args).cuda()
+    
+    # optimizer and critera
     optimizer = optim.Adam(model.parameters(), lr=train_args.lr)
     criterion = nn.MSELoss()
 
