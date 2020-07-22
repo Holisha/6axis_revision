@@ -9,40 +9,10 @@ from argparse import ArgumentParser
 
 # self defined
 # from model import FeatureExtractor
-from utils import out2csv, csv2txt, writer_builder, model_builder
+from test import test_argument
+from utils import out2csv, csv2txt, writer_builder, model_builder, model_config
 from dataset import AxisDataSet, cross_validation
 
-def test_argument():
-    r"""
-    return test arguments
-    """
-    parser = ArgumentParser()
-
-    # dataset setting
-    parser.add_argument('--test-path', type=str, default='../dataset/test',
-                        help='test dataset path (default: ../datasettest)')
-    parser.add_argument('--batch-size', type=int, default=128,
-                        help='set the batch size (default: 128)')
-    parser.add_argument('--num-workers', type=int, default=8,
-                        help='set the number of processes to run (default: 8)')
-
-    # model setting
-    parser.add_argument('--load', action='store_false', default=True,
-                        help='load model parameter from exist .pt file (default: True)')
-    parser.add_argument('--gpu-id', type=int, default=0,
-                        help='set the model to run on which gpu (default: 0)')
-    parser.add_argument('--scale', type=int, default=1,
-                        help='set the scale factor for the SR model (default: 1)')
-
-    # logger setting
-    parser.add_argument('--log-path', type=str, default='../logs/FSRCNN',
-                        help='set the logger path of pytorch model (default: ../logs/FSRCNN)')
-    
-    # save setting
-    parser.add_argument('--save-path', type=str, default='../output',
-                        help='set the output file (csv or txt) path (default: ../output)')
-
-    return parser.parse_args()
 
 # same as with torch.no_grad()
 @torch.no_grad()
@@ -83,11 +53,14 @@ if __name__ == '__main__':
     # argument setting
     test_args = test_argument()
 
+    # config
+    model_config(test_args, save=False)     # print model configuration of evaluation
+
     # set cuda
     torch.cuda.set_device(test_args.gpu_id)
 
     # model
-    model = model_builder('FSRCNN', test_args.scale).cuda()
+    model = model_builder(test_args.model_name, test_args.scale, *test_args.model_args).cuda()
 
     # optimizer and criteriohn
     optimizer = optim.Adam(model.parameters(), lr=test_args.lr)

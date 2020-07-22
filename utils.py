@@ -1,5 +1,6 @@
 import os
 import csv
+import json
 import torch
 import numpy as np
 import pandas as pd
@@ -49,6 +50,7 @@ def stroke_statistics(path='6d/', mode='max'):
         'min' : min_cnt
     }.get(mode, 'error')
 
+
 def writer_builder(log_root, load=False):
     """Build writer acording to exist or new logs
 
@@ -91,19 +93,36 @@ def model_builder(model_name, *args, **kwargs):
         model_name (str): FSRCNN, DDBPN 
 
     Returns:
-        model(torch.nn.module): Call module
+        model(torch.nn.module): instantiate model
     """
-    
-    # FSRCNN
-    if model_name.lower() == 'fsrcnn':
-        from model.FSRCNN import FSRCNN
-        model = FSRCNN(*args, **kwargs)
+    from model import FSRCNN, DDBPN
 
-    # D-DBPN
-    elif model_name.lower() == 'ddbpn':
-        return NotImplemented
+    # class object, yet instantiate
+    model = {
+        'fsrcnn': FSRCNN,    # scale_factor, num_channels=1, d=56, s=12, m=4
+        'ddbpn': DDBPN,      # scale_factor, num_channels=1, stages=7, n0=256, nr=64
+    }.get(model_name.lower())
 
-    return model
+    return model(*args, **kwargs)
+
+def model_config(args, save=False):
+    """record model configuration
+
+    Args:
+        args (Argparse object): Model setting
+        save (bool, optional): save as json file or just print to stdout. Defaults to False.
+    """
+
+    print('\n####### model arguments #######\n')
+    for key, value in vars(args).items():
+        print(f'{key}: {value}')
+    print('\n####### model arguments #######\n')
+
+    # save config as .json file        
+    if save is True:
+        config = open('config.json', 'w')
+        json.dump(vars(args), config, indent=4)
+        config.close()
 
 ##### training #####
 
@@ -174,7 +193,6 @@ def csv2txt(path='./output'):
 
                     txt_file.write("100.0000 ")
                     txt_file.write(f'{row[6]}\n')
-
 
 def save_final_predict_and_new_dataset(inputs,stroke_num, file_string, args,store_data_cnt):
     output = np.squeeze(inputs.cpu().detach().numpy())

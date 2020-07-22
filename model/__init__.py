@@ -1,2 +1,3 @@
 from .loss import FeatureExtractor
-from .FSRCNN.models import FSRCNN
+from .FSRCNN import FSRCNN
+from .DBPN import DDBPN

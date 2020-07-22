@@ -5,58 +5,14 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
-from argparse import ArgumentParser
 
 # self defined
 # from model import FeatureExtractor
-from utils import out2csv, csv2txt, writer_builder, model_builder
+from train import train_argument
+from utils import out2csv, csv2txt, writer_builder, model_builder, model_config
 from dataset import AxisDataSet, cross_validation
 
 # TODO: change path name, add other args
-def train_argument():
-    r"""
-    return training arguments
-    """
-    parser = ArgumentParser()
-
-    # dataset setting
-    parser.add_argument('--stroke-length', type=int, default=150,
-                        help='control the stroke length (default: 150)')
-    parser.add_argument('--train-path', type=str, default='../dataset/train',
-                        help='training dataset path (default: ../dataset/train)')
-    parser.add_argument('--batch-size', type=int, default=64,
-                        help='set the batch size (default: 64)')
-    parser.add_argument('--num-workers', type=int, default=8,
-                        help='set the number of processes to run (default: 8)')
-    parser.add_argument('--holdout-p', type=float, default=0.8,
-                        help='set hold out CV probability (default: 0.8)')
-
-    # model setting
-    parser.add_argument('--load', action='store_true', default=False,
-                        help='load model parameter from exist .pt file (default: False)')
-    parser.add_argument('--gpu-id', type=int, default=0,
-                        help='set the model to run on which gpu (default: 0)')
-    parser.add_argument('--lr', type=float, default=1e-3,
-                        help='set the learning rate (default: 1e-3)')
-    parser.add_argument('--scale', type=int, default=1,
-                        help='set the scale factor for the SR model (default: 1)')
-
-    # training setting
-    parser.add_argument('--epochs', type=int, default=50,
-                        help='set the epochs (default: 50)')
-    parser.add_argument('--check-interval', type=int, default=5,
-                        help='setting output a csv file every epoch of interval (default: 5)')
-
-    # logger setting
-    parser.add_argument('--log-path', type=str, default='../logs/FSRCNN',
-                        help='set the logger path of pytorch model (default: ../logs/FSRCNN)')
-    
-    # save setting
-    parser.add_argument('--save-path', type=str, default='../output',
-                        help='set the output file (csv or txt) path (default: ../output)')
-
-    return parser.parse_args()
-
 def train(model, train_loader, valid_loader, optimizer, criterion, args):
     # content_loss
     best_err = None
@@ -169,11 +125,14 @@ if __name__ == '__main__':
     # argument setting
     train_args = train_argument()
 
+    # config
+    model_config(train_args, save=True)     # save model configuration before training
+
     # set cuda
     torch.cuda.set_device(train_args.gpu_id)
 
     # model
-    model = model_builder('FSRCNN', train_args.scale).cuda()
+    model = model_builder(train_args.model_name, train_args.scale, *train_args.model_args).cuda()
 
     # optimizer and criteriohn
     optimizer = optim.Adam(model.parameters(), lr=train_args.lr)
@@ -204,3 +163,7 @@ if __name__ == '__main__':
 
     # training
     train(model, train_loader, valid_loader, optimizer, criterion, train_args)
+
+    # config
+    model_config(train_args, save=False)     # print model configuration after training
+
