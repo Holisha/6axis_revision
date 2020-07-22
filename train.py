@@ -34,6 +34,8 @@ def train_argument(inhert=False):
                         help='control the stroke length (default: 150)')
     parser.add_argument('--train-path', type=str, default='../dataset/train',
                         help='training dataset path (default: ../dataset/train)')
+    parser.add_argument('--target-path', type=str, default='../dataset/target',
+                        help='target dataset path (default: ../dataset/target)')
     parser.add_argument('--batch-size', type=int, default=64,
                         help='set the batch size (default: 64)')
     parser.add_argument('--num-workers', type=int, default=8,
@@ -144,7 +146,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         with torch.no_grad():
             for data in tqdm(valid_loader, desc=f'valid epoch: {epoch}/{args.epochs}'):
 
-                inputs, target = data
+                inputs, target, _ = data
                 inputs, target = inputs.cuda(), target.cuda()
 
                 pred = model(inputs)
@@ -208,7 +210,7 @@ if __name__ == '__main__':
     criterion = nn.MSELoss()
 
     # dataset
-    train_set = AxisDataSet(train_args.train_path)
+    train_set = AxisDataSet(train_args.train_path, train_args.target_path)
 
     # build hold out CV
     train_sampler, valid_sampler = cross_validation(
