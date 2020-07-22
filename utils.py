@@ -7,11 +7,6 @@ import pandas as pd
 from argparse import ArgumentParser
 from glob import glob
 
-def argument_setting():
-    r"""
-    return arguments
-    """
-    parser = ArgumentParser()
 
 def stroke_statistics(path='6d/', mode='max'):
     r""" 
