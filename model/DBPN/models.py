@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 
+
 def unit_discriminator(in_channels, out_channels, kernel_size, stride=1, padding=0, up=True):
     # upsampling
     if up:
@@ -143,6 +144,7 @@ class DDBPN(nn.Module):
         x = self.reconstruction(torch.cat(h_list, dim=1))
 
         return x
+
 
 if __name__ == '__main__':
     model = DDBPN(1, 1, 7)

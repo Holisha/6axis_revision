@@ -81,6 +81,7 @@ def writer_builder(log_root, load=False):
     
     return SummaryWriter(log_path)
 
+
 def model_builder(model_name, *args, **kwargs):
     """choose which model would be training
 
@@ -99,6 +100,7 @@ def model_builder(model_name, *args, **kwargs):
     }.get(model_name.lower())
 
     return model(*args, **kwargs)
+
 
 def model_config(args, save=False):
     """record model configuration
@@ -120,6 +122,7 @@ def model_config(args, save=False):
         config.close()
 
 ##### training #####
+
 
 def inverse_scaler_transform(pred, target):
     """Inverse pred from range (0, 1) to target range.
@@ -144,6 +147,7 @@ def inverse_scaler_transform(pred, target):
 
     return pred_inverse
 
+
 def out2csv(inputs, file_string, stroke_length):
     """
     store input to csv file.
@@ -164,6 +168,7 @@ def out2csv(inputs, file_string, stroke_length):
             row[1:6] = table[i][:]
             row.append('stroke' + str(1))
             writer.writerow(row)
+
 
 def csv2txt(path='./output'):
     r"""
@@ -188,6 +193,7 @@ def csv2txt(path='./output'):
 
                     txt_file.write("100.0000 ")
                     txt_file.write(f'{row[6]}\n')
+
 
 def save_final_predict_and_new_dataset(inputs,stroke_num, file_string, args,store_data_cnt):
     output = np.squeeze(inputs.cpu().detach().numpy())
