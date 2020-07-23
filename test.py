@@ -85,11 +85,22 @@ def test(model, test_loader, criterion, args):
         inputs, target, _ = data
         inputs, target = inputs.cuda(), target.cuda()
 
+        # get inputs min and max
+        scale_min = inputs.min(2, keepdim=True)[0].detach()
+        scale_interval = (inputs.max(2, keepdim=True)[0].detach() - scale_min)
+
+        # normalize to 0~1
+        inputs = (inputs - scale_min) / scale_interval
+
         pred = model(inputs)
-        pred = inverse_scaler_transform(pred, target)
+
+        # inverse transform
+        # pred = inverse_scaler_transform(pred, target)
+        pred = pred * scale_interval + scale_min
 
         # inverse transform inputs
-        inputs_inverse = inverse_scaler_transform(inputs, target)
+        # inputs_inverse = inverse_scaler_transform(inputs, target)
+        inputs_inverse = inputs * scale_interval + scale_min
 
         # out2csv
         while j - (i * 64) < pred.size(0):

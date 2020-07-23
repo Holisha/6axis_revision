@@ -3,7 +3,6 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 from argparse import ArgumentParser
 
@@ -11,6 +10,7 @@ from argparse import ArgumentParser
 from model import FeatureExtractor
 from utils import writer_builder, model_builder, out2csv, inverse_scaler_transform, model_config
 from dataset import AxisDataSet, cross_validation
+
 
 # TODO: change path name, add other args
 def train_argument(inhert=False):
@@ -77,6 +77,7 @@ def train_argument(inhert=False):
     
     return parser.parse_args()
 
+
 def train(model, train_loader, valid_loader, optimizer, criterion, args):
     # call content_loss
     best_err = None
@@ -112,11 +113,18 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
             inputs, target, _ = data
             inputs, target = inputs.cuda(), target.cuda()
 
+            # get inputs min and max
+            scale_min = inputs.min(2, keepdim=True)[0].detach()
+            scale_interval = (inputs.max(2, keepdim=True)[0].detach() - scale_min)
+
+            # normalize to 0~1
+            inputs = (inputs - scale_min) / scale_interval
+
             # predicted fixed 6 axis data
             pred = model(inputs)
 
             # inverse transform
-            pred = inverse_scaler_transform(pred, inputs)
+            pred = pred * scale_interval + scale_min
 
             # MSE loss
             mse_loss = criterion(pred, target)
@@ -145,14 +153,20 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         model.eval()
         with torch.no_grad():
             for data in tqdm(valid_loader, desc=f'valid epoch: {epoch}/{args.epochs}'):
-
                 inputs, target, _ = data
                 inputs, target = inputs.cuda(), target.cuda()
+
+                # get inputs min and max
+                scale_min = inputs.min(2, keepdim=True)[0].detach()
+                scale_interval = (inputs.max(2, keepdim=True)[0].detach() - scale_min)
+
+                # normalize to 0~1
+                inputs = (inputs - scale_min) / scale_interval
 
                 pred = model(inputs)
 
                 # inverse transform
-                pred = inverse_scaler_transform(pred, inputs)
+                pred = pred * scale_interval + scale_min
 
                 # MSE loss
                 mse_loss = criterion(pred, target)
@@ -186,8 +200,9 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
                 , model_path)
 
         # update loggers
-        writer.add_scalars('Loss/', {'train loss': err,
-                                          'valid loss': valid_err}, epoch)
+        writer.add_scalars('Loss/',
+                           {'train loss': err, 'valid loss': valid_err},
+                           epoch,)
 
     writer.close()
 
