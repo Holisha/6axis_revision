@@ -4,8 +4,10 @@ import json
 import torch
 import numpy as np
 import pandas as pd
+import torch.optim as optim
 from argparse import ArgumentParser
 from glob import glob
+from typing import Union
 
 
 def stroke_statistics(path='6d/', mode='max'):
@@ -102,14 +104,15 @@ def model_builder(model_name, *args, **kwargs):
     return model(*args, **kwargs)
 
 
-def model_config(args, save=False):
+def model_config(args, save: Union[str, bool]=False):
     """record model configuration
 
+    if save is path, save to the path
+    if save is True, save in current directory
     Args:
         args (Argparse object): Model setting
-        save (bool, optional): save as json file or just print to stdout. Defaults to False.
+        save (Union[str, bool], optional): save as json file or just print to stdout. Defaults to False.
     """
-
     print('\n####### model arguments #######\n')
     for key, value in vars(args).items():
         print(f'{key}: {value}')
@@ -120,6 +123,35 @@ def model_config(args, save=False):
         config = open('config.json', 'w')
         json.dump(vars(args), config, indent=4)
         config.close()
+    # save config as .json file to path
+    elif type(save) is str:
+        config = open(
+            os.path.join(save,'config.json'), 'w')
+        json.dump(vars(args), config, indent=4)
+        config.close()
+
+
+def optimizer_builder(optim_name: str):
+    """build optimizer
+
+    Args:
+        optim_name (str): choose which optimizer for training
+            'adam': optim.Adam
+            'sgd': optim.SGD
+            'ranger': Ranger
+            'rangerva': RangerVA
+
+    Returns:
+        optimizer class, yet instantiate
+    """
+    from model import Ranger, RangerVA
+    
+    return {
+        'adam': optim.Adam,
+        'sgd': optim.SGD,
+        'ranger': Ranger,
+        'rangerva': RangerVA,
+    }.get(optim_name, optim.Adam)
 
 ##### training #####
 

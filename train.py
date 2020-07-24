@@ -8,7 +8,7 @@ from argparse import ArgumentParser
 
 # self defined
 from model import FeatureExtractor
-from utils import writer_builder, model_builder, out2csv, inverse_scaler_transform, model_config
+from utils import writer_builder, model_builder, optimizer_builder, out2csv, inverse_scaler_transform, model_config
 from dataset import AxisDataSet, cross_validation
 
 
@@ -50,6 +50,8 @@ def train_argument(inhert=False):
                         help='set the scale factor for the SR model (default: 1)')
     parser.add_argument('--model-args', nargs='*', type=int, default=[],
                         help="set other args (default: [])")
+    parser.add_argument('--optim', type=str, default='adam',
+                        help='set optimizer')
     parser.add_argument('--load', action='store_true', default=False,
                         help='load model parameter from exist .pt file (default: False)')
     parser.add_argument('--gpu-id', type=int, default=0,
@@ -115,7 +117,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
             # get inputs min and max
             scale_min = inputs.min(2, keepdim=True)[0].detach()
-            scale_interval = (inputs.max(2, keepdim=True)[0].detach() - scale_min)
+            scale_interval = inputs.max(2, keepdim=True)[0].detach() - scale_min
 
             # normalize to 0~1
             inputs = (inputs - scale_min) / scale_interval
@@ -158,7 +160,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
                 # get inputs min and max
                 scale_min = inputs.min(2, keepdim=True)[0].detach()
-                scale_interval = (inputs.max(2, keepdim=True)[0].detach() - scale_min)
+                scale_interval = inputs.max(2, keepdim=True)[0].detach() - scale_min
 
                 # normalize to 0~1
                 inputs = (inputs - scale_min) / scale_interval
@@ -221,7 +223,8 @@ if __name__ == '__main__':
     model = model_builder(train_args.model_name, train_args.scale, *train_args.model_args).cuda()
     
     # optimizer and critera
-    optimizer = optim.Adam(model.parameters(), lr=train_args.lr)
+    optimizer = optimizer_builder(train_args.optim)                   # optimizer class
+    optimizer = optimizer(model.parameters(), lr=train_args.lr) # optmizer instance
     criterion = nn.MSELoss()
 
     # dataset
