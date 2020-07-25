@@ -75,7 +75,7 @@ class AxisDataSet(Dataset):
 
         data = csv_file.iloc[:, :-1].to_numpy()
         
-        # data = MinMaxScaler(feature_range=(0, 1)).fit_transform(data)
+        data = MinMaxScaler(feature_range=(0, 1)).fit_transform(data)
         
         # regard 2d array to gray scale image format (*, 6) -> (1, *, 6)
         data = torch.from_numpy(data).unsqueeze(0).float()

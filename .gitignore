@@ -11,3 +11,6 @@ tmp.*
 # model parameter
 *.pt
 *.pth
+
+# output files
+output/*

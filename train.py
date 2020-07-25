@@ -1,3 +1,5 @@
+# TODO: train_argument load  store_true -> str or bool both
+
 import os
 import torch
 import torch.nn as nn
@@ -32,10 +34,10 @@ def train_argument(inhert=False):
     # dataset setting
     parser.add_argument('--stroke-length', type=int, default=150,
                         help='control the stroke length (default: 150)')
-    parser.add_argument('--train-path', type=str, default='../dataset/train',
-                        help='training dataset path (default: ../dataset/train)')
-    parser.add_argument('--target-path', type=str, default='../dataset/target',
-                        help='target dataset path (default: ../dataset/target)')
+    parser.add_argument('--train-path', type=str, default='/home/jefflin/dataset/train',
+                        help='training dataset path (default: /home/jefflin/dataset/train)')
+    parser.add_argument('--target-path', type=str, default='/home/jefflin/dataset/target',
+                        help='target dataset path (default: /home/jefflin/dataset/target)')
     parser.add_argument('--batch-size', type=int, default=64,
                         help='set the batch size (default: 64)')
     parser.add_argument('--num-workers', type=int, default=8,
@@ -58,20 +60,26 @@ def train_argument(inhert=False):
                         help='set the model to run on which gpu (default: 0)')
     parser.add_argument('--lr', type=float, default=1e-3,
                         help='set the learning rate (default: 1e-3)')
+    parser.add_argument('--weight-decay', '--wd', type=float, default=1e-2,
+                        help="set weight decay (default: 1e-2)")
 
     # training setting
+    parser.add_argument('--alpha', type=float, default=1e-3,
+                        help="set loss 1's weight (default: 1e-3)")
+    parser.add_argument('--beta', type=float, default=1,
+                        help="set loss 2's weight (default: 1)")
     parser.add_argument('--epochs', type=int, default=50,
                         help='set the epochs (default: 50)')
     parser.add_argument('--check-interval', type=int, default=5,
                         help='setting output a csv file every epoch of interval (default: 5)')
 
     # logger setting
-    parser.add_argument('--log-path', type=str, default='../logs/FSRCNN',
-                        help='set the logger path of pytorch model (default: ../logs/FSRCNN)')
+    parser.add_argument('--log-path', type=str, default='./logs',
+                        help='set the logger path of pytorch model (default: ./logs)')
     
     # save setting
-    parser.add_argument('--save-path', type=str, default='../output',
-                        help='set the output file (csv or txt) path (default: ../output)')
+    parser.add_argument('--save-path', type=str, default='./output',
+                        help='set the output file (csv or txt) path (default: ./output)')
 
     # for the compatiable
     if inhert is True:
@@ -86,6 +94,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
     feature_extractor = FeatureExtractor().cuda()
     feature_extractor.eval()
 
+    device = 'cuda:0'
     # load data
     model_path = f'{args.model_name}_{args.scale}x.pt'
     checkpoint = {'epoch': 1}   # start from 1
@@ -103,7 +112,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         model.load_state_dict(checkpoint['state_dict'])
 
     # store the training time
-    writer = writer_builder(args.log_path)
+    writer = writer_builder(args.log_path, args.model_name, args.load)
 
     for epoch in range(checkpoint['epoch'], args.epochs+1):
         model.train()
@@ -111,34 +120,26 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         valid_err = 0.0
 
         for data in tqdm(train_loader, desc=f'train epoch: {epoch}/{args.epochs}'):
-            # load data from data loader
             inputs, target, _ = data
             inputs, target = inputs.cuda(), target.cuda()
 
-            # get inputs min and max
-            scale_min = inputs.min(2, keepdim=True)[0].detach()
-            scale_interval = inputs.max(2, keepdim=True)[0].detach() - scale_min
-
-            # normalize to 0~1
-            inputs = (inputs - scale_min) / scale_interval
-
-            # predicted fixed 6 axis data
             pred = model(inputs)
 
-            # inverse transform
-            pred = pred * scale_interval + scale_min
+            # inverse transform pred
+            pred = inverse_scaler_transform(pred, target)
 
             # MSE loss
-            mse_loss = criterion(pred, target)
+            mse_loss = args.alpha * criterion(pred, target)
 
             # content loss
             gen_features = feature_extractor(pred)
             real_features = feature_extractor(target)
-            content_loss = criterion(gen_features, real_features)
+            content_loss = args.beta * criterion(gen_features, real_features)
 
             # for compatible but bad for memory usage
             loss = mse_loss + content_loss
 
+            # print('train loss:', mse_loss, content_loss, loss)
             err += loss.sum().item() * inputs.size(0)
 
             # out2csv every check interval epochs (default: 5)
@@ -155,21 +156,15 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         model.eval()
         with torch.no_grad():
             for data in tqdm(valid_loader, desc=f'valid epoch: {epoch}/{args.epochs}'):
+            # for data in valid_loader:
                 inputs, target, _ = data
                 inputs, target = inputs.cuda(), target.cuda()
 
-                # get inputs min and max
-                scale_min = inputs.min(2, keepdim=True)[0].detach()
-                scale_interval = inputs.max(2, keepdim=True)[0].detach() - scale_min
-
-                # normalize to 0~1
-                inputs = (inputs - scale_min) / scale_interval
-
                 pred = model(inputs)
 
-                # inverse transform
-                pred = pred * scale_interval + scale_min
-
+                # inverse transform pred
+                pred = inverse_scaler_transform(pred, target)
+                
                 # MSE loss
                 mse_loss = criterion(pred, target)
 
@@ -180,7 +175,6 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
                 # for compatible
                 loss = mse_loss + content_loss
-
                 valid_err += loss.sum().item() * inputs.size(0)
 
         # compute loss
@@ -223,8 +217,12 @@ if __name__ == '__main__':
     model = model_builder(train_args.model_name, train_args.scale, *train_args.model_args).cuda()
     
     # optimizer and critera
-    optimizer = optimizer_builder(train_args.optim)                   # optimizer class
-    optimizer = optimizer(model.parameters(), lr=train_args.lr) # optmizer instance
+    optimizer = optimizer_builder(train_args.optim) # optimizer class
+    optimizer = optimizer(                          # optmizer instance
+        model.parameters(),
+        lr=train_args.lr,
+        weight_decay=train_args.weight_decay
+    )
     criterion = nn.MSELoss()
 
     # dataset

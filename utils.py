@@ -48,11 +48,14 @@ def stroke_statistics(path='6d/', mode='max'):
     }.get(mode, 'error')
 
 
-def writer_builder(log_root, load=False):
+def writer_builder(log_root, model_name, load: Union[bool, str]=False):
     """Build writer acording to exist or new logs
+
+    save summary writer in: ./log_root/model_name/version_*
 
     Args:
         log_root (str): logs root
+        model_name (str): model's name
         load (bool, optional): load existed Tensorboard. Defaults to False.
         
     Returns:
@@ -61,7 +64,7 @@ def writer_builder(log_root, load=False):
 
     from torch.utils.tensorboard import SummaryWriter
 
-    version = os.listdir(log_root)
+    log_root = os.path.join(log_root, model_name.upper())
 
     # make sure logs directories exist
     if not os.path.exists('./logs'):
@@ -70,8 +73,20 @@ def writer_builder(log_root, load=False):
     if not os.path.exists(log_root):
         os.mkdir(log_root)
 
+    # list version of model
+    version = os.listdir(log_root)
+
     # load exist logs
-    if version and load == True:
+    if version and type(load) is str:
+        log_path = op.path.join(log_root, load)
+
+        # check log path is exist or not
+        if log_path not in version:
+            print(f'load non existent writer: {log_path}')
+            os._exit(0)
+        
+    elif version and load is True:
+        print(version[-1])
         log_path = os.path.join(log_root, version[-1])
 
     # create new log directory indexed by exist directories
@@ -81,6 +96,7 @@ def writer_builder(log_root, load=False):
             log_path
         )
     
+    print(f'tensorboard logger save in:{log_path}')
     return SummaryWriter(log_path)
 
 
@@ -115,6 +131,10 @@ def model_config(args, save: Union[str, bool]=False):
     """
     print('\n####### model arguments #######\n')
     for key, value in vars(args).items():
+        
+        if key == 'model_name':
+            value = value.upper()
+
         print(f'{key}: {value}')
     print('\n####### model arguments #######\n')
 
@@ -149,9 +169,9 @@ def optimizer_builder(optim_name: str):
     return {
         'adam': optim.Adam,
         'sgd': optim.SGD,
-        'ranger': Ranger,
+        # 'ranger': Ranger,   # Bug in Ranger
         'rangerva': RangerVA,
-    }.get(optim_name, optim.Adam)
+    }.get(optim_name.lower(), optim.Adam)
 
 ##### training #####
 
