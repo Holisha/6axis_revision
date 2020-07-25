@@ -1,4 +1,4 @@
-# TODO: train_argument load  store_true -> str or bool both
+# TODO: Fix normalize bug
 
 import os
 import torch
@@ -14,7 +14,6 @@ from utils import writer_builder, model_builder, optimizer_builder, out2csv, inv
 from dataset import AxisDataSet, cross_validation
 
 
-# TODO: change path name, add other args
 def train_argument(inhert=False):
     """return train arguments
 
@@ -26,10 +25,12 @@ def train_argument(inhert=False):
         parser(): if inhert is true, then return parser
     """
 
-    if inhert is True:
-        parser = ArgumentParser(add_help=False)
-    else:
-        parser = ArgumentParser(add_help=True)
+    # for compatible
+    parser = ArgumentParser(add_help=not inhert)
+
+    # optional setting
+    parser.add_argument('--summary', action='store_true', default=False,
+                        help='Set torch summary (default: False)')
 
     # dataset setting
     parser.add_argument('--stroke-length', type=int, default=150,
@@ -56,6 +57,8 @@ def train_argument(inhert=False):
                         help='set optimizer')
     parser.add_argument('--load', action='store_true', default=False,
                         help='load model parameter from exist .pt file (default: False)')
+    parser.add_argument('--version', type=int, dest='load',
+                        help='load specific version (default: False)')
     parser.add_argument('--gpu-id', type=int, default=0,
                         help='set the model to run on which gpu (default: 0)')
     parser.add_argument('--lr', type=float, default=1e-3,
@@ -94,13 +97,12 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
     feature_extractor = FeatureExtractor().cuda()
     feature_extractor.eval()
 
-    device = 'cuda:0'
     # load data
     model_path = f'{args.model_name}_{args.scale}x.pt'
     checkpoint = {'epoch': 1}   # start from 1
 
     # load model from exist .pt file
-    if args.load is True and os.path.isfile(model_path):
+    if args.load and os.path.isfile(model_path):
         r"""
         load a pickle file from exist parameter
 
@@ -247,6 +249,17 @@ if __name__ == '__main__':
                               num_workers=train_args.num_workers,
                               sampler=valid_sampler,
                               pin_memory=True,)
+
+    # model summary
+    if train_args.summary:
+        from torchsummary import summary
+        data, _, _ = train_set[0]
+        print(f'\n{train_args.model_name.upper()} summary')
+        summary(model,
+            tuple(data.shape),
+            batch_size=train_args.batch_size,
+            device='cuda',
+            )
 
     # training
     train(model, train_loader, valid_loader, optimizer, criterion, train_args)

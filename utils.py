@@ -48,7 +48,7 @@ def stroke_statistics(path='6d/', mode='max'):
     }.get(mode, 'error')
 
 
-def writer_builder(log_root, model_name, load: Union[bool, str]=False):
+def writer_builder(log_root, model_name, load: Union[bool, int]=False):
     """Build writer acording to exist or new logs
 
     save summary writer in: ./log_root/model_name/version_*
@@ -56,8 +56,8 @@ def writer_builder(log_root, model_name, load: Union[bool, str]=False):
     Args:
         log_root (str): logs root
         model_name (str): model's name
-        load (bool, optional): load existed Tensorboard. Defaults to False.
-        
+        load (Union[bool, int], optional): load existed Tensorboard. Defaults to False.
+
     Returns:
         SummaryWriter: tensorboard
     """
@@ -65,6 +65,7 @@ def writer_builder(log_root, model_name, load: Union[bool, str]=False):
     from torch.utils.tensorboard import SummaryWriter
 
     log_root = os.path.join(log_root, model_name.upper())
+    print('\n####### logger info #######\n')
 
     # make sure logs directories exist
     if not os.path.exists('./logs'):
@@ -77,17 +78,20 @@ def writer_builder(log_root, model_name, load: Union[bool, str]=False):
     version = os.listdir(log_root)
 
     # load exist logs
-    if version and type(load) is str:
-        log_path = op.path.join(log_root, load)
-
+    if version and type(load) is int:
         # check log path is exist or not
-        if log_path not in version:
-            print(f'load non existent writer: {log_path}')
+        if f'version_{load}' not in version:
+            print(f'Logger Error: load non existent writer: {log_path}')
+            print('\n####### logger info #######\n')
             os._exit(0)
-        
+
+        log_path = os.path.join(log_root, f'version_{load}')
+        # print(f'load exist logger:{log_path}')
+
+    # load specific version
     elif version and load is True:
-        print(version[-1])
         log_path = os.path.join(log_root, version[-1])
+        # print(f'load exist logger:{log_path}')
 
     # create new log directory indexed by exist directories
     else:
@@ -95,8 +99,11 @@ def writer_builder(log_root, model_name, load: Union[bool, str]=False):
         os.mkdir(
             log_path
         )
+        print(f'create new logger in:{log_path}')
     
-    print(f'tensorboard logger save in:{log_path}')
+    print(f'Tensorboard logger save in:{log_path}')
+    print('\n####### logger info #######\n')
+
     return SummaryWriter(log_path)
 
 
@@ -132,8 +139,10 @@ def model_config(args, save: Union[str, bool]=False):
     print('\n####### model arguments #######\n')
     for key, value in vars(args).items():
         
-        if key == 'model_name':
-            value = value.upper()
+        # format modified
+        value = {
+            'model_name': f'{value}'.upper(),
+        }.get(key, value)
 
         print(f'{key}: {value}')
     print('\n####### model arguments #######\n')
@@ -169,9 +178,9 @@ def optimizer_builder(optim_name: str):
     return {
         'adam': optim.Adam,
         'sgd': optim.SGD,
-        # 'ranger': Ranger,   # Bug in Ranger
+        'ranger': Ranger,   # Bug in Ranger
         'rangerva': RangerVA,
-    }.get(optim_name.lower(), optim.Adam)
+    }.get(optim_name.lower(), 'Error optimizer')
 
 ##### training #####
 
@@ -209,6 +218,9 @@ def out2csv(inputs, file_string, stroke_length):
 
     no output
     """
+    if not os.path.exists('./output'):
+        os.mkdir('./output')
+
     output = np.squeeze(inputs.cpu().detach().numpy())
     table = output[0]
 
