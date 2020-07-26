@@ -1,4 +1,4 @@
-# TODO: Fix normalize bug
+# TODO: Fix normalize bug, gradient false
 
 import os
 import torch
@@ -93,7 +93,6 @@ def train_argument(inhert=False):
 
 def train(model, train_loader, valid_loader, optimizer, criterion, args):
     # call content_loss
-    best_err = None
     feature_extractor = FeatureExtractor().cuda()
     feature_extractor.eval()
 
@@ -129,6 +128,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
             # inverse transform pred
             pred = inverse_scaler_transform(pred, target)
+            inputs = inverse_scaler_transform(inputs, target)
 
             # MSE loss
             mse_loss = args.alpha * criterion(pred, target)
@@ -186,8 +186,8 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
         # update every epoch
         # save model as pickle file
-        if best_err is None or err < best_err:
-            best_err = err
+        if epoch == checkpoint['epoch'] or err < best_err:
+            best_err = err  # save err in first epoch
 
             # save current epoch and model parameters
             torch.save(
