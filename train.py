@@ -10,7 +10,7 @@ from argparse import ArgumentParser
 
 # self defined
 from model import FeatureExtractor
-from utils import writer_builder, model_builder, optimizer_builder, out2csv, NormScaler, model_config
+from utils import writer_builder, model_builder, optimizer_builder, out2csv, NormScaler, model_config, summary
 from dataset import AxisDataSet, cross_validation
 
 
@@ -27,10 +27,6 @@ def train_argument(inhert=False):
 
     # for compatible
     parser = ArgumentParser(add_help=not inhert)
-
-    # optional setting
-    parser.add_argument('--summary', action='store_true', default=False,
-                        help='Set torch summary (default: False)')
 
     # dataset setting
     parser.add_argument('--stroke-length', type=int, default=150,
@@ -122,13 +118,13 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
     progress_bar = tqdm(
         range(checkpoint['epoch'], args.epochs+1),
         total=len(train_loader)+len(valid_loader),)
+
     for epoch in progress_bar:
         model.train()
         err = 0.0
         valid_err = 0.0
 
-        # progress_bar = tqdm(train_loader, desc=f'train epoch: {epoch}/{args.epochs}')
-        progress_bar.set_description(f'Epoch: {epoch}/{args.epochs} in train')
+        progress_bar.set_description(f'Train epoch: {epoch}/{args.epochs}')
         for data in train_loader:
             inputs, target, _ = data
             inputs, target = inputs.cuda(), target.cuda()
@@ -175,12 +171,10 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
                 out2csv(target, f'{epoch}_target', args.stroke_length)
 
         # cross validation
-        progress_bar.set_description(f'Epoch: {epoch}/{args.epochs} in valid')
+        progress_bar.set_description(f'Valid epoch:{epoch}/{args.epochs}')
         model.eval()
         with torch.no_grad():
-            # progress_bar = tqdm(valid_loader,  desc=f'valid epoch: {epoch}/{args.epochs}')
             for data in valid_loader:
-            # for data in valid_loader:
                 inputs, target, _ = data
                 inputs, target = inputs.cuda(), target.cuda()
 
@@ -279,15 +273,13 @@ if __name__ == '__main__':
                               pin_memory=True,)
 
     # model summary
-    if train_args.summary:
-        from torchsummary import summary
-        data, _, _ = train_set[0]
-        print(f'\n{train_args.model_name.upper()} summary')
-        summary(model,
-            tuple(data.shape),
-            batch_size=train_args.batch_size,
-            device='cuda',
-            )
+    data, _, _ = train_set[0]
+    summary(model,
+        tuple(data.shape),
+        batch_size=train_args.batch_size,
+        device='cuda',
+        model_name=train_args.model_name.upper(),
+        )
     
     # training
     train(model, train_loader, valid_loader, optimizer, criterion, train_args)
