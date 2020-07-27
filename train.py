@@ -140,7 +140,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         
             # for compatible but bad for memory usage
             loss = mse_loss + content_loss
-            print(mse_loss, content_loss, sep='\n')
+            # print(mse_loss, content_loss, sep='\n')
 
             # print('train loss:', mse_loss, content_loss, loss)
             err += loss.sum().item() * inputs.size(0)
