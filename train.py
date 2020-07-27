@@ -10,7 +10,7 @@ from argparse import ArgumentParser
 
 # self defined
 from model import FeatureExtractor
-from utils import writer_builder, model_builder, optimizer_builder, out2csv, NormScaler, model_config
+from utils import writer_builder, model_builder, optimizer_builder, out2csv, NormScaler, model_config, summary
 from dataset import AxisDataSet, cross_validation
 
 
@@ -27,10 +27,6 @@ def train_argument(inhert=False):
 
     # for compatible
     parser = ArgumentParser(add_help=not inhert)
-
-    # optional setting
-    parser.add_argument('--summary', action='store_true', default=False,
-                        help='Set torch summary (default: False)')
 
     # dataset setting
     parser.add_argument('--stroke-length', type=int, default=150,
@@ -264,15 +260,13 @@ if __name__ == '__main__':
                               pin_memory=True,)
 
     # model summary
-    if train_args.summary:
-        from torchsummary import summary
-        data, _, _ = train_set[0]
-        print(f'\n{train_args.model_name.upper()} summary')
-        summary(model,
-            tuple(data.shape),
-            batch_size=train_args.batch_size,
-            device='cuda',
-            )
+    data, _, _ = train_set[0]
+    summary(model,
+        tuple(data.shape),
+        batch_size=train_args.batch_size,
+        device='cuda',
+        model_name=train_args.model_name.upper(),
+        )
     
     # training
     train(model, train_loader, valid_loader, optimizer, criterion, train_args)
