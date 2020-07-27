@@ -36,7 +36,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         model.load_state_dict(checkpoint['state_dict'])
 
     # store the training time
-    writer = writer_builder(args.log_path)
+    writer = writer_builder(args.log_path,args.model_name)
 
     for epoch in range(checkpoint['epoch'], args.epochs+1):
         model.train()
