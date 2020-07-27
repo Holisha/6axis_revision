@@ -42,6 +42,12 @@
     \---6axis
 ```
 
+## Commit format
+
+- `Fixed`: **where**, solve **what bug**, **how**
+- `New`: **Where**, Add new feature
+- `Other`: Special case
+
 ## TODO
 
 - update readme file

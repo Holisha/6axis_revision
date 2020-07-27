@@ -1,4 +1,4 @@
-# TODO: Fix normalize bug, gradient false
+#TODO: Add early stop, out2csv take specific data
 
 import os
 import torch
@@ -10,7 +10,7 @@ from argparse import ArgumentParser
 
 # self defined
 from model import FeatureExtractor
-from utils import writer_builder, model_builder, optimizer_builder, out2csv, inverse_scaler_transform, model_config
+from utils import writer_builder, model_builder, optimizer_builder, out2csv, NormScaler, model_config, summary
 from dataset import AxisDataSet, cross_validation
 
 
@@ -27,10 +27,6 @@ def train_argument(inhert=False):
 
     # for compatible
     parser = ArgumentParser(add_help=not inhert)
-
-    # optional setting
-    parser.add_argument('--summary', action='store_true', default=False,
-                        help='Set torch summary (default: False)')
 
     # dataset setting
     parser.add_argument('--stroke-length', type=int, default=150,
@@ -96,6 +92,10 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
     feature_extractor = FeatureExtractor().cuda()
     feature_extractor.eval()
 
+    # normalize scaler
+    input_scaler = NormScaler()
+    target_scaler = NormScaler()
+
     # load data
     model_path = f'{args.model_name}_{args.scale}x.pt'
     checkpoint = {'epoch': 1}   # start from 1
@@ -124,11 +124,11 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
             inputs, target, _ = data
             inputs, target = inputs.cuda(), target.cuda()
 
-            pred = model(inputs)
+            # normalize inputs and target
+            inputs = input_scaler.fit(inputs)
+            target = target_scaler.fit(target)
 
-            # inverse transform pred
-            pred = inverse_scaler_transform(pred, target)
-            inputs = inverse_scaler_transform(inputs, target)
+            pred = model(inputs)
 
             # MSE loss
             mse_loss = args.alpha * criterion(pred, target)
@@ -137,15 +137,23 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
             gen_features = feature_extractor(pred)
             real_features = feature_extractor(target)
             content_loss = args.beta * criterion(gen_features, real_features)
-
+        
             # for compatible but bad for memory usage
             loss = mse_loss + content_loss
+            # print(mse_loss, content_loss, sep='\n')
 
             # print('train loss:', mse_loss, content_loss, loss)
             err += loss.sum().item() * inputs.size(0)
-
+            
             # out2csv every check interval epochs (default: 5)
             if epoch % args.check_interval == 0:
+
+                # unnormalize value for visualize
+                inputs = input_scaler.inverse_transform(inputs)
+                pred = input_scaler.inverse_transform(pred)
+                target = target_scaler.inverse_transform(target)
+
+                # tensor to csv file
                 out2csv(inputs, f'{epoch}_input', args.stroke_length)
                 out2csv(pred, f'{epoch}_output', args.stroke_length)
                 out2csv(target, f'{epoch}_target', args.stroke_length)
@@ -162,11 +170,12 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
                 inputs, target, _ = data
                 inputs, target = inputs.cuda(), target.cuda()
 
+                # normalize inputs and target
+                inputs = input_scaler.fit(inputs)
+                target = target_scaler.fit(target)
+
                 pred = model(inputs)
 
-                # inverse transform pred
-                pred = inverse_scaler_transform(pred, target)
-                
                 # MSE loss
                 mse_loss = criterion(pred, target)
 
@@ -251,16 +260,14 @@ if __name__ == '__main__':
                               pin_memory=True,)
 
     # model summary
-    if train_args.summary:
-        from torchsummary import summary
-        data, _, _ = train_set[0]
-        print(f'\n{train_args.model_name.upper()} summary')
-        summary(model,
-            tuple(data.shape),
-            batch_size=train_args.batch_size,
-            device='cuda',
-            )
-
+    data, _, _ = train_set[0]
+    summary(model,
+        tuple(data.shape),
+        batch_size=train_args.batch_size,
+        device='cuda',
+        model_name=train_args.model_name.upper(),
+        )
+    
     # training
     train(model, train_loader, valid_loader, optimizer, criterion, train_args)
 
