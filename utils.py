@@ -47,6 +47,10 @@ def stroke_statistics(path='6d/', mode='max'):
         'min' : min_cnt
     }.get(mode, 'error')
 
+################################################################
+########################## model info ##########################
+################################################################
+
 
 def writer_builder(log_root, model_name, load: Union[bool, int]=False):
     """Build writer acording to exist or new logs
@@ -182,7 +186,56 @@ def optimizer_builder(optim_name: str):
         'rangerva': RangerVA,
     }.get(optim_name.lower(), 'Error optimizer')
 
-##### training #####
+################################################################
+########################### training ###########################
+################################################################
+
+
+class NormScaler:
+    """
+    Normalize tensor's value into range 1~0
+    And interse tensor back to original rage
+    """
+    def __init__(self):
+        self.min = None
+        self.interval = None
+    
+    def fit(self, tensor):
+        """transform tensor into range 1~0
+
+        Args:
+            tensor (torch.Tensor): unnormalized value
+
+        Returns:
+            shape as origin: inverse value
+        """
+        shape = tensor.shape
+        tensor = tensor.view(shape[0], -1)
+
+        self.min = tensor.min(1, keepdim=True)[0]
+        self.interval = tensor.max(1, keepdim=True)[0] - self.min
+        tensor = (tensor - self.min) / self.interval
+        
+        return tensor.view(shape)
+        
+    def inverse_transform(self, tensor):
+        """inverse tensor's value back
+
+        Args:
+            tensor (torch.Tensor): normalized value
+
+        Returns:
+            shape as origin: inverse value 
+        """
+        assert self.min is not None, r'ValueError: scaler must fit data before inverse transform'
+        assert self.interval is not None, r'ValueError: scaler must fit data before inverse transform'
+
+        shape = tensor.shape
+        tensor = tensor.view(shape[0], -1)
+
+        tensor = tensor * self.interval + self.min
+
+        return tensor.view(shape)
 
 
 def inverse_scaler_transform(pred, target):

@@ -15,5 +15,8 @@ tmp.*
 # output files
 output/*
 
+# nohup files
+*.out
+
 # post
 postprocessing/*
