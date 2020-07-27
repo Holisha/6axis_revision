@@ -10,7 +10,7 @@ from argparse import ArgumentParser
 
 # self defined
 from model import FeatureExtractor
-from utils import writer_builder, model_builder, optimizer_builder, out2csv, NormScaler, model_config, summary
+from utils import writer_builder, model_builder, optimizer_builder, out2csv, NormScaler, model_config
 from dataset import AxisDataSet, cross_validation
 
 
@@ -27,6 +27,10 @@ def train_argument(inhert=False):
 
     # for compatible
     parser = ArgumentParser(add_help=not inhert)
+
+    # optional setting
+    parser.add_argument('--summary', action='store_true', default=False,
+                        help='Set torch summary (default: False)')
 
     # dataset setting
     parser.add_argument('--stroke-length', type=int, default=150,
@@ -115,12 +119,17 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
     # store the training time
     writer = writer_builder(args.log_path, args.model_name, args.load)
 
-    for epoch in range(checkpoint['epoch'], args.epochs+1):
+    progress_bar = tqdm(
+        range(checkpoint['epoch'], args.epochs+1),
+        total=len(train_loader)+len(valid_loader),)
+    for epoch in progress_bar:
         model.train()
         err = 0.0
         valid_err = 0.0
 
-        for data in tqdm(train_loader, desc=f'train epoch: {epoch}/{args.epochs}'):
+        # progress_bar = tqdm(train_loader, desc=f'train epoch: {epoch}/{args.epochs}')
+        progress_bar.set_description(f'Epoch: {epoch}/{args.epochs} in train')
+        for data in train_loader:
             inputs, target, _ = data
             inputs, target = inputs.cuda(), target.cuda()
 
@@ -140,10 +149,17 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         
             # for compatible but bad for memory usage
             loss = mse_loss + content_loss
-            # print(mse_loss, content_loss, sep='\n')
 
-            # print('train loss:', mse_loss, content_loss, loss)
+            # update progress bar
+            progress_bar.set_postfix({'MSE loss': mse_loss.item(), 'Content loss': content_loss.item()})
+            progress_bar.update(1)
+
             err += loss.sum().item() * inputs.size(0)
+
+            # update model parameters
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
             
             # out2csv every check interval epochs (default: 5)
             if epoch % args.check_interval == 0:
@@ -158,14 +174,12 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
                 out2csv(pred, f'{epoch}_output', args.stroke_length)
                 out2csv(target, f'{epoch}_target', args.stroke_length)
 
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-
         # cross validation
+        progress_bar.set_description(f'Epoch: {epoch}/{args.epochs} in valid')
         model.eval()
         with torch.no_grad():
-            for data in tqdm(valid_loader, desc=f'valid epoch: {epoch}/{args.epochs}'):
+            # progress_bar = tqdm(valid_loader,  desc=f'valid epoch: {epoch}/{args.epochs}')
+            for data in valid_loader:
             # for data in valid_loader:
                 inputs, target, _ = data
                 inputs, target = inputs.cuda(), target.cuda()
@@ -186,12 +200,17 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
                 # for compatible
                 loss = mse_loss + content_loss
+
+                # update tqdm info
+                progress_bar.set_postfix({'MSE loss': mse_loss.sum().item(), 'Content loss': content_loss.sum().item()})
+                progress_bar.update(1)
+
                 valid_err += loss.sum().item() * inputs.size(0)
 
         # compute loss
         err /= len(train_loader.dataset)
         valid_err /= len(valid_loader.dataset)
-        print(f'train loss: {err:.4f}, valid loss: {valid_err:.4f}')
+        print(f'\ntrain loss: {err:.4f}, valid loss: {valid_err:.4f}')
 
         # update every epoch
         # save model as pickle file
@@ -260,13 +279,15 @@ if __name__ == '__main__':
                               pin_memory=True,)
 
     # model summary
-    data, _, _ = train_set[0]
-    summary(model,
-        tuple(data.shape),
-        batch_size=train_args.batch_size,
-        device='cuda',
-        model_name=train_args.model_name.upper(),
-        )
+    if train_args.summary:
+        from torchsummary import summary
+        data, _, _ = train_set[0]
+        print(f'\n{train_args.model_name.upper()} summary')
+        summary(model,
+            tuple(data.shape),
+            batch_size=train_args.batch_size,
+            device='cuda',
+            )
     
     # training
     train(model, train_loader, valid_loader, optimizer, criterion, train_args)
