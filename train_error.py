@@ -79,7 +79,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         with torch.no_grad():
             for data in tqdm(valid_loader, desc=f'valid epoch: {epoch}/{args.epochs}'):
 
-                inputs, target = data
+                inputs, target, _ = data
                 inputs, target = inputs.cuda(), target.cuda()
 
                 pred = model(inputs)
