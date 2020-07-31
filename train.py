@@ -94,7 +94,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
     # normalize scaler
     input_scaler = NormScaler()
-    target_scaler = NormScaler()
+    # target_scaler = NormScaler()
 
     # load data
     model_path = f'{args.model_name}_{args.scale}x.pt'
@@ -131,9 +131,12 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
             # normalize inputs and target
             inputs = input_scaler.fit(inputs)
-            target = target_scaler.fit(target)
+            # target = target_scaler.fit(target)
 
             pred = model(inputs)
+
+            # unnormalize
+            pred = input_scaler.inverse_transform(pred)
 
             # MSE loss
             mse_loss = args.alpha * criterion(pred, target)
@@ -162,8 +165,8 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
                 # unnormalize value for visualize
                 inputs = input_scaler.inverse_transform(inputs)
-                pred = input_scaler.inverse_transform(pred)
-                target = target_scaler.inverse_transform(target)
+                # pred = input_scaler.inverse_transform(pred)
+                # target = target_scaler.inverse_transform(target)
 
                 # tensor to csv file
                 out2csv(inputs, f'{epoch}_input', args.stroke_length)
@@ -180,9 +183,12 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
                 # normalize inputs and target
                 inputs = input_scaler.fit(inputs)
-                target = target_scaler.fit(target)
+                # target = target_scaler.fit(target)
 
                 pred = model(inputs)
+
+                # unnormalize
+                pred = input_scaler.inverse_transform(pred)
 
                 # MSE loss
                 mse_loss = criterion(pred, target)
