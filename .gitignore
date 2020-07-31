@@ -4,6 +4,7 @@ gui.py
 
 # log
 logs/*
+config.*
 
 # temporary file
 tmp.*

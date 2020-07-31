@@ -94,7 +94,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
     # normalize scaler
     input_scaler = NormScaler()
-    target_scaler = NormScaler()
+    # target_scaler = NormScaler()
 
     # load data
     model_path = f'{args.model_name}_{args.scale}x.pt'
@@ -115,20 +115,28 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
     # store the training time
     writer = writer_builder(args.log_path, args.model_name, args.load)
 
-    for epoch in range(checkpoint['epoch'], args.epochs+1):
+    progress_bar = tqdm(
+        range(checkpoint['epoch'], args.epochs+1),
+        total=len(train_loader)+len(valid_loader),)
+
+    for epoch in progress_bar:
         model.train()
         err = 0.0
         valid_err = 0.0
 
-        for data in tqdm(train_loader, desc=f'train epoch: {epoch}/{args.epochs}'):
+        progress_bar.set_description(f'Train epoch: {epoch}/{args.epochs}')
+        for data in train_loader:
             inputs, target, _ = data
             inputs, target = inputs.cuda(), target.cuda()
 
             # normalize inputs and target
             inputs = input_scaler.fit(inputs)
-            target = target_scaler.fit(target)
+            # target = target_scaler.fit(target)
 
             pred = model(inputs)
+
+            # unnormalize
+            pred = input_scaler.inverse_transform(pred)
 
             # MSE loss
             mse_loss = args.alpha * criterion(pred, target)
@@ -140,41 +148,47 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         
             # for compatible but bad for memory usage
             loss = mse_loss + content_loss
-            # print(mse_loss, content_loss, sep='\n')
 
-            # print('train loss:', mse_loss, content_loss, loss)
+            # update progress bar
+            progress_bar.set_postfix({'MSE loss': mse_loss.item(), 'Content loss': content_loss.item()})
+            progress_bar.update(1)
+
             err += loss.sum().item() * inputs.size(0)
+
+            # update model parameters
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
             
             # out2csv every check interval epochs (default: 5)
             if epoch % args.check_interval == 0:
 
                 # unnormalize value for visualize
                 inputs = input_scaler.inverse_transform(inputs)
-                pred = input_scaler.inverse_transform(pred)
-                target = target_scaler.inverse_transform(target)
+                # pred = input_scaler.inverse_transform(pred)
+                # target = target_scaler.inverse_transform(target)
 
                 # tensor to csv file
                 out2csv(inputs, f'{epoch}_input', args.stroke_length)
                 out2csv(pred, f'{epoch}_output', args.stroke_length)
                 out2csv(target, f'{epoch}_target', args.stroke_length)
 
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-
         # cross validation
+        progress_bar.set_description(f'Valid epoch:{epoch}/{args.epochs}')
         model.eval()
         with torch.no_grad():
-            for data in tqdm(valid_loader, desc=f'valid epoch: {epoch}/{args.epochs}'):
-            # for data in valid_loader:
+            for data in valid_loader:
                 inputs, target, _ = data
                 inputs, target = inputs.cuda(), target.cuda()
 
                 # normalize inputs and target
                 inputs = input_scaler.fit(inputs)
-                target = target_scaler.fit(target)
+                # target = target_scaler.fit(target)
 
                 pred = model(inputs)
+
+                # unnormalize
+                pred = input_scaler.inverse_transform(pred)
 
                 # MSE loss
                 mse_loss = criterion(pred, target)
@@ -186,12 +200,17 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
                 # for compatible
                 loss = mse_loss + content_loss
+
+                # update tqdm info
+                progress_bar.set_postfix({'MSE loss': mse_loss.sum().item(), 'Content loss': content_loss.sum().item()})
+                progress_bar.update(1)
+
                 valid_err += loss.sum().item() * inputs.size(0)
 
         # compute loss
         err /= len(train_loader.dataset)
         valid_err /= len(valid_loader.dataset)
-        print(f'train loss: {err:.4f}, valid loss: {valid_err:.4f}')
+        print(f'\ntrain loss: {err:.4f}, valid loss: {valid_err:.4f}')
 
         # update every epoch
         # save model as pickle file
