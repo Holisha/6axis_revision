@@ -115,11 +115,9 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
     # store the training time
     writer = writer_builder(args.log_path, args.model_name, args.load)
 
-    progress_bar = tqdm(
-        range(checkpoint['epoch'], args.epochs+1),
-        total=len(train_loader)+len(valid_loader),)
+    progress_bar = tqdm(total=len(train_loader)+len(valid_loader))
 
-    for epoch in progress_bar:
+    for epoch in range(checkpoint['epoch'], args.epochs+1):        
         model.train()
         err = 0.0
         valid_err = 0.0
@@ -151,7 +149,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
             # update progress bar
             progress_bar.set_postfix({'MSE loss': mse_loss.item(), 'Content loss': content_loss.item()})
-            progress_bar.update(1)
+            progress_bar.update()
 
             err += loss.sum().item() * inputs.size(0)
 
@@ -203,7 +201,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
                 # update tqdm info
                 progress_bar.set_postfix({'MSE loss': mse_loss.sum().item(), 'Content loss': content_loss.sum().item()})
-                progress_bar.update(1)
+                progress_bar.update()
 
                 valid_err += loss.sum().item() * inputs.size(0)
 
@@ -229,8 +227,9 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         writer.add_scalars('Loss/',
                            {'train loss': err, 'valid loss': valid_err},
                            epoch,)
-
+        
     writer.close()
+    progress_bar.close()
 
 
 if __name__ == '__main__':
@@ -270,13 +269,13 @@ if __name__ == '__main__':
                               # shuffle=True,
                               num_workers=train_args.num_workers,
                               sampler=train_sampler,
-                              pin_memory=True,)
+                              pin_memory=False,)
     valid_loader = DataLoader(train_set,
                               batch_size=train_args.batch_size,
                               # shuffle=True,
                               num_workers=train_args.num_workers,
                               sampler=valid_sampler,
-                              pin_memory=True,)
+                              pin_memory=False,)
 
     # model summary
     data, _, _ = train_set[0]
