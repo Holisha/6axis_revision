@@ -37,7 +37,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         model.load_state_dict(checkpoint['state_dict'])
 
     # store the training time
-    writer = writer_builder(args.log_path)
+    writer = writer_builder(args.log_path,args.model_name)
 
     for epoch in range(checkpoint['epoch'], args.epochs+1):
         model.train()
@@ -159,7 +159,7 @@ if __name__ == '__main__':
     criterion = nn.MSELoss()
 
     # dataset
-    train_set = AxisDataSet(train_args.train_path)
+    train_set = AxisDataSet(train_args.train_path,train_args.target_path)
 
     # build hold out CV
     train_sampler, valid_sampler = cross_validation(
