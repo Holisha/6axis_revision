@@ -125,7 +125,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
     # initialize the early_stopping object
     if args.early_stop:
-        early_stopping = EarlyStopping(patience=args.patience, verbose=args.verbose)
+        early_stopping = EarlyStopping(patience=args.patience, verbose=args.verbose, path=model_path)
 
     progress_bar = tqdm(total=len(train_loader)+len(valid_loader))
 
@@ -224,8 +224,8 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
         # update every epoch
         # save model as pickle file
-        if epoch == checkpoint['epoch'] or err < best_err:
-            best_err = err  # save err in first epoch
+        """if epoch == checkpoint['epoch'] or err < best_err:
+            best_err = err  # checkpointsave err in first epoch
 
             # save current epoch and model parameters
             torch.save(
@@ -234,6 +234,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
                     'epoch': epoch,
                 }
                 , model_path)
+        """
 
         # update loggers
         writer.add_scalars('Loss/',
