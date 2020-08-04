@@ -225,7 +225,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         # update every epoch
         # save model as pickle file
         """if epoch == checkpoint['epoch'] or err < best_err:
-            best_err = err  # checkpointsave err in first epoch
+            best_err = err  # save err in first epoch
 
             # save current epoch and model parameters
             torch.save(
@@ -244,7 +244,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         # early_stopping needs the validation loss to check if it has decresed, 
         # and if it has, it will make a checkpoint of the current model
         if args.early_stop:
-            early_stopping(valid_err, model)
+            early_stopping(valid_err, model, epoch)
 
             if early_stopping.early_stop:
                 print("Early stopping")
