@@ -10,8 +10,13 @@ def get_len(data):
         int: the original length of the stroke
     """
     match = data.iloc[:, :-1].eq(data.iloc[:, :-1].shift())
-    stroke_len = match.groupby(match.iloc[:, 0]).groups.get(True)[0]
 
+    # get the length of the different rows
+    stroke_len = len(
+        match.groupby(
+            match.iloc[:, 0]
+        ).groups.get(False)
+    )
     return stroke_len
 
 

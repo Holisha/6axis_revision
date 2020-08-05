@@ -1,7 +1,14 @@
 # Postprocessing for 6axis_revision Project
 > 開發及維護人員: jefflin
 
-> 最新更新時間: 2020/08/05 02:10
+> 最新更新時間: 2020/08/06
+
+- [Postprocessing for 6axis_revision Project](#postprocessing-for-6axis_revision-project)
+	- [Quik Run](#quik-run)
+	- [Arguments Setting](#arguments-setting)
+		- [Example](#example)
+	- [Program Running Rule](#program-running-rule)
+		- [**注意事項**](#注意事項)
 
 ## Quik Run
 Run the following command for running without any arguments
@@ -9,10 +16,14 @@ Run the following command for running without any arguments
 python postprocessor.py
 ```
 
-## Arguments
+## Arguments Setting
 Set the path of the directory. (default : `./output` )
 ```
 --path PATH
+```
+### Example
+```
+python postprocessor.py --path ./output_path
 ```
 
 ## Program Running Rule
@@ -21,7 +32,8 @@ Set the path of the directory. (default : `./output` )
 2. axis2img: 把 target, input, output 三部分生成 2D 細線化圖示，以進行比較
 3. csv2txt: 把所有 csv 檔轉成機器手臂可執行的 txt 指令檔
 
-注意:
+### **注意事項**
+- 所有輸出檔之書法筆畫長度皆被還原成原本的長度，長度不再是 150
 - test data 的檔名須為 `test_` 開頭
 - 檔名須以 `_target.csv`, `_input.csv` 或 `_output.csv` 為結尾形式命名
 - 因此，同一層資料夾下的 csv 檔個數須為 3 的倍數，不然會報錯
