@@ -11,7 +11,7 @@ from argparse import ArgumentParser
 # self defined
 from model import FeatureExtractor
 from utils import (writer_builder, model_builder, optimizer_builder,
-                out2csv, NormScaler, model_config, summary, config_loader)
+                out2csv, NormScaler, model_config, summary, config_loader, EarlyStopping)
 from dataset import AxisDataSet, cross_validation
 
 
@@ -77,6 +77,14 @@ def train_argument(inhert=False):
     parser.add_argument('--check-interval', type=int, default=5,
                         help='setting output a csv file every epoch of interval (default: 5)')
 
+    # Early-Stop setting
+    parser.add_argument('--early-stop', action='store_false', default=True,
+                        help='Early stops the training if validation loss does not improve (default: True)')
+    parser.add_argument('--patience', type=int, default=2,
+                        help='How long to wait after last time validation loss improved. (default: 2)')
+    parser.add_argument('--verbose', action='store_true', default=False,
+                        help='If True, prints a message for each validation loss improvement. (default: False)')
+
     # logger setting
     parser.add_argument('--log-path', type=str, default='./logs',
                         help='set the logger path of pytorch model (default: ./logs)')
@@ -119,6 +127,10 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
     # store the training time
     writer = writer_builder(args.log_path, args.model_name, args.load)
+
+    # initialize the early_stopping object
+    if args.early_stop:
+        early_stopping = EarlyStopping(patience=args.patience, verbose=args.verbose, path=model_path)
 
     progress_bar = tqdm(total=len(train_loader)+len(valid_loader))
 
@@ -217,7 +229,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
         # update every epoch
         # save model as pickle file
-        if epoch == checkpoint['epoch'] or err < best_err:
+        """if epoch == checkpoint['epoch'] or err < best_err:
             best_err = err  # save err in first epoch
 
             # save current epoch and model parameters
@@ -227,12 +239,22 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
                     'epoch': epoch,
                 }
                 , model_path)
+        """
 
         # update loggers
         writer.add_scalars('Loss/',
                            {'train loss': err, 'valid loss': valid_err},
                            epoch,)
-        
+
+        # early_stopping needs the validation loss to check if it has decresed, 
+        # and if it has, it will make a checkpoint of the current model
+        if args.early_stop:
+            early_stopping(valid_err, model, epoch)
+
+            if early_stopping.early_stop:
+                print("Early stopping")
+                break
+
     writer.close()
     progress_bar.close()
 
