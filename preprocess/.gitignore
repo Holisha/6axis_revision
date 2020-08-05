@@ -1,7 +1,0 @@
-__pycache__
-*.zip
-*.tar.gz
-*.rar
-dataset*/
-train/
-6axis/
