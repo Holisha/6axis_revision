@@ -1,12 +1,13 @@
 import os
 import csv
 import json
+import yaml
 import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 from collections import OrderedDict
 from glob import glob
 from typing import Union, Optional
@@ -136,8 +137,10 @@ def model_builder(model_name, *args, **kwargs):
 def model_config(args, save: Union[str, bool]=False):
     """record model configuration
 
-    if save is path, save to the path
-    if save is True, save in current directory
+    save model config as config.json
+        if save is path, save to the path
+        if save is True, save in current directory
+
     Args:
         args (Argparse object): Model setting
         save (Union[str, bool], optional): save as json file or just print to stdout. Defaults to False.
@@ -153,17 +156,55 @@ def model_config(args, save: Union[str, bool]=False):
         print(f'{key}: {value}')
     print('\n####### model arguments #######\n')
 
-    # save config as .json file        
-    if save is True:
-        config = open('config.json', 'w')
-        json.dump(vars(args), config, indent=4)
-        config.close()
-    # save config as .json file to path
-    elif type(save) is str:
-        config = open(
-            os.path.join(save,'config.json'), 'w')
-        json.dump(vars(args), config, indent=4)
-        config.close()
+    if save:
+        # save config as .json file 
+        # if user has determined path
+        config_path = os.path.join(save, 'config.json') if type(save is str) else 'config.json'
+
+        with open(config_path, 'w') as config:
+            json.dump(vars(args), config, indent=4)
+
+
+def config_loader(doc_path, args):
+    """load config instead of argparser
+
+    Noticed that keys must be the same as original arguments
+    support config type:
+        .json
+        .yaml (load with save loader)
+
+    Args:
+        doc_path (str): document path
+        args : To be replaced arguments 
+
+    Returns:
+        argparse's object: for the compatiable 
+    """
+    with open(doc_path, 'r') as doc:
+        format = doc_path.split('.')[-1]
+        # determine the doc format
+        load_func={
+            'yaml': yaml.safe_load,
+            'json': json.load,
+        }[format]
+        doc_args = load_func(doc)
+
+    try:
+        del args.doc
+        del doc_args['doc']
+    except:
+        print('There is no "doc" in args parser')
+
+    # check which key value is missing
+    if vars(args).keys() != doc_args.keys():
+        for key in vars(args).keys():
+            if not key in doc_args.keys():
+                print(f'"{key}" not found in document file!')
+        
+        print('ValueError: loaded argument file was not the same')
+        os._exit(0)
+
+    return Namespace(**doc_args)
 
 
 def optimizer_builder(optim_name: str):
@@ -456,7 +497,7 @@ def save_final_predict_and_new_dataset(inputs,stroke_num, file_string, args,stor
                 row.append(f'stroke{num}')
                 writer.writerow(row)
 
-
+#early stopping https://github.com/Bjarten/early-stopping-pytorch/blob/master/pytorchtools.py
 class EarlyStopping:
     """Early stops the training if validation loss doesn't improve after a given patience."""
     def __init__(self, patience=2, verbose=False, delta=0, path='./checkpoint.pt'):
