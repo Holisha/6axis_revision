@@ -10,7 +10,8 @@ from argparse import ArgumentParser
 
 # self defined
 from model import FeatureExtractor
-from utils import writer_builder, model_builder, optimizer_builder, out2csv, NormScaler, model_config, summary
+from utils import (writer_builder, model_builder, optimizer_builder,
+                out2csv, NormScaler, model_config, summary, config_loader)
 from dataset import AxisDataSet, cross_validation
 
 
@@ -27,6 +28,10 @@ def train_argument(inhert=False):
 
     # for compatible
     parser = ArgumentParser(add_help=not inhert)
+
+    # doc setting
+    parser.add_argument('--doc', type=str, metavar='./doc/sample.yaml',
+                        help='load document file (default: None)')
 
     # dataset setting
     parser.add_argument('--stroke-length', type=int, default=150,
@@ -235,6 +240,9 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 if __name__ == '__main__':
     # argument setting
     train_args = train_argument()
+
+    # replace args by document file
+    train_args = config_loader(train_args.doc, train_args)
 
     # config
     model_config(train_args, save=True)     # save model configuration before training

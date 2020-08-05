@@ -1,0 +1,35 @@
+# data setting
+stroke_length: 150
+train_path: /home/jefflin/dataset/train
+target_path: /home/jefflin/dataset/target
+batch_size: 64
+num_workers: 8
+holdout_p: 0.8  # hold out cross validation probability
+
+# model setting
+model_name: FSRCNN  # FSRCNN, DDBPN
+scale: 1
+model_args: []      # model args, for more detail, please take a look in model/model name/models.py
+gpu_id: 0
+
+# optimizer
+lr: 0.001 # learning rate
+# Adam, SGD, ranger, rangerVA
+# noticed that different optimizer fit in different learning rate
+optim: adam
+load: false         # load exist .pickle file or not
+weight_decay: 0.01
+
+# weighted loss
+alpha: 0.001        # mse loss weight
+beta: 1             # content loss weight
+epochs: 50
+
+# logger setting
+log_path: ./logs
+
+# output setting
+save_path: ./output
+check_interval: 5   # convert tensor to csv file
+
+# other
