@@ -456,7 +456,7 @@ def save_final_predict_and_new_dataset(inputs,stroke_num, file_string, args,stor
                 row.append(f'stroke{num}')
                 writer.writerow(row)
 
-
+#early stopping https://github.com/Bjarten/early-stopping-pytorch/blob/master/pytorchtools.py
 class EarlyStopping:
     """Early stops the training if validation loss doesn't improve after a given patience."""
     def __init__(self, patience=2, verbose=False, delta=0, path='./checkpoint.pt'):
