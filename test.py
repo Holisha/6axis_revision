@@ -31,7 +31,9 @@ def test_argument(inhert=False):
 
     # dataset setting
     parser.add_argument('--test-path', type=str, default='../dataset/test',
-                        help='test dataset path (default: ../datasettest)')
+                        help='test dataset path (default: ../dataset/test)')
+    parser.add_argument('--target-path', type=str, default='../dataset/target',
+                        help='target dataset path (default: ../dataset/target)')
     parser.add_argument('--batch-size', type=int, default=128,
                         help='set the batch size (default: 128)')
     parser.add_argument('--num-workers', type=int, default=8,
@@ -145,7 +147,7 @@ if __name__ == '__main__':
     criterion = nn.MSELoss()
 
     # dataset
-    test_set = AxisDataSet(test_args.test_path)
+    test_set = AxisDataSet(test_args.test_path,test_args.target_path)
 
 
     test_loader = DataLoader(test_set,
