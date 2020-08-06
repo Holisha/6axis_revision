@@ -7,16 +7,38 @@ from torch.utils.data.sampler import SubsetRandomSampler
 from glob import glob
 from sklearn.preprocessing import MinMaxScaler
 
+
+#TODO: determine test path or add axis test set
 class AxisDataSet(Dataset):
-    def __init__(self, path, target_path):
+    """
+    file location: PATH/task/word directory/stroke_num/*.csv
+        ex: PATH/train/0042/05/0042_01.csv
+
+    file format: (word dir)_(stroke num).csv
+        ex: 0042_01.csv
+    """
+    def __init__(self, path: str, target_path: str):
+        """
+        specific the where the directory is
+
+        using list to save all csv file path, word index, and stroke num in 'path'
+            csv_list = [
+                (0001_01.csv, 0001, 1),
+                (0001_02.csv, 0001, 1),
+                 ...]
+        
+        Save target data as tensor and save in dictionary
+            target = {
+                '0001': [tensor_1 , tensor_2,...]
+                '0002': [...],
+            }
+
+        Args:
+            path (str): PATH/train/ or PATH/test/
+            target_path (str): PATH/target/
+        """
         self.csv_list = []
 
-        # list to dict to store word number
-        # {
-        #   '0001': [target_1.csv , target_2.csv ,...]
-        #   '0002': [...],
-        #    ...
-        # }
         self.target = {}
 
         # list all word directory name

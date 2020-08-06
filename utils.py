@@ -1,5 +1,6 @@
 import os
 import csv
+import sys
 import json
 import yaml
 import numpy as np
@@ -193,7 +194,14 @@ def config_loader(doc_path, args):
         del args.doc
         del doc_args['doc']
     except:
-        print('There is no "doc" in args parser')
+        print('There is no "doc" in args parser\n')
+        
+    try:
+        # train path exist
+        if args.train_path:
+            args.test_path = None
+    except:
+        print(f'No "train_path" founded in {sys.argv[0]}\n')
 
     # check which key value is missing
     if vars(args).keys() != doc_args.keys():
@@ -201,9 +209,10 @@ def config_loader(doc_path, args):
             if not key in doc_args.keys():
                 print(f'"{key}" not found in document file!')
         
-        print('ValueError: loaded argument file was not the same')
-        os._exit(0)
+        print('\nWarning: missing above key in document file, which would raising error')
+        # os._exit(0)
 
+    print(f'config loaded: {doc_path}')
     return Namespace(**doc_args)
 
 
