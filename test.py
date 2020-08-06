@@ -146,8 +146,7 @@ if __name__ == '__main__':
     # dataset
     test_set = AxisDataSet(test_args.test_path)
 
-    # dataloader
-    test_set = AxisDataSet(test_args.test_path)
+
     test_loader = DataLoader(test_set,
                              batch_size=test_args.batch_size,
                              shuffle=False,

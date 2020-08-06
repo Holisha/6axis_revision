@@ -69,7 +69,8 @@ class DDBPN(nn.Module):
 
         # convolution setting
         kernel_size, stride, padding = {
-            1: ((4, 3), 1, (2, 1)),
+            1: ((4, 3), 1, (2, 1)),   # version 1
+            # 1: (4, 1, 2),     # version 2
             2: (6, 2, 2),
             4: (8, 4, 2),
             8: (12, 8, 2),

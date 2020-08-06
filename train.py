@@ -31,7 +31,7 @@ def train_argument(inhert=False):
 
     # doc setting
     parser.add_argument('--doc', type=str, metavar='./doc/sample.yaml',
-                        help='load document file (default: None)')
+                        help='load document file by position(default: None)')
 
     # dataset setting
     parser.add_argument('--stroke-length', type=int, default=150,
@@ -60,7 +60,7 @@ def train_argument(inhert=False):
                         help='load model parameter from exist .pt file (default: False)')
     parser.add_argument('--version', type=int, dest='load',
                         help='load specific version (default: False)')
-    parser.add_argument('--gpu-id', type=int, default=0,
+    parser.add_argument('--gpu-id', type=int,
                         help='set the model to run on which gpu (default: 0)')
     parser.add_argument('--lr', type=float, default=1e-3,
                         help='set the learning rate (default: 1e-3)')
@@ -134,11 +134,12 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
     progress_bar = tqdm(total=len(train_loader)+len(valid_loader))
 
-    for epoch in range(checkpoint['epoch'], args.epochs+1):        
+    for epoch in range(checkpoint['epoch'], args.epochs+1):
         model.train()
         err = 0.0
         valid_err = 0.0
 
+        progress_bar.reset(total=len(train_loader)+len(valid_loader))        
         progress_bar.set_description(f'Train epoch: {epoch}/{args.epochs}')
         for data in train_loader:
             inputs, target, _ = data
@@ -264,7 +265,8 @@ if __name__ == '__main__':
     train_args = train_argument()
 
     # replace args by document file
-    train_args = config_loader(train_args.doc, train_args)
+    if train_args.doc:
+        train_args = config_loader(train_args.doc, train_args)
 
     # config
     model_config(train_args, save=True)     # save model configuration before training
