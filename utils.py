@@ -159,7 +159,7 @@ def model_config(args, save: Union[str, bool]=False):
     if save:
         # save config as .json file 
         # if user has determined path
-        config_path = os.path.join(save, 'config.json') if type(save is str) else 'config.json'
+        config_path = os.path.join(save, 'config.json') if type(save) is str else 'config.json'
 
         with open(config_path, 'w') as config:
             json.dump(vars(args), config, indent=4)
