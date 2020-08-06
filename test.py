@@ -150,7 +150,12 @@ if __name__ == '__main__':
     # optimizer = None # don't need optimizer in test
 
     # dataset
+<<<<<<< HEAD
     test_set = AxisDataSet(test_args.test_path, test_args.target_path)
+=======
+    test_set = AxisDataSet(test_args.test_path,test_args.target_path)
+
+>>>>>>> e9b4ee7edb055f0b71cb1145cf441604abf9ec20
 
     test_loader = DataLoader(test_set,
                              batch_size=test_args.batch_size,
