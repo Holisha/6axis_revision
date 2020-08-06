@@ -48,7 +48,8 @@ def test_argument(inhert=False):
                         help='load model parameter from exist .pt file (default: True)')
     parser.add_argument('--gpu-id', type=int, default=0,
                         help='set the model to run on which gpu (default: 0)')
-
+    parser.add_argument('--lr', type=float, default=1e-3,
+                        help='set the learning rate (default: 1e-3)')
     # logger setting
     parser.add_argument('--log-path', type=str, default='../logs/FSRCNN',
                         help='set the logger path of pytorch model (default: ../logs/FSRCNN)')
