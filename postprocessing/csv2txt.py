@@ -1,5 +1,3 @@
-import pandas as pd
-
 def csv2txt(data, txt_path):
     """Convert all CSV files to TXT files.
 
