@@ -151,7 +151,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
             pred = model(inputs)
 
-            # unnormalize
+            # denormalize
             pred = input_scaler.inverse_transform(pred)
 
             # MSE loss
@@ -179,7 +179,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
             # out2csv every check interval epochs (default: 5)
             if epoch % args.check_interval == 0:
 
-                # unnormalize value for visualize
+                # denormalize value for visualize
                 inputs = input_scaler.inverse_transform(inputs)
                 # pred = input_scaler.inverse_transform(pred)
                 # target = target_scaler.inverse_transform(target)

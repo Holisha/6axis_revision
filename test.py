@@ -1,15 +1,13 @@
 import os
 import torch
 import torch.nn as nn
-import torch.optim as optim
 from torch.utils.data import DataLoader
-from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 from argparse import ArgumentParser
 
 # self defined
 from model import FeatureExtractor
-from utils import writer_builder, model_builder, out2csv, inverse_scaler_transform, model_config
+from utils import  (model_builder, out2csv, model_config, config_loader, NormScaler)
 from dataset import AxisDataSet, cross_validation
 
 
@@ -24,14 +22,18 @@ def test_argument(inhert=False):
         parser(): if inhert is true, then return parser
     """
 
-    if inhert is True:
-        parser = ArgumentParser(add_help=False)
-    else:
-        parser = ArgumentParser(add_help=True)
+    # for compatible
+    parser = ArgumentParser(add_help=not inhert)
+
+    # doc setting
+    parser.add_argument('--doc', type=str, metavar='./doc/sample.yaml',
+                        help='load document file by position(default: None)')
 
     # dataset setting
-    parser.add_argument('--test-path', type=str, default='../dataset/test',
-                        help='test dataset path (default: ../datasettest)')
+    parser.add_argument('--test-path', type=str, default='/home/jefflin/dataset/test_all',
+                        help="test dataset path (default: '/home/jefflin/dataset/test_all')")
+    parser.add_argument('--target-path', type=str, default='/home/jefflin/dataset/target',
+                        help="target dataset path (default: '/home/jefflin/dataset/target')")
     parser.add_argument('--batch-size', type=int, default=128,
                         help='set the batch size (default: 128)')
     parser.add_argument('--num-workers', type=int, default=8,
@@ -46,17 +48,23 @@ def test_argument(inhert=False):
                         help="set other args (default: [])")
     parser.add_argument('--load', action='store_false', default=True,
                         help='load model parameter from exist .pt file (default: True)')
+    parser.add_argument('--version', type=int, dest='load',
+                        help='load specific version (default: False)')
     parser.add_argument('--gpu-id', type=int, default=0,
                         help='set the model to run on which gpu (default: 0)')
-    parser.add_argument('--lr', type=float, default=1e-3,
-                        help='set the learning rate (default: 1e-3)')
+
+    # test setting
+    parser.add_argument('--alpha', type=float, default=1e-3,
+                        help="set loss 1's weight (default: 1e-3)")
+    parser.add_argument('--beta', type=float, default=1,
+                        help="set loss 2's weight (default: 1)")
+
     # logger setting
-    parser.add_argument('--log-path', type=str, default='../logs/FSRCNN',
-                        help='set the logger path of pytorch model (default: ../logs/FSRCNN)')
-    
+    parser.add_argument('--log-path', type=str, default='./logs',
+                        help='set the logger path of pytorch model (default: ./logs)')
     # save setting
-    parser.add_argument('--save-path', type=str, default='../output',
-                        help='set the output file (csv or txt) path (default: ../output)')
+    parser.add_argument('--save-path', type=str, default='./output',
+                        help='set the output file (csv or txt) path (default: ./output)')
 
     # for the compatiable
     if inhert is True:
@@ -68,9 +76,12 @@ def test_argument(inhert=False):
 @torch.no_grad()
 def test(model, test_loader, criterion, args):
     # load model parameters
-    checkpoint = torch.load(f'fsrcnn_{args.scale}x.pt', map_location=f'cuda:{args.gpu_id}')
+    checkpoint = torch.load(f'{args.model_name}_{args.scale}x.pt', map_location=f'cuda:{args.gpu_id}')
     model.load_state_dict(checkpoint['state_dict'])
     model.eval()
+
+    # normalize scaler
+    input_scaler = NormScaler()
 
     # declare content loss
     feature_extractor = FeatureExtractor().cuda()
@@ -86,22 +97,13 @@ def test(model, test_loader, criterion, args):
         inputs, target, _ = data
         inputs, target = inputs.cuda(), target.cuda()
 
-        # get inputs min and max
-        scale_min = inputs.min(2, keepdim=True)[0].detach()
-        scale_interval = (inputs.max(2, keepdim=True)[0].detach() - scale_min)
-
-        # normalize to 0~1
-        inputs = (inputs - scale_min) / scale_interval
+        # normalize inputs and target
+        inputs = input_scaler.fit(inputs)
 
         pred = model(inputs)
 
-        # inverse transform
-        # pred = inverse_scaler_transform(pred, target)
-        pred = pred * scale_interval + scale_min
-
-        # inverse transform inputs
-        # inputs_inverse = inverse_scaler_transform(inputs, target)
-        inputs_inverse = inputs * scale_interval + scale_min
+        # denormalize
+        pred = input_scaler.inverse_transform(pred)
 
         # out2csv
         while j - (i * 64) < pred.size(0):
@@ -112,12 +114,12 @@ def test(model, test_loader, criterion, args):
         i += 1
 
         # MSE loss
-        mse_loss = criterion(pred, target)
+        mse_loss = args.alpha * criterion(pred, target)
 
         # content loss
         gen_feature = feature_extractor(pred)
         real_feature = feature_extractor(target)
-        content_loss = criterion(gen_feature, real_feature)
+        content_loss = args.beta * criterion(gen_feature, real_feature)
 
         # for compatible
         loss = content_loss + mse_loss
@@ -130,6 +132,9 @@ def test(model, test_loader, criterion, args):
 if __name__ == '__main__':
     # argument setting
     test_args = test_argument()
+    
+    if test_args.doc:
+        test_args = config_loader(test_args.doc, test_args)
 
     # config
     model_config(test_args, save=False)     # print model configuration of evaluation
@@ -140,19 +145,25 @@ if __name__ == '__main__':
     # model
     model = model_builder(test_args.model_name, test_args.scale, *test_args.model_args).cuda()
 
-    # optimizer and criteriohn
-    optimizer = optim.Adam(model.parameters(), lr=test_args.lr)
+    # criteriohn
     criterion = nn.MSELoss()
+    # optimizer = None # don't need optimizer in test
 
     # dataset
-    test_set = AxisDataSet(test_args.test_path)
+<<<<<<< HEAD
+    test_set = AxisDataSet(test_args.test_path, test_args.target_path)
+=======
+    test_set = AxisDataSet(test_args.test_path,test_args.target_path)
 
+>>>>>>> e9b4ee7edb055f0b71cb1145cf441604abf9ec20
 
     test_loader = DataLoader(test_set,
                              batch_size=test_args.batch_size,
                              shuffle=False,
                              num_workers=test_args.num_workers,
-                             pin_memory=True,)
+                            #  pin_memory=True,
+                             pin_memory=False,
+                             )
 
     # test
     test(model, test_loader, criterion, test_args)
