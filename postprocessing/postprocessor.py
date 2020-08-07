@@ -1,14 +1,12 @@
-# TODO: fix the test file bug about the name of the file. eg. test_10_input.csv v.s. test_1_input.csv
-
 import os
 from glob import glob
 import re
 import pandas as pd
 
-from stroke2char import stroke2char, get_len
+from stroke2char import stroke2char
 from axis2img import axis2img
 from csv2txt import csv2txt
-from utils import argument_setting
+from utils import argument_setting, get_len
 
 def postprocessor_dir(dir_path, csv_list):
     """Do postprocessor to the directory
@@ -39,7 +37,7 @@ def postprocessor_dir(dir_path, csv_list):
 
         # get original length
         stroke_len = get_len(target)
-        
+
         # drop the extra rows and read input and output data
         target.drop(target.index[stroke_len:], inplace=True)
         input = pd.read_csv(
@@ -53,7 +51,7 @@ def postprocessor_dir(dir_path, csv_list):
                     header=None
                 )
 
-        # test data but not test all data
+        # test stroke2char
         if file_feature[:5] == 'test_' and file_feature != 'test_all':
             (
                 test_flag,
@@ -61,15 +59,26 @@ def postprocessor_dir(dir_path, csv_list):
             ) = stroke2char(
                     target.iloc[:, :-1], input.iloc[:, :-1], output.iloc[:, :-1],
                     test_target, test_input, test_output,
-                    dir_path, stroke_len, file_feature[5:]
+                    dir_path, stroke_len, int(file_feature[5:])
                 )
 
+        # axis2img
         axis2img(target, input, output, file_feature, dir_path)
+
+        # csv2txt
         csv2txt(target, os.path.join(dir_path, f'{file_feature}_target.txt'))
         csv2txt(input, os.path.join(dir_path, f'{file_feature}_input.txt'))
         csv2txt(output, os.path.join(dir_path, f'{file_feature}_output.txt'))
 
+    # save test char file
+    if test_target.shape[0] != 0:
+        test_target.to_csv(os.path.join(dir_path, 'test_all_target.csv'), header=False, index=False)
+        test_input.to_csv(os.path.join(dir_path, 'test_all_input.csv'), header=False, index=False)
+        test_output.to_csv(os.path.join(dir_path, 'test_all_output.csv'), header=False, index=False)
+
+
 def postprocessor():
+
     # check the path exists or not
     if not os.path.exists(args.path):
         print(f'{args.path} is not exist!!!')

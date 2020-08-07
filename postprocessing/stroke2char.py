@@ -1,55 +1,65 @@
 import pandas as pd
 
-def get_len(data):
-    """get the original length of the stroke
+def insert_test(test_data, input, stroke_idx):
+    """insert the input to test_data with right stroke place
 
     Args:
-        data (pandas.Dataframe): the stroke data to count the length
+        test_data (pandas.DataFrame): test data
+        input (pandas.DataFrame): input data to insert
+        stroke_idx (int): the input stroke index
 
     Returns:
-        int: the original length of the stroke
+        pandas.DataFrame: the test data after inserted
     """
-    match = data.iloc[:, :-1].eq(data.iloc[:, :-1].shift())
+    start = 0  # for get the index to insert
 
-    # get the length of the different rows
-    stroke_len = len(
-        match.groupby(
-            match.iloc[:, 0]
-        ).groups.get(False)
-    )
-    return stroke_len
+    # find the correct index to insert the stroke
+    for row in range(test_data.shape[0]):
+        if stroke_idx < int(test_data.iloc[row, 6][6:]):
+            start = row
+            break;
 
+    # output = test_data[:start] + input
+    output = pd.concat([test_data.iloc[:start], input], ignore_index=True)
 
-def stroke2char(target_data, input_data, output_data, test_target, test_input, test_output, dir_path, stroke_len, index):
+    # output = output + test_data[start:]
+    output = output.append(test_data.iloc[start:], ignore_index=True)
+
+    return output
+
+def stroke2char(
+                target_data, input_data, output_data,
+                test_target, test_input, test_output,
+                dir_path, stroke_len, stroke_idx
+            ):
     """Merge each stroke into a single character
 
     Args:
         target_data (pandas.DataFrame): original target data
         input_data (pandas.DataFrame): original input data
         output_data (pandas.DataFrame): original output data
+
         test_target (pandas.DataFrame): all test target data
         test_input (pandas.DataFrame): all test input data
         test_output (pandas.DataFrame): all test output data
+
         dir_path (string): the path of directory
         stroke_len (int): the length of stroke
-        index (string): the stroke index
+        stroke_idx (int): the stroke index
 
     Returns:
-        Boolean, pandas.DataFrame, pandas.DataFrame, pandas.DataFrame: True, test_target, test_input, test_output
+        Boolean, pandas.DataFrame, pandas.DataFrame, pandas.DataFrame:
+                True, test_target, test_input, test_output
     """
 
     # Update stroke number
-    target_data[6] = [f'stroke{index}'] * stroke_len
-    input_data[6] = [f'stroke{index}'] * stroke_len
-    output_data[6] = [f'stroke{index}'] * stroke_len
+    target_data[6] = [f'stroke{stroke_idx}'] * stroke_len
+    input_data[6] = [f'stroke{stroke_idx}'] * stroke_len
+    output_data[6] = [f'stroke{stroke_idx}'] * stroke_len
 
-    # append data
-    test_target = test_target.append(target_data, ignore_index=True)
-    test_input = test_input.append(input_data, ignore_index=True)
-    test_output = test_output.append(output_data, ignore_index=True)
-
-    test_target.to_csv(f'{dir_path}/test_all_target.csv', header=False, index=False)
-    test_input.to_csv(f'{dir_path}/test_all_input.csv', header=False, index=False)
-    test_output.to_csv(f'{dir_path}/test_all_output.csv', header=False ,index=False)
+    # insert data
+    test_target = insert_test(test_target, target_data, stroke_idx)
+    test_input = insert_test(test_input, input_data, stroke_idx)
+    test_output = insert_test(test_output, output_data, stroke_idx)
 
     return True, test_target, test_input, test_output
