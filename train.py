@@ -10,7 +10,7 @@ from argparse import ArgumentParser
 
 # self defined
 from model import FeatureExtractor
-from utils import (writer_builder, model_builder, optimizer_builder,
+from utils import (writer_builder, model_builder, optimizer_builder, StorePair,
                 out2csv, NormScaler, model_config, summary, config_loader, EarlyStopping)
 from dataset import AxisDataSet, cross_validation
 
@@ -52,15 +52,15 @@ def train_argument(inhert=False):
                         metavar='FSRCNN, DDBPN' ,help="set model name (default: 'FSRCNN')")
     parser.add_argument('--scale', type=int, default=1,
                         help='set the scale factor for the SR model (default: 1)')
-    parser.add_argument('--model-args', nargs='*', type=int, default=[],
-                        help="set other args (default: [])")
+    parser.add_argument('--model-args', action=StorePair, nargs='+', default={},
+                        metavar='key=value', help="set other args (default: {})")
     parser.add_argument('--optim', type=str, default='adam',
                         help='set optimizer')
     parser.add_argument('--load', action='store_true', default=False,
                         help='load model parameter from exist .pt file (default: False)')
     parser.add_argument('--version', type=int, dest='load',
                         help='load specific version (default: False)')
-    parser.add_argument('--gpu-id', type=int,
+    parser.add_argument('--gpu-id', type=int, default=0,
                         help='set the model to run on which gpu (default: 0)')
     parser.add_argument('--lr', type=float, default=1e-3,
                         help='set the learning rate (default: 1e-3)')
@@ -275,8 +275,8 @@ if __name__ == '__main__':
     torch.cuda.set_device(train_args.gpu_id)
 
     # model
-    model = model_builder(train_args.model_name, train_args.scale, *train_args.model_args).cuda()
-    
+    model = model_builder(train_args.model_name, train_args.scale, **train_args.model_args).cuda()
+
     # optimizer and critera
     optimizer = optimizer_builder(train_args.optim) # optimizer class
     optimizer = optimizer(                          # optmizer instance

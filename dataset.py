@@ -9,6 +9,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 
 #TODO: determine test path or add axis test set
+#TODO: out2csv with same data
 class AxisDataSet(Dataset):
     """
     file location: PATH/task/word directory/stroke_num/*.csv

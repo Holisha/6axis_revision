@@ -1,3 +1,4 @@
+import re
 import os
 import csv
 import sys
@@ -8,7 +9,7 @@ import pandas as pd
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from argparse import ArgumentParser, Namespace
+from argparse import Action, ArgumentParser, Namespace
 from collections import OrderedDict
 from glob import glob
 from typing import Union, Optional
@@ -54,6 +55,27 @@ def stroke_statistics(path='6d/', mode='max'):
 ################################################################
 ########################## model info ##########################
 ################################################################
+
+
+class StorePair(Action):
+    def __init__(self, option_strings, dest, nargs=None, **kwargs):
+        super(StorePair, self).__init__(option_strings, dest, nargs=nargs, **kwargs)
+    
+    def __call__(self, parser, namespace, values, option_string=None):
+        target = {}
+
+        for pair in values:
+            k, v = pair.split('=')
+
+            if re.match(r'^-?\d+\.\d+$', v):
+                v = float(v)
+            elif v.isdigit():
+                v = int(v)
+
+            target[k] = v
+        
+        # assign value to namespace
+        setattr(namespace, self.dest, target)
 
 
 def writer_builder(log_root, model_name, load: Union[bool, int]=False):

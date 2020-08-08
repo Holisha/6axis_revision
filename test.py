@@ -7,7 +7,7 @@ from argparse import ArgumentParser
 
 # self defined
 from model import FeatureExtractor
-from utils import  (model_builder, out2csv, model_config, config_loader, NormScaler)
+from utils import  (model_builder, out2csv, model_config, config_loader, StorePair, NormScaler)
 from dataset import AxisDataSet, cross_validation
 
 
@@ -44,8 +44,8 @@ def test_argument(inhert=False):
                         metavar='FSRCNN, DDBPN' ,help="set model name (default: 'FSRCNN')")
     parser.add_argument('--scale', type=int, default=1,
                         help='set the scale factor for the SR model (default: 1)')
-    parser.add_argument('--model-args', nargs='*', type=int, default=[],
-                        help="set other args (default: [])")
+    parser.add_argument('--model-args', action=StorePair, nargs='+', default={},
+                        metavar='key=value', help="set other args (default: {})")
     parser.add_argument('--load', action='store_false', default=True,
                         help='load model parameter from exist .pt file (default: True)')
     parser.add_argument('--version', type=int, dest='load',
@@ -143,19 +143,14 @@ if __name__ == '__main__':
     torch.cuda.set_device(test_args.gpu_id)
 
     # model
-    model = model_builder(test_args.model_name, test_args.scale, *test_args.model_args).cuda()
+    model = model_builder(test_args.model_name, test_args.scale, **test_args.model_args).cuda()
 
     # criteriohn
     criterion = nn.MSELoss()
     # optimizer = None # don't need optimizer in test
 
     # dataset
-<<<<<<< HEAD
     test_set = AxisDataSet(test_args.test_path, test_args.target_path)
-=======
-    test_set = AxisDataSet(test_args.test_path,test_args.target_path)
-
->>>>>>> e9b4ee7edb055f0b71cb1145cf441604abf9ec20
 
     test_loader = DataLoader(test_set,
                              batch_size=test_args.batch_size,
