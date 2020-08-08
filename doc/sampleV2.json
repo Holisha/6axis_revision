@@ -6,9 +6,11 @@
     "batch_size": 64,
     "num_workers": 8,
     "holdout_p": 0.8,
-    "model_name": "FSRCNN",
+    "model_name": "DDBPN",
     "scale": 1,
-    "model_args": [],
+    "model_args": {
+        "stages": 3
+    },
     "optim": "adam",
     "load": false,
     "gpu_id": 0,
@@ -18,6 +20,9 @@
     "beta": 1,
     "epochs": 50,
     "check_interval": 5,
+    "early_stop": true,
+    "patience": 2,
+    "verbose": false,
     "log_path": "./logs",
     "save_path": "./output"
 }
