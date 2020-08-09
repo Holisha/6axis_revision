@@ -1,6 +1,6 @@
 import pandas as pd
 
-def insert_test(test_data, input, stroke_idx):
+def _insert_test(test_data, input, stroke_idx):
     """insert the input to test_data with right stroke place
 
     Args:
@@ -58,8 +58,8 @@ def stroke2char(
     output_data[6] = [f'stroke{stroke_idx}'] * stroke_len
 
     # insert data
-    test_target = insert_test(test_target, target_data, stroke_idx)
-    test_input = insert_test(test_input, input_data, stroke_idx)
-    test_output = insert_test(test_output, output_data, stroke_idx)
+    test_target = _insert_test(test_target, target_data, stroke_idx)
+    test_input = _insert_test(test_input, input_data, stroke_idx)
+    test_output = _insert_test(test_output, output_data, stroke_idx)
 
     return True, test_target, test_input, test_output

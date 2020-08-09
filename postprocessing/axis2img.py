@@ -2,11 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import re
 
-def angle2deg(angle):
+def _angle2deg(angle):
     return angle * np.pi / 180
 
 
-def get_3d(csv_file, length=185):
+def _get_3d(csv_file, length=185):
     """
     input: 6 axis csv file path
     path: file path
@@ -25,9 +25,9 @@ def get_3d(csv_file, length=185):
         c = csv_file.iloc[row, 5]
         n_stroke = int(re.search(r'\d+$', csv_file.iloc[row, 6]).group())
 
-        a = angle2deg(a)
-        b = angle2deg(b)
-        c = angle2deg(c)
+        a = _angle2deg(a)
+        b = _angle2deg(b)
+        c = _angle2deg(c)
         # print(f'{n_stroke}: {x}, {y}, {z}, {a}, {b}, {c}')
 
         R_a = np.array([
@@ -71,7 +71,7 @@ def get_3d(csv_file, length=185):
     return data
 
 
-def vis_2d_compare(target, inputs, outputs, path_name, idx):
+def _vis_2d_compare(target, inputs, outputs, path_name, idx):
     r"""
     compare only one stroke
     input: xyz data, character name
@@ -125,12 +125,12 @@ def axis2img(target_data, input_data, output_data, file_feature, path):
         path (string): director path
     """
     # get 3d data from csv
-    target  = get_3d(target_data)
-    inputs  = get_3d(input_data)
-    outputs = get_3d(output_data)
+    target  = _get_3d(target_data)
+    inputs  = _get_3d(input_data)
+    outputs = _get_3d(output_data)
 
     # get visual 2d img from ndarray
-    vis_2d_compare(
+    _vis_2d_compare(
         target=target,
         inputs=inputs,
         outputs=outputs,

@@ -3,13 +3,13 @@ import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import Dataset
-from torch.utils.data.sampler import SubsetRandomSampler
+from torch.utils.data.sampler import SubsetRandomSampler, SequentialSampler
 from glob import glob
 from sklearn.preprocessing import MinMaxScaler
 
 
 #TODO: determine test path or add axis test set
-#TODO: out2csv with same data
+
 class AxisDataSet(Dataset):
     """
     file location: PATH/task/word directory/stroke_num/*.csv
@@ -142,6 +142,6 @@ def cross_validation(train_set, mode='hold', **kwargs):
     train_idx, valid_idx = indices[:split_idx], indices[split_idx:]
 
     train_sampler = SubsetRandomSampler(train_idx)
-    valid_sampler = SubsetRandomSampler(valid_idx)
+    valid_sampler = SequentialSampler(valid_idx)
 
     return train_sampler, valid_sampler

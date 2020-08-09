@@ -1,5 +1,3 @@
-#TODO: Add early stop, out2csv take specific data
-
 import os
 import torch
 import torch.nn as nn
@@ -13,7 +11,7 @@ from model import FeatureExtractor
 from utils import (writer_builder, model_builder, optimizer_builder, StorePair,
                 out2csv, NormScaler, model_config, summary, config_loader, EarlyStopping)
 from dataset import AxisDataSet, cross_validation
-
+from postprocessing import postprocessor
 
 def train_argument(inhert=False):
     """return train arguments
@@ -80,8 +78,10 @@ def train_argument(inhert=False):
     # Early-Stop setting
     parser.add_argument('--early-stop', action='store_false', default=True,
                         help='Early stops the training if validation loss does not improve (default: True)')
-    parser.add_argument('--patience', type=int, default=2,
-                        help='How long to wait after last time validation loss improved. (default: 2)')
+    parser.add_argument('--patience', type=int, default=5,
+                        help='How long to wait after last time validation loss improved. (default: 5)')
+    parser.add_argument('--threshold', type=float, default=0.1,
+                        help='Minimum change in the monitored quantity to qualify as an improvement. (default: 0.1)')
     parser.add_argument('--verbose', action='store_true', default=False,
                         help='If True, prints a message for each validation loss improvement. (default: False)')
 
@@ -130,7 +130,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
     # initialize the early_stopping object
     if args.early_stop:
-        early_stopping = EarlyStopping(patience=args.patience, verbose=args.verbose, path=model_path)
+        early_stopping = EarlyStopping(patience=args.patience, verbose=args.verbose, threshold=args.threshold, path=model_path)
 
     progress_bar = tqdm(total=len(train_loader)+len(valid_loader))
 
@@ -161,7 +161,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
             gen_features = feature_extractor(pred)
             real_features = feature_extractor(target)
             content_loss = args.beta * criterion(gen_features, real_features)
-        
+
             # for compatible but bad for memory usage
             loss = mse_loss + content_loss
 
@@ -176,18 +176,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
             loss.backward()
             optimizer.step()
             
-            # out2csv every check interval epochs (default: 5)
-            if epoch % args.check_interval == 0:
 
-                # denormalize value for visualize
-                inputs = input_scaler.inverse_transform(inputs)
-                # pred = input_scaler.inverse_transform(pred)
-                # target = target_scaler.inverse_transform(target)
-
-                # tensor to csv file
-                out2csv(inputs, f'{epoch}_input', args.stroke_length)
-                out2csv(pred, f'{epoch}_output', args.stroke_length)
-                out2csv(target, f'{epoch}_target', args.stroke_length)
 
         # cross validation
         progress_bar.set_description(f'Valid epoch:{epoch}/{args.epochs}')
@@ -222,6 +211,19 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
                 progress_bar.update()
 
                 valid_err += loss.sum().item() * inputs.size(0)
+
+                # out2csv every check interval epochs (default: 5)
+                if epoch % args.check_interval == 0:
+
+                    # denormalize value for visualize
+                    inputs = input_scaler.inverse_transform(inputs)
+                    # pred = input_scaler.inverse_transform(pred)
+                    # target = target_scaler.inverse_transform(target)
+
+                    # tensor to csv file
+                    out2csv(inputs, f'{epoch}_input', args.save_path, args.stroke_length)
+                    out2csv(pred, f'{epoch}_output', args.save_path, args.stroke_length)
+                    out2csv(target, f'{epoch}_target', args.save_path, args.stroke_length)
 
         # compute loss
         err /= len(train_loader.dataset)
@@ -323,3 +325,5 @@ if __name__ == '__main__':
 
     # config
     model_config(train_args, save=False)     # print model configuration after training
+
+    postprocessor(train_args.save_path)
