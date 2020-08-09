@@ -457,7 +457,7 @@ def inverse_scaler_transform(pred, target):
     return pred_inverse
 
 
-def out2csv(inputs, file_string, stroke_length):
+def out2csv(inputs, file_string, save_path, stroke_length):
     """
     store input to csv file.
 
@@ -466,45 +466,19 @@ def out2csv(inputs, file_string, stroke_length):
 
     no output
     """
-    if not os.path.exists('./output'):
-        os.mkdir('./output')
+    if not os.path.exists(save_path):
+        os.mkdir(save_path)
 
     output = np.squeeze(inputs.cpu().detach().numpy())
     table = output[0]
 
-    # with open('output/' + file_string + '.csv', 'w', newline='') as csvfile:
-    with open(f'output/{file_string}.csv', 'w', newline='') as csvfile:
+    with open(f'{save_path}/{file_string}.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         for i in range(stroke_length):
             row = [] * 7
             row[1:6] = table[i][:]
             row.append('stroke' + str(1))
             writer.writerow(row)
-
-
-def csv2txt(path='./output'):
-    r"""
-    Convert all CSV files to txt files.
-
-    path: store the csv files (default: './output')
-    """
-    for csv_name in sorted(glob(os.path.join(path, '*.csv'))):
-
-        # read csv file content
-        with open(csv_name, newline='') as csv_file:
-            rows = csv.reader(csv_file)
-            txt_name = f'{csv_name[:-4]}.txt'
-
-            # store in txt file
-            with open(txt_name, "w") as txt_file:
-                for row in rows:
-                    txt_file.write("movl 0 ")
-
-                    for j in range(len(row) - 1):
-                        txt_file.write(f'{float(row[j]):0.4f} ')
-
-                    txt_file.write("100.0000 ")
-                    txt_file.write(f'{row[6]}\n')
 
 
 def save_final_predict_and_new_dataset(inputs,stroke_num, file_string, args,store_data_cnt):
@@ -528,18 +502,19 @@ def save_final_predict_and_new_dataset(inputs,stroke_num, file_string, args,stor
                 row.append(f'stroke{num}')
                 writer.writerow(row)
 
-#early stopping https://github.com/Bjarten/early-stopping-pytorch/blob/master/pytorchtools.py
+
+#early stopping from https://github.com/Bjarten/early-stopping-pytorch/blob/master/pytorchtools.py
 class EarlyStopping:
     """Early stops the training if validation loss doesn't improve after a given patience."""
-    def __init__(self, patience=2, verbose=False, delta=0, path='./checkpoint.pt'):
+    def __init__(self, patience=5, verbose=False, threshold=0.1, path='./checkpoint.pt'):
         """
         Args:
             patience (int): How long to wait after last time validation loss improved.
-                            Default: 2
+                            Default: 5
             verbose (bool): If True, prints a message for each validation loss improvement. 
                             Default: False
-            delta (float): Minimum change in the monitored quantity to qualify as an improvement.
-                            Default: 0
+            threshold (float): Minimum change in the monitored quantity to qualify as an improvement.
+                            Default: 0.1
             path (str): Path for the checkpoint to be saved to.
                             Default: 'checkpoint.pt'
         """
@@ -549,7 +524,7 @@ class EarlyStopping:
         self.best_score = None
         self.early_stop = False
         self.val_loss_min = np.Inf
-        self.delta = delta
+        self.threshold = threshold
         self.path = path
 
     def __call__(self, val_loss, model, epoch):
@@ -559,7 +534,7 @@ class EarlyStopping:
         if self.best_score is None:
             self.best_score = score
             self.save_checkpoint(val_loss, model, epoch)
-        elif score < self.best_score + self.delta:
+        elif score < self.best_score * (1. + self.threshold):
             self.counter += 1
             if self.verbose:
                 print(f'EarlyStopping counter: {self.counter} out of {self.patience}')
@@ -574,7 +549,7 @@ class EarlyStopping:
         '''Saves model when validation loss decrease.'''
         if self.verbose:
             print(f'Validation loss decreased ({self.val_loss_min:.6f} --> {val_loss:.6f}).  Saving model ...\n')
-        # torch.save(model.state_dict(), self.path)
+
         # save current epoch and model parameters
         torch.save(
             {
@@ -583,3 +558,29 @@ class EarlyStopping:
             }
             , self.path)
         self.val_loss_min = val_loss
+
+
+'''def csv2txt(path='./output'):
+    r"""
+    Convert all CSV files to txt files.
+
+    path: store the csv files (default: './output')
+    """
+    for csv_name in sorted(glob(os.path.join(path, '*.csv'))):
+
+        # read csv file content
+        with open(csv_name, newline='') as csv_file:
+            rows = csv.reader(csv_file)
+            txt_name = f'{csv_name[:-4]}.txt'
+
+            # store in txt file
+            with open(txt_name, "w") as txt_file:
+                for row in rows:
+                    txt_file.write("movl 0 ")
+
+                    for j in range(len(row) - 1):
+                        txt_file.write(f'{float(row[j]):0.4f} ')
+
+                    txt_file.write("100.0000 ")
+                    txt_file.write(f'{row[6]}\n')
+'''

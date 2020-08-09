@@ -6,7 +6,7 @@ import pandas as pd
 from stroke2char import stroke2char
 from axis2img import axis2img
 from csv2txt import csv2txt
-from utils import argument_setting, get_len
+from post_utils import get_len, argument_setting
 
 def postprocessor_dir(dir_path, csv_list):
     """Do postprocessor to the directory
@@ -77,14 +77,19 @@ def postprocessor_dir(dir_path, csv_list):
         test_output.to_csv(os.path.join(dir_path, 'test_all_output.csv'), header=False, index=False)
 
 
-def postprocessor():
+def postprocessor(path):
+    """postprocess output files
+
+    Args:
+        path (string, optional): the path of the output directory.
+    """
 
     # check the path exists or not
-    if not os.path.exists(args.path):
-        print(f'{args.path} is not exist!!!')
+    if not os.path.exists(path):
+        print(f'{path} is not exist!!!')
         return
 
-    for root, _ , files in os.walk(args.path):
+    for root, _ , files in os.walk(path):
 
         # get the list of the csv file name
         csv_files = sorted(list(filter(lambda x: re.match(r'(.*).csv', x), files)))
@@ -99,4 +104,4 @@ def postprocessor():
 
 if __name__ == '__main__':
     args = argument_setting()
-    postprocessor()
+    postprocessor(args.path)
