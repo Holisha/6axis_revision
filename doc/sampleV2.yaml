@@ -19,7 +19,7 @@ lr: 0.001 # learning rate
 # noticed that different optimizer fit in different learning rate
 optim: adam
 load: false         # load exist .pickle file or not
-weight_decay: 0.01
+weight_decay: 0
 
 # early stopping
 early_stop: true

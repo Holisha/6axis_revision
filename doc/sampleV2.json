@@ -15,7 +15,7 @@
     "load": false,
     "gpu_id": 0,
     "lr": 0.001,
-    "weight_decay": 0.01,
+    "weight_decay": 0,
     "alpha": 0.001,
     "beta": 1,
     "epochs": 50,
