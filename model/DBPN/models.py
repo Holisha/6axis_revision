@@ -149,6 +149,9 @@ class DDBPN(nn.Module):
 
 if __name__ == '__main__':
     model = DDBPN(1, 1, 7)
+    for idx, param in enumerate(model.modules()):
+        if isinstance(param, nn.PReLU):
+            print(f'{idx}:{param}')
 
     torch.manual_seed(1)
 

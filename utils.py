@@ -391,9 +391,13 @@ class NormScaler:
     Normalize tensor's value into range 1~0
     And interse tensor back to original rage
     """
-    def __init__(self):
+    def __init__(self, mean=0, std=1):
         self.min = None
         self.interval = None
+
+        # normalize to specific range
+        self.mean = mean
+        self.std = std
     
     def fit(self, tensor):
         """transform tensor into range 1~0
@@ -410,8 +414,13 @@ class NormScaler:
         self.min = tensor.min(1, keepdim=True)[0]
         self.interval = tensor.max(1, keepdim=True)[0] - self.min
         tensor = (tensor - self.min) / self.interval
+        tensor = tensor.view(shape)
+
+        # normailze
+        if self.mean != 0 or self.std != 1:
+            tensor.sub_(self.mean).div_(self.std)
         
-        return tensor.view(shape)
+        return tensor
         
     def inverse_transform(self, tensor):
         """inverse tensor's value back
@@ -426,6 +435,11 @@ class NormScaler:
         assert self.interval is not None, r'ValueError: scaler must fit data before inverse transform'
 
         shape = tensor.shape
+
+        # denormalize
+        if self.mean != 0 or self.std != 1:
+            tensor.mul_(self.std).add_(self.mean)
+
         tensor = tensor.view(shape[0], -1)
 
         tensor = tensor * self.interval + self.min

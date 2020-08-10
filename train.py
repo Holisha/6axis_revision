@@ -1,3 +1,4 @@
+#TODO: add amp training
 import os
 import torch
 import torch.nn as nn
@@ -12,6 +13,7 @@ from utils import (writer_builder, model_builder, optimizer_builder, StorePair,
                 out2csv, NormScaler, model_config, summary, config_loader, EarlyStopping)
 from dataset import AxisDataSet, cross_validation
 from postprocessing import postprocessor
+
 
 def train_argument(inhert=False):
     """return train arguments
@@ -44,6 +46,10 @@ def train_argument(inhert=False):
                         help='set the number of processes to run (default: 8)')
     parser.add_argument('--holdout-p', type=float, default=0.8,
                         help='set hold out CV probability (default: 0.8)')
+    parser.add_argument('--mean', type=float, default=0.5,
+                        help='set mean value to normalize data (default: 0.5)')
+    parser.add_argument('--std', type=float, default=0.5,
+                        help='set std value to normalize data (default: 0.5)')
 
     # model setting
     parser.add_argument('--model-name', type=str, default='FSRCNN',
@@ -62,8 +68,8 @@ def train_argument(inhert=False):
                         help='set the model to run on which gpu (default: 0)')
     parser.add_argument('--lr', type=float, default=1e-3,
                         help='set the learning rate (default: 1e-3)')
-    parser.add_argument('--weight-decay', '--wd', type=float, default=1e-2,
-                        help="set weight decay (default: 1e-2)")
+    parser.add_argument('--weight-decay', '--wd', type=float, default=0,
+                        help="set weight decay (default: 0)")
 
     # training setting
     parser.add_argument('--alpha', type=float, default=1e-3,
@@ -74,6 +80,8 @@ def train_argument(inhert=False):
                         help='set the epochs (default: 50)')
     parser.add_argument('--check-interval', type=int, default=5,
                         help='setting output a csv file every epoch of interval (default: 5)')
+    parser.add_argument('--amp', action='store_true', default=False,
+                        help='training with amp (default: False)')
 
     # Early-Stop setting
     parser.add_argument('--early-stop', action='store_false', default=True,
@@ -106,8 +114,8 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
     feature_extractor.eval()
 
     # normalize scaler
-    input_scaler = NormScaler()
-    # target_scaler = NormScaler()
+    input_scaler = NormScaler(mean=args.mean, std=args.std)
+    target_scaler = NormScaler(mean=args.mean, std=args.std)
 
     # load data
     model_path = f'{args.model_name}_{args.scale}x.pt'
@@ -147,12 +155,12 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
             # normalize inputs and target
             inputs = input_scaler.fit(inputs)
-            # target = target_scaler.fit(target)
+            target = target_scaler.fit(target)
 
             pred = model(inputs)
 
             # denormalize
-            pred = input_scaler.inverse_transform(pred)
+            # pred = input_scaler.inverse_transform(pred)
 
             # MSE loss
             mse_loss = args.alpha * criterion(pred, target)
@@ -188,12 +196,12 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
                 # normalize inputs and target
                 inputs = input_scaler.fit(inputs)
-                # target = target_scaler.fit(target)
+                target = target_scaler.fit(target)
 
                 pred = model(inputs)
 
-                # unnormalize
-                pred = input_scaler.inverse_transform(pred)
+                # denormalize
+                # pred = input_scaler.inverse_transform(pred)
 
                 # MSE loss
                 mse_loss = criterion(pred, target)
@@ -217,8 +225,8 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
                     # denormalize value for visualize
                     inputs = input_scaler.inverse_transform(inputs)
-                    # pred = input_scaler.inverse_transform(pred)
-                    # target = target_scaler.inverse_transform(target)
+                    pred = input_scaler.inverse_transform(pred)
+                    target = target_scaler.inverse_transform(target)
 
                     # tensor to csv file
                     out2csv(inputs, f'{epoch}_input', args.save_path, args.stroke_length)
