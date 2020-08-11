@@ -471,12 +471,16 @@ def inverse_scaler_transform(pred, target):
     return pred_inverse
 
 
-def out2csv(inputs, file_string, save_path, stroke_length):
+def out2csv(inputs, epoch, file_string, out_num, save_path, stroke_length):
     """
     store input to csv file.
 
-    input: tensor data, with cuda device and size = [batch 1 STROKE_LENGTH 6]
-    file_string: string, filename
+    inputs: tensor data, with cuda device and size = [batch 1 STROKE_LENGTH 6]
+    epoch: string, the epoch number
+    file_string: string, 'input', 'output' or 'target'
+    out_num: int, the number of model porcess data to get in one epoch
+    save_path: string, the save path
+    stroke_length: int, the length of each stroke 
 
     no output
     """
@@ -484,15 +488,16 @@ def out2csv(inputs, file_string, save_path, stroke_length):
         os.mkdir(save_path)
 
     output = np.squeeze(inputs.cpu().detach().numpy())
-    table = output[0]
+    table = output[0:out_num]
 
-    with open(f'{save_path}/{file_string}.csv', 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        for i in range(stroke_length):
-            row = [] * 7
-            row[1:6] = table[i][:]
-            row.append('stroke' + str(1))
-            writer.writerow(row)
+    for index in range(out_num):
+        with open(f'{save_path}/{epoch}_{index}_{file_string}.csv', 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            for i in range(stroke_length):
+                row = [] * 7
+                row[1:6] = table[index][i][:]
+                row.append('stroke' + str(1))
+                writer.writerow(row)
 
 
 def save_final_predict_and_new_dataset(inputs,stroke_num, file_string, args,store_data_cnt):

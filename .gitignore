@@ -15,6 +15,7 @@ tmp.*
 
 # output files
 output/*
+output_tmp/*
 
 # nohup files
 *.out
