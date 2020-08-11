@@ -69,7 +69,7 @@ def train_argument(inhert=False):
     parser.add_argument('--lr', type=float, default=1e-3,
                         help='set the learning rate (default: 1e-3)')
     parser.add_argument('--weight-decay', '--wd', type=float, default=0,
-                        help="set weight decay (default: 0)")
+  dataset              help="set weight decay (default: 0)")
 
     # training setting
     parser.add_argument('--alpha', type=float, default=1e-3,
@@ -140,16 +140,17 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
     if args.early_stop:
         early_stopping = EarlyStopping(patience=args.patience, verbose=args.verbose, threshold=args.threshold, path=model_path)
 
-    progress_bar = tqdm(total=len(train_loader)+len(valid_loader))
+    # progress_bar = tqdm(total=len(train_loader)+len(valid_loader))
 
     for epoch in range(checkpoint['epoch'], args.epochs+1):
         model.train()
         err = 0.0
         valid_err = 0.0
 
-        progress_bar.reset(total=len(train_loader)+len(valid_loader))        
-        progress_bar.set_description(f'Train epoch: {epoch}/{args.epochs}')
-        for data in train_loader:
+        # progress_bar.reset(total=len(train_loader)+len(valid_loader))        
+        # progress_bar.set_description(f'Train epoch: {epoch}/{args.epochs}')
+        train_bar = tqdm(train_loader, desc=f'Train epoch: {epoch}/{args.epochs}')
+        for data in train_bar:
             inputs, target, _ = data
             inputs, target = inputs.cuda(), target.cuda()
 
@@ -174,8 +175,9 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
             loss = mse_loss + content_loss
 
             # update progress bar
-            progress_bar.set_postfix({'MSE loss': mse_loss.item(), 'Content loss': content_loss.item()})
-            progress_bar.update()
+            train_bar.set_postfix({'MSE loss': mse_loss.item(), 'Content loss': content_loss.item()})
+            # progress_bar.set_postfix({'MSE loss': mse_loss.item(), 'Content loss': content_loss.item()})
+            # progress_bar.update()
 
             err += loss.sum().item() * inputs.size(0)
 
@@ -184,13 +186,13 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
             loss.backward()
             optimizer.step()
             
-
-
         # cross validation
-        progress_bar.set_description(f'Valid epoch:{epoch}/{args.epochs}')
+        # progress_bar.set_description(f'Valid epoch:{epoch}/{args.epochs}')
+        valid_bar = tqdm(valid_loader, desc=f'Valid epoch:{epoch}/{args.epochs}', leave=False)
         model.eval()
         with torch.no_grad():
-            for data in valid_loader:
+            for data in valid_bar:
+            # for data in valid_loader:
                 inputs, target, _ = data
                 inputs, target = inputs.cuda(), target.cuda()
 
@@ -215,8 +217,9 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
                 loss = mse_loss + content_loss
 
                 # update tqdm info
-                progress_bar.set_postfix({'MSE loss': mse_loss.sum().item(), 'Content loss': content_loss.sum().item()})
-                progress_bar.update()
+                valid_bar.set_postfix({'MSE loss': mse_loss.sum().item(), 'Content loss': content_loss.sum().item()})
+                # progress_bar.set_postfix({'MSE loss': mse_loss.sum().item(), 'Content loss': content_loss.sum().item()})
+                # progress_bar.update()
 
                 valid_err += loss.sum().item() * inputs.size(0)
 
@@ -267,7 +270,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
                 break
 
     writer.close()
-    progress_bar.close()
+    # progress_bar.close()
 
 
 if __name__ == '__main__':
@@ -297,26 +300,26 @@ if __name__ == '__main__':
     criterion = nn.MSELoss()
 
     # dataset
-    train_set = AxisDataSet(train_args.train_path, train_args.target_path)
+    full_set = AxisDataSet(train_args.train_path, train_args.target_path)
 
     # build hold out CV
-    train_sampler, valid_sampler = cross_validation(
-        train_set,
+    train_set, valid_set = cross_validation(
+        full_set,
         mode='hold',
         p=train_args.holdout_p,)
 
     # dataloader
     train_loader = DataLoader(train_set,
                               batch_size=train_args.batch_size,
-                              # shuffle=True,
+                              shuffle=True,
                               num_workers=train_args.num_workers,
-                              sampler=train_sampler,
+                            #   sampler=train_sampler,
                               pin_memory=False,)
-    valid_loader = DataLoader(train_set,
+    valid_loader = DataLoader(valid_set,
                               batch_size=train_args.batch_size,
-                              # shuffle=True,
+                              shuffle=False,
                               num_workers=train_args.num_workers,
-                              sampler=valid_sampler,
+                            #   sampler=valid_sampler,
                               pin_memory=False,)
 
     # model summary
