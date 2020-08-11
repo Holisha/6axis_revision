@@ -235,26 +235,26 @@ if __name__ == '__main__':
     criterion = nn.MSELoss()
 
     # dataset
-    train_set = AxisDataSet(train_args.train_path, train_args.target_path)
+    full_set = AxisDataSet(train_args.train_path, train_args.target_path)
 
     # build hold out CV
-    train_sampler, valid_sampler = cross_validation(
-        train_set,
+    train_set, valid_set = cross_validation(
+        full_set,
         mode='hold',
         p=train_args.holdout_p,)
 
     # dataloader
     train_loader = DataLoader(train_set,
                               batch_size=train_args.batch_size,
-                              # shuffle=True,
+                              shuffle=True,
                               num_workers=train_args.num_workers,
-                              sampler=train_sampler,
+                            #   sampler=train_sampler,
                               pin_memory=False,)
-    valid_loader = DataLoader(train_set,
+    valid_loader = DataLoader(valid_set,
                               batch_size=train_args.batch_size,
-                              # shuffle=True,
+                              shuffle=False,
                               num_workers=train_args.num_workers,
-                              sampler=valid_sampler,
+                            #   sampler=valid_sampler,
                               pin_memory=False,)
 
     # model summary

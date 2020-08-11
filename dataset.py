@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import torch
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, random_split
 from torch.utils.data.sampler import SubsetRandomSampler, SequentialSampler
 from glob import glob
 from sklearn.preprocessing import MinMaxScaler
@@ -110,8 +110,42 @@ class AxisDataSet(Dataset):
         return data, self.target[word_dir][index], index+1
 
 
-def cross_validation(train_set, mode='hold', **kwargs):
+
+
+
+def cross_validation(dataset, mode='hold', **kwargs):
     """split dataset into train and valid dataset
+
+    hold out:
+        A key word argument 'p' to control hold probability
+    fold:
+        'k' to control number of folds
+
+    Args:
+        dataset (torch.utils.data.Dataset): full dataset to be split
+        mode (str, optional): control the valid method. Defaults to 'hold'.
+
+    Returns:
+        train, valid: return train and valid sampler
+    """
+    # hold out validation
+    if mode == 'hold':
+        p = kwargs['p']
+        train_len = int(dataset.__len__() * p)
+        valid_len = dataset.__len__() - train_len
+
+        return random_split(dataset, [train_len, valid_len])
+
+    # k fold
+    elif mode == 'fold':
+        k = kwargs['k']
+        assert dataset.__len__() % k == 0, f'dataset is indivisible by k: {dataset.__len__()} / {k}'
+        fold_num = datset.__len__() / k
+        return random_split(dataset, [fold_num]*k)
+
+def _cross_validation(train_set, mode='hold', **kwargs):
+    """Deprecated version
+    split dataset into train and valid dataset
 
     hold out:
         A key word argument 'p' to control hold probability
