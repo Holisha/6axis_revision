@@ -2,44 +2,47 @@
 stroke_length: 150
 train_path: /home/jefflin/dataset/train
 target_path: /home/jefflin/dataset/target
+test_path: /home/jefflin/dataset/test_all
 batch_size: 64
-num_workers: 8
-holdout_p: 0.8  # hold out cross validation probability
+num_workers: 20
+holdout_p: 0.8 # hold out cross validation probability
 # (x - mean) / std
 mean: 0.5
 std: 0.5
 
 # model setting
-model_name: DDBPN  # FSRCNN, DDBPN
+model_name: DDBPN # FSRCNN, DDBPN
 scale: 1
-model_args:       # model args, for more detail, please take a look in model/model name/models.py
+model_args: # model args, for more detail, please take a look in model/model name/models.py
   stages: 3
-gpu_id: 0
+gpu_id: 1
 
 # optimizer
-lr: 0.0001 # learning rate
+lr: 0.001 # learning rate
 # Adam, SGD, ranger, rangerVA
 # noticed that different optimizer fit in different learning rate
-optim: ranger
-load: false         # load exist .pickle file or not
+optim: rangerVA
+load: False # load exist .pickle file or not
 weight_decay: 0
 
 # early stopping
 early_stop: true
 patience: 5
+threshold: 0.1
 verbose: false
 
 # weighted loss
-alpha: 100        # mse loss weight
-beta: 100             # content loss weight
-epochs: 50
+alpha: 1 # mse loss weight
+beta: 1 # content loss weight
+epochs: 100
 
 # logger setting
 log_path: ./logs
 
 # output setting
 save_path: ./output
-check_interval: 1   # convert tensor to csv file
+check_interval: 1 # convert tensor to csv file
+out_num: 5
 
 # other
-amp: false  # beta function developing
+amp: false # beta function developing
