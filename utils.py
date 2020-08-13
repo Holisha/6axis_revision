@@ -386,6 +386,53 @@ def summary(model, input_size, batch_size=-1, device="cuda", model_name: Optiona
 ################################################################
 
 
+def criterion_builder(criterion='mse', **kwargs):
+    """build specific criterion
+
+    mse: MSELoss
+    huber: SmoothL1Loss
+    L1: L1Loss
+
+    Args:
+        criterion (str, optional): to instantiate loss function. Defaults to 'mse'.
+
+    Returns:
+        nn.Module: return loss function
+    """
+
+    return {
+        'l1': nn.L1Loss(**kwargs),
+        'mse': nn.MSELoss(**kwargs),
+        'huber': nn.SmoothL1Loss(**kwargs),
+    }[criterion.lower()]
+
+
+def schedule_builder(optimizer, lr_method='step', step=2, gamma=0.1):
+    """declare scheduler
+    TODO: add lr scheduler by condition and fit in current function
+
+    Args:
+        optimizer : parameter of lr_scheduler 
+        lr_method (str, optional): choose which scheduler to be used. Defaults to 'step'.
+            step: step or multiple step
+        step (int, optional): set step size. Defaults to 2 (epoch).
+        gamma (float, optional): decrease factor. Defaults to 0.1.
+
+    Returns:
+        torch.optmizer.lr_sceduler
+    """
+
+    if lr_method == 'step' or lr_method is True:
+        if type(step) is list and len(step) > 1:
+            step = [int(x) for x in step]
+            scheduler = optim.lr_scheduler.MultiStepLR(optimizer, step, gamma)
+        else:
+            step = step.pop() if type(step) is list else step
+            scheduler = optim.lr_scheduler.StepLR(optimizer, step, gamma)
+
+    return scheduler
+
+
 class NormScaler:
     """
     Normalize tensor's value into range 1~0

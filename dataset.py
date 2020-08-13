@@ -110,9 +110,6 @@ class AxisDataSet(Dataset):
         return data, self.target[word_dir][index], index+1
 
 
-
-
-
 def cross_validation(dataset, mode='hold', **kwargs):
     """split dataset into train and valid dataset
 
@@ -142,6 +139,7 @@ def cross_validation(dataset, mode='hold', **kwargs):
         assert dataset.__len__() % k == 0, f'dataset is indivisible by k: {dataset.__len__()} / {k}'
         fold_num = datset.__len__() / k
         return random_split(dataset, [fold_num]*k)
+
 
 def _cross_validation(train_set, mode='hold', **kwargs):
     """Deprecated version
