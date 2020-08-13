@@ -69,7 +69,7 @@ def train_argument(inhert=False):
     parser.add_argument('--lr', type=float, default=1e-3,
                         help='set the learning rate (default: 1e-3)')
     parser.add_argument('--weight-decay', '--wd', type=float, default=0,
-  dataset              help="set weight decay (default: 0)")
+                        help="set weight decay (default: 0)")
 
     # training setting
     parser.add_argument('--alpha', type=float, default=1e-3,
@@ -100,6 +100,8 @@ def train_argument(inhert=False):
     # save setting
     parser.add_argument('--save-path', type=str, default='./output',
                         help='set the output file (csv or txt) path (default: ./output)')
+    parser.add_argument('--out-num', type=int, default=5,
+                        help='Set the number of model porcess data to get in one epoch. (default: 5)')
 
     # for the compatiable
     if inhert is True:
@@ -115,7 +117,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
     # normalize scaler
     input_scaler = NormScaler(mean=args.mean, std=args.std)
-    target_scaler = NormScaler(mean=args.mean, std=args.std)
+    # target_scaler = NormScaler(mean=args.mean, std=args.std)
 
     # load data
     model_path = f'{args.model_name}_{args.scale}x.pt'
@@ -156,12 +158,12 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
             # normalize inputs and target
             inputs = input_scaler.fit(inputs)
-            target = target_scaler.fit(target)
+            # target = target_scaler.fit(target)
 
             pred = model(inputs)
 
             # denormalize
-            # pred = input_scaler.inverse_transform(pred)
+            pred = input_scaler.inverse_transform(pred)
 
             # MSE loss
             mse_loss = args.alpha * criterion(pred, target)
@@ -198,12 +200,12 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
                 # normalize inputs and target
                 inputs = input_scaler.fit(inputs)
-                target = target_scaler.fit(target)
+                # target = target_scaler.fit(target)
 
                 pred = model(inputs)
 
                 # denormalize
-                # pred = input_scaler.inverse_transform(pred)
+                pred = input_scaler.inverse_transform(pred)
 
                 # MSE loss
                 mse_loss = criterion(pred, target)
@@ -228,13 +230,13 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
                     # denormalize value for visualize
                     inputs = input_scaler.inverse_transform(inputs)
-                    pred = input_scaler.inverse_transform(pred)
-                    target = target_scaler.inverse_transform(target)
+                    # pred = input_scaler.inverse_transform(pred)
+                    # target = target_scaler.inverse_transform(target)
 
                     # tensor to csv file
-                    out2csv(inputs, f'{epoch}_input', args.save_path, args.stroke_length)
-                    out2csv(pred, f'{epoch}_output', args.save_path, args.stroke_length)
-                    out2csv(target, f'{epoch}_target', args.save_path, args.stroke_length)
+                    out2csv(inputs, f'{epoch}', 'input', args.out_num, args.save_path, args.stroke_length)
+                    out2csv(pred, f'{epoch}', 'output', args.out_num, args.save_path, args.stroke_length)
+                    out2csv(target, f'{epoch}', 'target', args.out_num, args.save_path, args.stroke_length)
 
         # compute loss
         err /= len(train_loader.dataset)
