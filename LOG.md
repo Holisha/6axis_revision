@@ -1,5 +1,7 @@
 # project log
 
+- [toc]
+
 ## event type:
 
 - format: `event`: `where`: `what`
@@ -9,10 +11,27 @@
 	- ex: rename file or variable
 - `new`: **new** features
 - `fixed`: **bug fixed**
-- `bug`: bug found but yet fix
+- `bug`: bug found but **yet fix**
 - `other`: TBD
 
 ## Version 5
+
+### 8/14 - fan
+
+- Now can store model without early stopping
+- Add learning rate scheduler and add huber loss function
+- modified writer every iteration and epoch
+	- `new`: In train.py: add new argument to adjust new builder
+	- `fixed`: In train.py: now can store without earlystopping
+	- `new`: In utils.py: add criterion builder
+		- `--criterion`: choose loss function
+	- `new`: In utils.py: add scheduler builder
+		- `--scheduler`: to choose step or multiple step scheduler
+		- `--lr-method`: to choose scheduler
+		- `--step`: set update step(epoch)
+		- `--factor`: set decreate factor
+
+- TODO: modified out2csv timing
 
 ### 8/11 - jeff
 

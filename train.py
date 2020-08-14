@@ -3,13 +3,14 @@ import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torch.optim import lr_scheduler
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from argparse import ArgumentParser
 
 # self defined
 from model import FeatureExtractor
-from utils import (writer_builder, model_builder, optimizer_builder, StorePair,
+from utils import (StorePair, writer_builder, model_builder, optimizer_builder, criterion_builder, schedule_builder,
                 out2csv, NormScaler, model_config, summary, config_loader, EarlyStopping)
 from dataset import AxisDataSet, cross_validation
 from postprocessing import postprocessor
@@ -80,8 +81,20 @@ def train_argument(inhert=False):
                         help='set the epochs (default: 50)')
     parser.add_argument('--check-interval', type=int, default=5,
                         help='setting output a csv file every epoch of interval (default: 5)')
+    parser.add_argument('--criterion', type=str, default='huber',
+                        help="set criterion (default: 'huber')")
     parser.add_argument('--amp', action='store_true', default=False,
                         help='training with amp (default: False)')
+
+    # Sceduler setting
+    parser.add_argument('--scheduler', action='store_true', default=False,
+                        help='training with step or multi step scheduler (default: False)')
+    parser.add_argument('--lr-method', type=str, dest='scheduler', 
+                        help='training with chose lr scheduler (default: False)')
+    parser.add_argument('--step', nargs='+', default=2,
+                        help='decreate learning rate every few epochs (default: 2)')
+    parser.add_argument('--factor', type=float, default=0.1,
+                        help='set decreate factor (default: 0.1)')
 
     # Early-Stop setting
     parser.add_argument('--early-stop', action='store_false', default=True,
@@ -142,15 +155,14 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
     if args.early_stop:
         early_stopping = EarlyStopping(patience=args.patience, verbose=args.verbose, threshold=args.threshold, path=model_path)
 
-    # progress_bar = tqdm(total=len(train_loader)+len(valid_loader))
+    if args.scheduler:
+        scheduler = schedule_builder(optimizer, args.scheduler, args.step, args.factor)
 
     for epoch in range(checkpoint['epoch'], args.epochs+1):
         model.train()
         err = 0.0
         valid_err = 0.0
 
-        # progress_bar.reset(total=len(train_loader)+len(valid_loader))        
-        # progress_bar.set_description(f'Train epoch: {epoch}/{args.epochs}')
         train_bar = tqdm(train_loader, desc=f'Train epoch: {epoch}/{args.epochs}')
         for data in train_bar:
             inputs, target, _ = data
@@ -178,8 +190,6 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
             # update progress bar
             train_bar.set_postfix({'MSE loss': mse_loss.item(), 'Content loss': content_loss.item()})
-            # progress_bar.set_postfix({'MSE loss': mse_loss.item(), 'Content loss': content_loss.item()})
-            # progress_bar.update()
 
             err += loss.sum().item() * inputs.size(0)
 
@@ -187,9 +197,11 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+
+            # update writer
+            writer.add_scalar('Iteration/train loss', loss.sum.item(), epoch)
             
         # cross validation
-        # progress_bar.set_description(f'Valid epoch:{epoch}/{args.epochs}')
         valid_bar = tqdm(valid_loader, desc=f'Valid epoch:{epoch}/{args.epochs}', leave=False)
         model.eval()
         with torch.no_grad():
@@ -220,10 +232,11 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
                 # update tqdm info
                 valid_bar.set_postfix({'MSE loss': mse_loss.sum().item(), 'Content loss': content_loss.sum().item()})
-                # progress_bar.set_postfix({'MSE loss': mse_loss.sum().item(), 'Content loss': content_loss.sum().item()})
-                # progress_bar.update()
 
                 valid_err += loss.sum().item() * inputs.size(0)
+
+                # update writer
+                writer.add_scalar('Iteration/valid loss', loss.sum.item(), epoch)
 
                 # out2csv every check interval epochs (default: 5)
                 if epoch % args.check_interval == 0:
@@ -243,22 +256,12 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         valid_err /= len(valid_loader.dataset)
         print(f'\ntrain loss: {err:.4f}, valid loss: {valid_err:.4f}')
 
-        # update every epoch
-        # save model as pickle file
-        """if epoch == checkpoint['epoch'] or err < best_err:
-            best_err = err  # save err in first epoch
-
-            # save current epoch and model parameters
-            torch.save(
-                {
-                    'state_dict': model.state_dict(),
-                    'epoch': epoch,
-                }
-                , model_path)
-        """
+        # update scheduler
+        if args.scheduler:
+            scheduler.step()
 
         # update loggers
-        writer.add_scalars('Loss/',
+        writer.add_scalars('Epoch',
                            {'train loss': err, 'valid loss': valid_err},
                            epoch,)
 
@@ -270,6 +273,17 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
             if early_stopping.early_stop:
                 print("Early stopping")
                 break
+        # if early stop is false, store model when the err is lowest
+        elif epoch == checkpoint['epoch'] or err < best_err:
+            best_err = err  # save err in first epoch
+
+            # save current epoch and model parameters
+            torch.save(
+                {
+                    'state_dict': model.state_dict(),
+                    'epoch': epoch,
+                }
+                , model_path)
 
     writer.close()
     # progress_bar.close()
@@ -285,13 +299,14 @@ if __name__ == '__main__':
 
     # config
     model_config(train_args, save=True)     # save model configuration before training
+    # model_config(train_args, save=False)  # for developing
 
     # set cuda
     torch.cuda.set_device(train_args.gpu_id)
 
     # model
     model = model_builder(train_args.model_name, train_args.scale, **train_args.model_args).cuda()
-
+    
     # optimizer and critera
     optimizer = optimizer_builder(train_args.optim) # optimizer class
     optimizer = optimizer(                          # optmizer instance
@@ -299,7 +314,7 @@ if __name__ == '__main__':
         lr=train_args.lr,
         weight_decay=train_args.weight_decay
     )
-    criterion = nn.MSELoss()
+    criterion = criterion_builder(train_args.criterion)
 
     # dataset
     full_set = AxisDataSet(train_args.train_path, train_args.target_path)
