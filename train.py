@@ -199,7 +199,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
             optimizer.step()
 
             # update writer
-            writer.add_scalar('Iteration/train loss', loss.sum.item(), epoch)
+            writer.add_scalar('Iteration/train loss', loss.sum().item(), epoch)
             
         # cross validation
         valid_bar = tqdm(valid_loader, desc=f'Valid epoch:{epoch}/{args.epochs}', leave=False)
@@ -236,7 +236,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
                 valid_err += loss.sum().item() * inputs.size(0)
 
                 # update writer
-                writer.add_scalar('Iteration/valid loss', loss.sum.item(), epoch)
+                writer.add_scalar('Iteration/valid loss', loss.sum().item(), epoch)
 
                 # out2csv every check interval epochs (default: 5)
                 if epoch % args.check_interval == 0:
