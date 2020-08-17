@@ -129,7 +129,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
     feature_extractor.eval()
 
     # normalize scaler
-    input_scaler = NormScaler(mean=args.mean, std=args.std)
+    # input_scaler = NormScaler(mean=args.mean, std=args.std)
     # target_scaler = NormScaler(mean=args.mean, std=args.std)
 
     # set data path and summary writer
@@ -167,6 +167,9 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         err = 0.0
         valid_err = 0.0
 
+        # writer
+        iteration = 0
+
         train_bar = tqdm(train_loader, desc=f'Train epoch: {epoch}/{args.epochs}')
         # show current learning rate
         train_bar.set_postfix({
@@ -177,13 +180,13 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
             inputs, target = inputs.cuda(), target.cuda()
 
             # normalize inputs and target
-            inputs = input_scaler.fit(inputs)
+            # inputs = input_scaler.fit(inputs)
             # target = target_scaler.fit(target)
 
             pred = model(inputs)
 
             # denormalize
-            pred = input_scaler.inverse_transform(pred)
+            # pred = input_scaler.inverse_transform(pred)
 
             # MSE loss
             mse_loss = args.alpha * criterion(pred, target)
@@ -207,11 +210,13 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
             optimizer.step()
 
             # update writer
-            writer.add_scalar('Iteration/train loss', loss.sum().item())
+            writer.add_scalar('Iteration/train loss', loss.sum().item(), iteration)
+            iteration += 1
             
         # cross validation
         valid_bar = tqdm(valid_loader, desc=f'Valid epoch:{epoch}/{args.epochs}', leave=False)
         model.eval()
+        iteration = 0
         with torch.no_grad():
             for data in valid_bar:
             # for data in valid_loader:
@@ -244,13 +249,14 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
                 valid_err += loss.sum().item() * inputs.size(0)
 
                 # update writer
-                writer.add_scalar('Iteration/valid loss', loss.sum().item())
+                writer.add_scalar('Iteration/valid loss', loss.sum().item(), iteration)
+                iteration += 1
 
                 # out2csv every check interval epochs (default: 5)
                 if epoch % args.check_interval == 0:
 
                     # denormalize value for visualize
-                    inputs = input_scaler.inverse_transform(inputs)
+                    # inputs = input_scaler.inverse_transform(inputs)
                     # pred = input_scaler.inverse_transform(pred)
                     # target = target_scaler.inverse_transform(target)
 
