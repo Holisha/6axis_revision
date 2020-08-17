@@ -25,6 +25,7 @@
 	- `update`: In utils.py: `model_config` will save config to version directory
 	- `update`: In train.py: progress bar can show current learning rate
 	- `new`: In loss.py: add rmse loss function
+	- `fixed`: In train.py: iteration will show value normaly
 
 ### 8/14 - fan
 
