@@ -154,5 +154,16 @@ class Discriminator(nn.Module):
 
         return layers
 
+
+class RMSELoss(nn.Module):
+    def __init__(self, eps=1e-8):
+        super().__init__()
+        self.mse = nn.MSELoss()
+        self.eps = eps
+    
+    def forward(self, y, yhat):
+        return torch.sqrt(self.mse(y, yhat) + self.eps)
+
+
 if __name__ == '__main__':
     print(Discriminator(1))
