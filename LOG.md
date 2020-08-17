@@ -16,6 +16,16 @@
 
 ## Version 5
 
+### 8/17 - fan
+
+- Now model parameter and config would be save in log/\*/version\*/
+	- `update`: In utils.py: `writer_builder` now would return writer and store path
+		- return value: `writer` -> `(writer, model_path)`
+	- `update`: In train.py: model_path would be define by `writer_builder`
+	- `update`: In utils.py: `model_config` will save config to version directory
+	- `update`: In train.py: progress bar can show current learning rate
+	- `new`: In loss.py: add rmse loss function
+
 ### 8/14 - fan
 
 - Now can store model without early stopping

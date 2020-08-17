@@ -90,6 +90,7 @@ def writer_builder(log_root, model_name, load: Union[bool, int]=False):
 
     Returns:
         SummaryWriter: tensorboard
+        log_path(str): determine version location
     """
 
     from torch.utils.tensorboard import SummaryWriter
@@ -134,7 +135,7 @@ def writer_builder(log_root, model_name, load: Union[bool, int]=False):
     print(f'Tensorboard logger save in:{log_path}')
     print('\n####### logger info #######\n')
 
-    return SummaryWriter(log_path)
+    return SummaryWriter(log_path), log_path
 
 
 def model_builder(model_name, *args, **kwargs):
@@ -390,6 +391,7 @@ def criterion_builder(criterion='mse', **kwargs):
     """build specific criterion
 
     mse: MSELoss
+    rmse: RMSELoss
     huber: SmoothL1Loss
     L1: L1Loss
 
@@ -399,11 +401,13 @@ def criterion_builder(criterion='mse', **kwargs):
     Returns:
         nn.Module: return loss function
     """
+    from model import RMSELoss
 
     return {
         'l1': nn.L1Loss(**kwargs),
         'mse': nn.MSELoss(**kwargs),
         'huber': nn.SmoothL1Loss(**kwargs),
+        'rmse': RMSELoss(**kwargs),
     }[criterion.lower()]
 
 

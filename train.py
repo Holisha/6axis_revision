@@ -132,9 +132,16 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
     input_scaler = NormScaler(mean=args.mean, std=args.std)
     # target_scaler = NormScaler(mean=args.mean, std=args.std)
 
-    # load data
-    model_path = f'{args.model_name}_{args.scale}x.pt'
+    # set data path and summary writer
+    writer, log_path = writer_builder(
+        args.log_path, args.model_name, load=args.load)
+    
+    # init data
     checkpoint = {'epoch': 1}   # start from 1
+    model_path = os.path.join(log_path, f'{args.model_name}_{args.scale}x.pt')
+
+    # config
+    model_config(train_args, save=log_path)     # save model configuration before training
 
     # load model from exist .pt file
     if args.load and os.path.isfile(model_path):
@@ -147,9 +154,6 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         checkpoint = torch.load(model_path, map_location=f'cuda:{args.gpu_id}')
         checkpoint['epoch'] += 1    # start from next epoch
         model.load_state_dict(checkpoint['state_dict'])
-
-    # store the training time
-    writer = writer_builder(args.log_path, args.model_name, args.load)
 
     # initialize the early_stopping object
     if args.early_stop:
@@ -164,6 +168,10 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         valid_err = 0.0
 
         train_bar = tqdm(train_loader, desc=f'Train epoch: {epoch}/{args.epochs}')
+        # show current learning rate
+        train_bar.set_postfix({
+            'lr': optimizer.param_groups[0]['lr'],
+        })
         for data in train_bar:
             inputs, target, _ = data
             inputs, target = inputs.cuda(), target.cuda()
@@ -199,7 +207,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
             optimizer.step()
 
             # update writer
-            writer.add_scalar('Iteration/train loss', loss.sum().item(), epoch)
+            writer.add_scalar('Iteration/train loss', loss.sum().item())
             
         # cross validation
         valid_bar = tqdm(valid_loader, desc=f'Valid epoch:{epoch}/{args.epochs}', leave=False)
@@ -236,7 +244,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
                 valid_err += loss.sum().item() * inputs.size(0)
 
                 # update writer
-                writer.add_scalar('Iteration/valid loss', loss.sum().item(), epoch)
+                writer.add_scalar('Iteration/valid loss', loss.sum().item())
 
                 # out2csv every check interval epochs (default: 5)
                 if epoch % args.check_interval == 0:
@@ -286,7 +294,6 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
                 , model_path)
 
     writer.close()
-    # progress_bar.close()
 
 
 if __name__ == '__main__':
@@ -296,10 +303,6 @@ if __name__ == '__main__':
     # replace args by document file
     if train_args.doc:
         train_args = config_loader(train_args.doc, train_args)
-
-    # config
-    model_config(train_args, save=True)     # save model configuration before training
-    # model_config(train_args, save=False)  # for developing
 
     # set cuda
     torch.cuda.set_device(train_args.gpu_id)
