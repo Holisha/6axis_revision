@@ -16,6 +16,25 @@
 
 ## Version 5
 
+### 8/22 - fan
+
+- Now can call dbpn by `--model-name dbpn`
+	- `new`: In model/DBPN.py, Add DBPN 
+	- `new`: In utils.py, add `dbpn` in model_builder
+- `update`: In model/DBPN.py, DBPN series can instantiate normally when scale factor is greater than 1
+
+```python
+DBPN-S:
+	stages=2,
+	n0=64,
+	nr=18
+
+DBPN-SS:
+	stages=2,
+	n0=128,
+	nr=32
+```
+
 ### 8/17 - fan
 
 - Now model parameter and config would be save in log/\*/version\*/

@@ -230,7 +230,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
                 pred = model(inputs)
 
                 # denormalize
-                pred = input_scaler.inverse_transform(pred)
+                # pred = input_scaler.inverse_transform(pred)
 
                 # MSE loss
                 mse_loss = criterion(pred, target)
