@@ -147,12 +147,15 @@ def model_builder(model_name, *args, **kwargs):
     Returns:
         model(torch.nn.module): instantiate model
     """
-    from model import FSRCNN, DDBPN
+    from model import FSRCNN, DDBPN, DBPN
 
     # class object, yet instantiate
     model = {
         'fsrcnn': FSRCNN,    # scale_factor, num_channels=1, d=56, s=12, m=4
         'ddbpn': DDBPN,      # scale_factor, num_channels=1, stages=7, n0=256, nr=64
+        'dbpn': DBPN,        # scale_factor, num_channels=1, stages=7, n0=256, nr=64
+        'lapsrn': NotImplementedError,
+        'drln': NotImplementedError
     }.get(model_name.lower())
 
     return model(*args, **kwargs)

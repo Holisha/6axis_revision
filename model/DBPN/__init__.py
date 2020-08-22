@@ -1,1 +1,1 @@
-from .models import DDBPN
+from .models import DDBPN, DBPN
