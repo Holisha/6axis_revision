@@ -137,7 +137,11 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         args.log_path, args.model_name, load=args.load)
     
     # init data
-    checkpoint = {'epoch': 1}   # start from 1
+    checkpoint = {
+        'epoch': 1,         # start from 1
+        'train_iter': 0,    # train iteration
+        'valid_iter': 0,    # valid iteration
+    }   
     model_path = os.path.join(log_path, f'{args.model_name}_{args.scale}x.pt')
 
     # config
@@ -152,7 +156,9 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         epoch: parameters were updated in which epoch
         """
         checkpoint = torch.load(model_path, map_location=f'cuda:{args.gpu_id}')
-        checkpoint['epoch'] += 1    # start from next epoch
+        checkpoint['epoch'] += 1        # start from next epoch
+        checkpoint['train_iter'] += 1
+        checkpoint['valid_iter'] += 1
         model.load_state_dict(checkpoint['state_dict'])
 
     # initialize the early_stopping object
@@ -162,19 +168,19 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
     if args.scheduler:
         scheduler = schedule_builder(optimizer, args.scheduler, args.step, args.factor)
 
+    # progress bar postfix value
+    pbar_postfix = {
+        'MSE loss': 0.0,
+        'Content loss': 0.0,
+        'lr': args.lr,
+    }
+    
     for epoch in range(checkpoint['epoch'], args.epochs+1):
         model.train()
         err = 0.0
         valid_err = 0.0
 
-        # writer
-        iteration = 0
-
         train_bar = tqdm(train_loader, desc=f'Train epoch: {epoch}/{args.epochs}')
-        # show current learning rate
-        train_bar.set_postfix({
-            'lr': optimizer.param_groups[0]['lr'],
-        })
         for data in train_bar:
             inputs, target, _ = data
             inputs, target = inputs.cuda(), target.cuda()
@@ -200,7 +206,14 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
             loss = mse_loss + content_loss
 
             # update progress bar
-            train_bar.set_postfix({'MSE loss': mse_loss.item(), 'Content loss': content_loss.item()})
+            pbar_postfix['MSE loss'] = mse_loss.item()
+            pbar_postfix['Content loss'] = content_loss.item()
+
+            # show current lr
+            if args.lr_sceduler:
+                pbar_postfix['lr'] = optimizer.param_groups[0]['lr']
+            
+            train_bar.set_postfix(pbar_postfix)
 
             err += loss.sum().item() * inputs.size(0)
 
@@ -210,13 +223,12 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
             optimizer.step()
 
             # update writer
-            writer.add_scalar('Iteration/train loss', loss.sum().item(), iteration)
-            iteration += 1
+            writer.add_scalar('Iteration/train loss', loss.sum().item(), checkpoint['train_iter'])
+            checkpoint['train_iter'] += 1
             
         # cross validation
         valid_bar = tqdm(valid_loader, desc=f'Valid epoch:{epoch}/{args.epochs}', leave=False)
         model.eval()
-        iteration = 0
         with torch.no_grad():
             for data in valid_bar:
             # for data in valid_loader:
@@ -224,7 +236,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
                 inputs, target = inputs.cuda(), target.cuda()
 
                 # normalize inputs and target
-                inputs = input_scaler.fit(inputs)
+                # inputs = input_scaler.fit(inputs)
                 # target = target_scaler.fit(target)
 
                 pred = model(inputs)
@@ -243,14 +255,21 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
                 # for compatible
                 loss = mse_loss + content_loss
 
-                # update tqdm info
-                valid_bar.set_postfix({'MSE loss': mse_loss.sum().item(), 'Content loss': content_loss.sum().item()})
+                # update progress bar
+                pbar_postfix['MSE loss'] = mse_loss.item()
+                pbar_postfix['Content loss'] = content_loss.item()
+
+                # show current lr
+                if args.lr_sceduler:
+                    pbar_postfix['lr'] = optimizer.param_groups[0]['lr']
+
+                valid_bar.set_postfix(pbar_postfix)
 
                 valid_err += loss.sum().item() * inputs.size(0)
 
                 # update writer
-                writer.add_scalar('Iteration/valid loss', loss.sum().item(), iteration)
-                iteration += 1
+                writer.add_scalar('Iteration/valid loss', loss.sum().item(), checkpoint['valid_iter'])
+                checkpoint['valid_iter'] += 1
 
                 # out2csv every check interval epochs (default: 5)
                 if epoch % args.check_interval == 0:
@@ -296,6 +315,8 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
                 {
                     'state_dict': model.state_dict(),
                     'epoch': epoch,
+                    'train_iter': checkpoint['train_iter'],
+                    'valid_iter': checkpoint['valid_iter'],
                 }
                 , model_path)
 
