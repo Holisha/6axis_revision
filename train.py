@@ -162,6 +162,13 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
     if args.scheduler:
         scheduler = schedule_builder(optimizer, args.scheduler, args.step, args.factor)
 
+    # progress bar postfix value
+    pbar_postfix = {
+        'MSE loss': 0.0,
+        'Content loss': 0.0,
+        'lr': args.lr,
+    }
+
     for epoch in range(checkpoint['epoch'], args.epochs+1):
         model.train()
         err = 0.0
@@ -171,10 +178,6 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         iteration = 0
 
         train_bar = tqdm(train_loader, desc=f'Train epoch: {epoch}/{args.epochs}')
-        # show current learning rate
-        train_bar.set_postfix({
-            'lr': optimizer.param_groups[0]['lr'],
-        })
         for data in train_bar:
             inputs, target, _ = data
             inputs, target = inputs.cuda(), target.cuda()
@@ -200,7 +203,14 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
             loss = mse_loss + content_loss
 
             # update progress bar
-            train_bar.set_postfix({'MSE loss': mse_loss.item(), 'Content loss': content_loss.item()})
+            pbar_postfix['MSE loss'] = mse_loss.item()
+            pbar_postfix['Content loss'] = content_loss.item()
+
+            # show current lr
+            if args.lr_sceduler:
+                pbar_postfix['lr'] = optimizer.param_groups[0]['lr']
+            
+            train_bar.set_postfix(pbar_postfix)
 
             err += loss.sum().item() * inputs.size(0)
 
@@ -224,7 +234,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
                 inputs, target = inputs.cuda(), target.cuda()
 
                 # normalize inputs and target
-                inputs = input_scaler.fit(inputs)
+                # inputs = input_scaler.fit(inputs)
                 # target = target_scaler.fit(target)
 
                 pred = model(inputs)
@@ -243,8 +253,15 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
                 # for compatible
                 loss = mse_loss + content_loss
 
-                # update tqdm info
-                valid_bar.set_postfix({'MSE loss': mse_loss.sum().item(), 'Content loss': content_loss.sum().item()})
+                # update progress bar
+                pbar_postfix['MSE loss'] = mse_loss.item()
+                pbar_postfix['Content loss'] = content_loss.item()
+
+                # show current lr
+                if args.lr_sceduler:
+                    pbar_postfix['lr'] = optimizer.param_groups[0]['lr']
+
+                valid_bar.set_postfix(pbar_postfix)
 
                 valid_err += loss.sum().item() * inputs.size(0)
 

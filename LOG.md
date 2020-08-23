@@ -16,6 +16,12 @@
 
 ## Version 5
 
+### 8/24 - fan
+
+- Now can view current learing rate with lr_scehduler
+	- `fixed`: In utils.py, in `writer_builder`, sort variable `version` now
+	- `fixed`: In train.py, add pbar_postfix to control postfix value
+
 ### 8/22 - fan
 
 - Now can call dbpn by `--model-name dbpn`
