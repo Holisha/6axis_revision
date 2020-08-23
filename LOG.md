@@ -18,6 +18,9 @@
 
 ### 8/24 - fan
 
+- Fix iteration bug
+	- `fixed`: In train.py, fixed iteration count bug
+
 - Now can view current learing rate with lr_scehduler
 	- `fixed`: In utils.py, in `writer_builder`, sort variable `version` now
 	- `fixed`: In train.py, add pbar_postfix to control postfix value
