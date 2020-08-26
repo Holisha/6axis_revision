@@ -9,7 +9,7 @@ from tqdm import tqdm
 # self defined
 # from model import FeatureExtractor
 from train import train_argument
-from utils import out2csv, csv2txt, writer_builder, model_builder, model_config
+from utils import out2csv, writer_builder, model_builder, model_config
 from dataset import AxisDataSet, cross_validation
 
 # TODO: change path name, add other args
@@ -36,7 +36,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         model.load_state_dict(checkpoint['state_dict'])
 
     # store the training time
-    writer = writer_builder(args.log_path,args.model_name)
+    writer, log_path = writer_builder(args.log_path,args.model_name)
 
     for epoch in range(checkpoint['epoch'], args.epochs+1):
         model.train()
