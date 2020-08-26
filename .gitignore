@@ -22,3 +22,5 @@ output_tmp/*
 
 # beta files
 train_beta.py
+
+*.txt
