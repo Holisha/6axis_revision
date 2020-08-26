@@ -106,7 +106,7 @@ def writer_builder(log_root, model_name, load: Union[bool, int]=False):
         os.mkdir(log_root)
 
     # list version of model
-    version = os.listdir(log_root)
+    version = sorted(os.listdir(log_root))
 
     # load exist logs
     if version and type(load) is int:
@@ -147,12 +147,15 @@ def model_builder(model_name, *args, **kwargs):
     Returns:
         model(torch.nn.module): instantiate model
     """
-    from model import FSRCNN, DDBPN
+    from model import FSRCNN, DDBPN, DBPN
 
     # class object, yet instantiate
     model = {
         'fsrcnn': FSRCNN,    # scale_factor, num_channels=1, d=56, s=12, m=4
         'ddbpn': DDBPN,      # scale_factor, num_channels=1, stages=7, n0=256, nr=64
+        'dbpn': DBPN,        # scale_factor, num_channels=1, stages=7, n0=256, nr=64
+        'lapsrn': NotImplementedError,
+        'drln': NotImplementedError
     }.get(model_name.lower())
 
     return model(*args, **kwargs)
@@ -190,7 +193,9 @@ def model_config(args, save: Union[str, bool]=False):
 
 
 def config_loader(doc_path, args):
-    """load config instead of argparser
+    """
+    load config instead of argparser
+    missing value will be filled by argparser's value
 
     Noticed that keys must be the same as original arguments
     support config type:
@@ -227,12 +232,17 @@ def config_loader(doc_path, args):
         print(f'No "train_path" founded in {sys.argv[0]}\n')
 
     # check which key value is missing
-    if vars(args).keys() != doc_args.keys():
-        for key in vars(args).keys():
+    arg_dict = vars(args)
+    if arg_dict.keys() != doc_args.keys():
+        for key in arg_dict.keys():
             if not key in doc_args.keys():
                 print(f'"{key}" not found in document file!')
+
+                # fill missing argument
+                doc_args[key] = arg_dict[key]     
         
         print('\nWarning: missing above key in document file, which would raising error')
+        print('Missing value would be argv value instead')
         # os._exit(0)
 
     print(f'config loaded: {doc_path}')

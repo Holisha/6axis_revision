@@ -76,6 +76,14 @@ class DDBPN(nn.Module):
             8: (12, 8, 2),
         }[scale_factor]
 
+        # reconstruction layer
+        if scale_factor == 1:
+            recon_kernel = (4, 3)
+            recon_pad = (2, 1)
+        else:
+            recon_kernel = 3
+            recon_pad = 1
+
         # Feature Extraction
         self.feature = nn.Sequential(
             nn.Conv2d(num_channels, n0, 3, padding=1),
@@ -109,7 +117,7 @@ class DDBPN(nn.Module):
         self.down_projection = nn.Sequential(*self.down_projection)
 
         # Reconstruction
-        self.reconstruction = nn.Conv2d(stages * nr, num_channels, (4, 3), padding=(2,1))
+        self.reconstruction = nn.Conv2d(stages * nr, num_channels, recon_kernel, padding=recon_pad)
 
         self.init_weight()
 
@@ -147,11 +155,99 @@ class DDBPN(nn.Module):
         return x
 
 
+class DBPN(nn.Module):
+    def __init__(self, scale_factor, num_channels=1, stages=7, n0=256, nr=64):
+        super(DBPN, self).__init__()
+
+        self.stages = stages
+
+        # convolution setting
+        kernel_size, stride, padding = {
+            1: ((4, 3), 1, (2, 1)),   # version 1
+            # 1: (4, 1, 2),     # version 2
+            2: (6, 2, 2),
+            4: (8, 4, 2),
+            8: (12, 8, 2),
+        }[scale_factor]
+
+        # reconstruction layer
+        if scale_factor == 1:
+            recon_kernel = (4, 3)
+            recon_pad = (2, 1)
+        else:
+            recon_kernel = 3
+            recon_pad = 1
+    
+        # Feature Extraction
+        self.feature = nn.Sequential(
+            nn.Conv2d(num_channels, n0, 3, padding=1),
+            nn.PReLU(n0),
+            nn.Conv2d(n0, nr, 1),
+            nn.PReLU(nr)
+        )
+
+        # projection unit
+        # in order to assign parameters
+        self.up_projection = nn.ModuleList([
+            Projection(nr, kernel_size, stride, padding),
+        ])
+
+        self.down_projection = nn.ModuleList()
+
+        for _ in range(1, stages):
+            # up sampling
+            self.up_projection.append(
+                Projection(nr, kernel_size, stride, padding),
+            )
+
+            # down sampling
+            self.down_projection.append(
+                Projection(nr, kernel_size, stride, padding, False),
+            )
+        
+        self.up_projection = nn.Sequential(*self.up_projection)
+        self.down_projection = nn.Sequential(*self.down_projection)
+
+        # Reconstruction
+        self.reconstruction = nn.Conv2d(stages * nr, num_channels, recon_kernel, padding=recon_pad)
+
+        self.init_weight()        
+
+    def init_weight(self):
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d):
+                nn.init.kaiming_normal_(m.weight)
+                nn.init.zeros_(m.bias)
+
+    def forward(self, x):
+        # feature extraction
+        x = self.feature(x)
+
+        # DBPN
+        hr = []
+        for i in range(self.stages-1):
+
+            x = self.up_projection[i](x)
+            hr.append(x)
+            x = self.down_projection[i](x)
+        
+        x = self.up_projection[i+1](x)
+        hr.append(x)
+
+        # reconstruction
+        x = self.reconstruction(
+            torch.cat(hr, dim=1)
+        )
+
+        return x
+
+
 if __name__ == '__main__':
-    model = DDBPN(1, 1, 7)
-    for idx, param in enumerate(model.modules()):
-        if isinstance(param, nn.PReLU):
-            print(f'{idx}:{param}')
+    # model = DDBPN(1, 1, 7)
+    model = DBPN(1, 1, 2) 
+    # for idx, param in enumerate(model.modules()):
+        # if isinstance(param, nn.PReLU):
+            # print(f'{idx}:{param}')
 
     torch.manual_seed(1)
 
