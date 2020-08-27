@@ -95,6 +95,9 @@ def writer_builder(log_root, model_name, load: Union[bool, int]=False):
 
     from torch.utils.tensorboard import SummaryWriter
 
+    if not os.path.exists(log_root):
+        os.mkdir(log_root)
+
     log_root = os.path.join(log_root, model_name.upper())
     print('\n####### logger info #######\n')
 

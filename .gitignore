@@ -14,8 +14,7 @@ tmp.*
 *.pth
 
 # output files
-output/*
-output_tmp/*
+output*/*
 
 # nohup files
 *.out
