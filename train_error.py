@@ -206,7 +206,6 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
             err += loss.sum().item() * inputs.size(0)
 
-
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -217,6 +216,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         # cross validation
         valid_bar = tqdm(valid_loader, desc=f'Valid epoch:{epoch}/{args.epochs}', leave=False)
         model.eval()
+        input_epoch = pred_epoch = target_epoch = torch.empty(0,0)
         with torch.no_grad():
             for data in valid_bar:
             # for data in valid_loader:
@@ -254,10 +254,24 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
                 # out2csv every check interval epochs (default: 5)
                 if epoch % args.check_interval == 0:
 
-                    # denormalize value for visualize
-                    # inputs = input_scaler.inverse_transform(inputs)
-                    # pred = input_scaler.inverse_transform(pred)
-                    # target = target_scaler.inverse_transform(target)
+                # out2csv every check interval epochs (default: 5)
+                if epoch % args.check_interval == 0:
+                    input_epoch = inputs
+                    pred_epoch = pred
+                    target_epoch = target
+
+        # out2csv every check interval epochs (default: 5)
+        if epoch % args.check_interval == 0:
+
+            # tensor to csv file
+            out2csv(input_epoch, f'{epoch}', 'input', args.out_num, args.save_path, args.stroke_length)
+            out2csv(pred_epoch, f'{epoch}', 'output', args.out_num, args.save_path, args.stroke_length)
+            out2csv(target_epoch, f'{epoch}', 'target', args.out_num, args.save_path, args.stroke_length)
+
+            # compute loss
+            err /= len(train_loader.dataset)
+            valid_err /= len(valid_loader.dataset)
+            print(f'train loss: {err:.4f}, valid loss: {valid_err:.4f}')
 
                     # tensor to csv file
                     out2csv(inputs, f'{epoch}', 'input', args.out_num, args.save_path, args.stroke_length)
