@@ -16,6 +16,19 @@
 
 ## Version 5
 
+### 8/27 - jeff
+
+- fix lr_scheduler bug and move out2csv place to decrease the I/O times
+  - `fixed`: In train.py and train_error.py: fix lr_scheduler bug
+  - `update`: In train.py: move out2csv to the end of epoch loop to decrease the I/O times
+  - `fixed`: In utils.py in `writer_builder`: check the log_root exists, or create a new one
+  - `update`: In .gitignore: Add `output*/` folder
+
+### 8/23 - angelo
+
+- fix line39 bug
+  - `fixed`: In train_error.py line39, fix bug
+
 ### 8/24 - fan
 
 - Fix iteration bug

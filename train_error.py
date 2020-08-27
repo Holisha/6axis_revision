@@ -64,18 +64,13 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
             err += loss.sum().item() * inputs.size(0)
 
-            # out2csv every check interval epochs (default: 5)
-            if epoch % args.check_interval == 0:
-                out2csv(inputs, f'{epoch}_input', args.stroke_length)
-                out2csv(pred, f'{epoch}_output', args.stroke_length)
-                out2csv(target, f'{epoch}_target', args.stroke_length)
-
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
         # cross validation
         model.eval()
+        input_epoch = pred_epoch = target_epoch = torch.empty(0,0)
         with torch.no_grad():
             for data in tqdm(valid_loader, desc=f'valid epoch: {epoch}/{args.epochs}'):
 
@@ -96,6 +91,20 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
                 loss = mse_loss
 
                 valid_err += loss.sum().item() * inputs.size(0)
+
+                # out2csv every check interval epochs (default: 5)
+                if epoch % args.check_interval == 0:
+                    input_epoch = inputs
+                    pred_epoch = pred
+                    target_epoch = target
+
+        # out2csv every check interval epochs (default: 5)
+        if epoch % args.check_interval == 0:
+
+            # tensor to csv file
+            out2csv(input_epoch, f'{epoch}', 'input', args.out_num, args.save_path, args.stroke_length)
+            out2csv(pred_epoch, f'{epoch}', 'output', args.out_num, args.save_path, args.stroke_length)
+            out2csv(target_epoch, f'{epoch}', 'target', args.out_num, args.save_path, args.stroke_length)
 
             # compute loss
             err /= len(train_loader.dataset)
