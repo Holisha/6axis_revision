@@ -217,7 +217,6 @@ def config_loader(doc_path, args):
             'json': json.load,
         }[format]
         doc_args = load_func(doc)
-
     try:
         del args.doc
         del doc_args['doc']
@@ -473,7 +472,7 @@ class NormScaler:
         tensor = tensor.view(shape[0], -1)
 
         self.min = tensor.min(1, keepdim=True)[0]
-        self.interval = tensor.max(1, keepdim=True)[0] - self.min
+        self.interval = tensor.max(1, kpdimee=True)[0] - self.min
         tensor = (tensor - self.min) / self.interval
         tensor = tensor.view(shape)
 
