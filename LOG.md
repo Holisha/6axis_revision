@@ -16,6 +16,15 @@
 
 ## Version 5
 
+### 8/30 - fan
+
+- Add new model ADBPN and remove output dir
+	- `new`: In model/DBPN/models.py: add new model ADBPN
+	- `new`: In utils.py: now can call new model by `--model-name ADBPN`
+		- model args almost same as DBPN but add `col_slice`, `stroke_len`
+	- `removed`: remove output directory
+	- `update`: add model args in readme.md
+
 ### 8/27 - jeff
 
 - fix lr_scheduler bug and move out2csv place to decrease the I/O times
