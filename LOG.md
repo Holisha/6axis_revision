@@ -15,6 +15,11 @@
 - `other`: TBD
 
 ## Version 5
+### 8/30 - Angelowen
+- fix fix DBPN/init.py bug and train_error bug
+  - `fixed`: train_error.py: fix out2csv bug
+  - `fixed`: In DBPN/init.py add ADBPN to call 
+  - `update`: In .gitignore: Add `output*/` folder
 
 ### 8/30 - fan
 
