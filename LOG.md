@@ -19,7 +19,7 @@
 - fix fix DBPN/init.py bug and train_error bug
   - `fixed`: train_error.py: fix out2csv bug
   - `fixed`: In DBPN/init.py add ADBPN to call 
-  - `update`: In .gitignore: Add `output*/` folder
+  - `update`: In .gitignore: Add `output-v5-1c779cab/` folder
 
 ### 8/30 - fan
 
