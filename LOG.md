@@ -1,7 +1,5 @@
 # project log
 
-- [toc]
-
 ## event type:
 
 - format: `event`: `where`: `what`
@@ -14,10 +12,13 @@
 - `bug`: bug found but **yet fix**
 - `other`: TBD
 
+## Version 6
+
 ## Version 5
 
 ### 8/30 - fan
 
+- Merge to master branch
 - Add new model ADBPN and remove output dir
 	- `new`: In model/DBPN/models.py: add new model ADBPN
 	- `new`: In utils.py: now can call new model by `--model-name ADBPN`

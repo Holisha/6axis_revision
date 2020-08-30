@@ -1,5 +1,9 @@
 # 6 Axis Revision 
 
+- [TOC]
+- Version: 5.0
+    - update at 2020/8/30
+
 ## Introduction
 
 - This project is aiming at revise calligraphy words based on CNN method.
