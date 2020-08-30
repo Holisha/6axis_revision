@@ -11,13 +11,13 @@ mean: 0.5
 std: 0.5
 
 # model setting
-model_name: DBPN # FSRCNN, DDBPN, DBPN
+model_name: ADBPN # FSRCNN, DDBPN, DBPN
 scale: 1
 model_args: # model args, for more detail, please take a look in model/model name/models.py
   stages: 2
   n0: 64
   nr: 18
-gpu_id: 0
+gpu_id: 1
 criterion: huber
 
 # optimizer
@@ -52,7 +52,7 @@ epochs: 1000
 log_path: ./logs
 
 # output setting
-save_path: ./output-v5-1c779cab
+save_path: ./output-adbpn
 check_interval: 3 # convert tensor to csv file
 out_num: 5
 

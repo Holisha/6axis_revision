@@ -58,7 +58,7 @@ def train_argument(inhert=False):
                         help='set the scale factor for the SR model (default: 1)')
     parser.add_argument('--model-args', action=StorePair, nargs='+', default={},
                         metavar='key=value', help="set other args (default: {})")
-    parser.add_argument('--optim', type=str, default='adam',
+    parser.add_argument('--optim', type=str, default='rangerVA',
                         help='set optimizer')
     parser.add_argument('--load', action='store_true', default=False,
                         help='load model parameter from exist .pt file (default: False)')
@@ -253,9 +253,6 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
                 # out2csv every check interval epochs (default: 5)
                 if epoch % args.check_interval == 0:
-
-                # out2csv every check interval epochs (default: 5)
-                if epoch % args.check_interval == 0:
                     input_epoch = inputs
                     pred_epoch = pred
                     target_epoch = target
@@ -268,15 +265,6 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
             out2csv(pred_epoch, f'{epoch}', 'output', args.out_num, args.save_path, args.stroke_length)
             out2csv(target_epoch, f'{epoch}', 'target', args.out_num, args.save_path, args.stroke_length)
 
-            # compute loss
-            err /= len(train_loader.dataset)
-            valid_err /= len(valid_loader.dataset)
-            print(f'train loss: {err:.4f}, valid loss: {valid_err:.4f}')
-
-                    # tensor to csv file
-                    out2csv(inputs, f'{epoch}', 'input', args.out_num, args.save_path, args.stroke_length)
-                    out2csv(pred, f'{epoch}', 'output', args.out_num, args.save_path, args.stroke_length)
-                    out2csv(target, f'{epoch}', 'target', args.out_num, args.save_path, args.stroke_length)
 
         # compute loss
         err /= len(train_loader.dataset)
