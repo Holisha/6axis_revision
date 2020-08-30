@@ -43,7 +43,7 @@ def train_argument(inhert=False):
                         help='target dataset path (default: /home/jefflin/dataset/target)')
     parser.add_argument('--batch-size', type=int, default=64,
                         help='set the batch size (default: 64)')
-    parser.add_argument('--num-workers', type=int, default=8,
+    parser.add_argument('--num-workers', type=int, default=16,
                         help='set the number of processes to run (default: 8)')
     parser.add_argument('--holdout-p', type=float, default=0.8,
                         help='set hold out CV probability (default: 0.8)')

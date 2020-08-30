@@ -4,22 +4,24 @@ train_path: /home/jefflin/dataset/train
 target_path: /home/jefflin/dataset/target
 test_path: /home/jefflin/dataset/test_all
 batch_size: 64
-num_workers: 20
+num_workers: 22
 holdout_p: 0.8 # hold out cross validation probability
 # (x - mean) / std
 mean: 0.5
 std: 0.5
 
 # model setting
-model_name: DDBPN # FSRCNN, DDBPN
+model_name: DBPN # FSRCNN, DDBPN, DBPN
 scale: 1
 model_args: # model args, for more detail, please take a look in model/model name/models.py
-  stages: 3
-gpu_id: 1
+  stages: 2
+  n0: 64
+  nr: 18
+gpu_id: 0
 criterion: huber
 
 # optimizer
-lr: 0.001 # learning rate
+lr: 0.00005 # learning rate
 # Adam, SGD, ranger, rangerVA
 # noticed that different optimizer fit in different learning rate
 optim: rangerVA
@@ -30,29 +32,28 @@ weight_decay: 0
 
 # scheduler
 # scheduler can be defined by name or bool
-scheduler: step   # define by name
+scheduler: step # define by name
 # scheduler: true # define by bool
-step: 
-- 2
-factor: 0.1
+step: 5
+factor: 0.9
 
 # early stopping
 early_stop: true
-patience: 5
-threshold: 0.1
+patience: 10
+threshold: 0.3
 verbose: false
 
 # weighted loss
 alpha: 1 # mse loss weight
 beta: 1 # content loss weight
-epochs: 100
+epochs: 1000
 
 # logger setting
 log_path: ./logs
 
 # output setting
-save_path: ./output
-check_interval: 1 # convert tensor to csv file
+save_path: ./output-v5-1c779cab
+check_interval: 3 # convert tensor to csv file
 out_num: 5
 
 # other
