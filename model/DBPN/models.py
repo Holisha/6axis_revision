@@ -242,9 +242,42 @@ class DBPN(nn.Module):
         return x
 
 
+class ADBPN(DBPN):
+    def __init__(self, *args, col_slice=3, stroke_len=150, **kwargs):
+        """
+        Attention DBPN
+            pool -> fc -> tanh
+
+        Args:
+            col_slice (int, optional): slice the column to reduce repetitively value impact on avg pool. Defaults to 3.
+            stroke_len (int, optional): stroke length. Defaults to 150 (maximum stroke in dataset).
+        """
+        super().__init__(*args, **kwargs)
+        self.stroke_len = stroke_len
+        
+        self.glob_avgpool = nn.AdaptiveAvgPool1d(6 * col_slice)
+
+        self.attention = nn.Sequential(
+            nn.Linear(6 * col_slice, 6),
+            nn.Tanh(),
+        )
+
+        self.init_weight()
+    
+    def forward(self, x):
+        weight = x.view(-1, 1, self.stroke_len*6)
+        weight = self.glob_avgpool(weight)
+        weight = self.attention(weight).unsqueeze(2)
+        
+        return DBPN.forward(self, weight * x)
+
+
 if __name__ == '__main__':
     # model = DDBPN(1, 1, 7)
-    model = DBPN(1, 1, 2) 
+    # model = DBPN(1, 1, 2) 
+    model = ADBPN(1, 1, 2, col_slice=3, stroke_len=150)
+
+    # print(model)
     # for idx, param in enumerate(model.modules()):
         # if isinstance(param, nn.PReLU):
             # print(f'{idx}:{param}')
