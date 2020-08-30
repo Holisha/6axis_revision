@@ -89,6 +89,36 @@
 
 - please check `doc/sample` in detail
 
+### model parameter
+
+```python
+
+DBPN-S:
+	stages=2,
+	n0=128,
+	nr=32
+
+DBPN-SS:
+	stages=2,
+	n0=64,
+	nr=18
+	
+ADBPN:
+	col_slice=3,
+	stroke_len=150
+
+ADBPN-S:
+	stages=2,
+	n0=128,
+	nr=32
+	
+ADBPN-SS:
+	stages=2,
+	n0=64,
+	nr=18
+}
+```
+
 ## Pretained model
 
 - Developing
