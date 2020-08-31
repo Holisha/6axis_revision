@@ -15,7 +15,16 @@
 - `other`: TBD
 
 ## Version 6
+
+### 8/31 - fan
+
+- Now config will save as original document file when call args.doc
+	- `new`: In utils.py: now config will save in version directory with original format
+		`.json` -> `.json`, `.yaml` -> `.yaml`
+	- `update`: In README.md, add default lr which is based on paper
+
 ### 8/30 - Angelowen
+
 - fix fix DBPN/init.py bug and train_error bug
   - `fixed`: train_error.py: fix out2csv bug
   - `fixed`: In DBPN/init.py add ADBPN to call 
