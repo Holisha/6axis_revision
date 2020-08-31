@@ -3,6 +3,7 @@ import os
 import csv
 import sys
 import json
+import shutil
 import yaml
 import numpy as np
 import pandas as pd
@@ -12,6 +13,7 @@ import torch.optim as optim
 from argparse import Action, ArgumentParser, Namespace
 from collections import OrderedDict
 from glob import glob
+from pathlib import Path
 from typing import Union, Optional
 
 
@@ -194,12 +196,23 @@ def model_config(args, save: Union[str, bool]=False):
     print('\n####### model arguments #######\n')
 
     if save:
-        # save config as .json file 
-        # if user has determined path
-        config_path = os.path.join(save, 'config.json') if type(save) is str else 'config.json'
+    
+        # if user has determined path or not
+        save_path = save if type(save) is str else './'
 
-        with open(config_path, 'w') as config:
-            json.dump(vars(args), config, indent=4)
+        # if user specify doc
+        if args.doc:
+            shutil.copy(
+                args.doc, 
+                Path(save_path).joinpath(Path(args.doc).name)
+            )
+        
+        # save config as .json file
+        else:
+            config_path = os.path.join(save_path, 'config.json')
+
+            with open(config_path, 'w') as config:
+                json.dump(vars(args), config, indent=4)
 
 
 def config_loader(doc_path, args):
@@ -227,11 +240,13 @@ def config_loader(doc_path, args):
             'json': json.load,
         }[format]
         doc_args = load_func(doc)
-    try:
+    
+    # remain doc in args
+    """ try:
         del args.doc
         del doc_args['doc']
     except:
-        print('There is no "doc" in args parser\n')
+        print('There is no "doc" in args parser\n') """
         
     try:
         # train path exist

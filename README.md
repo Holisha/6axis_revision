@@ -91,6 +91,10 @@
 
 ### model parameter
 
+- learning rate:
+    - FSRCNN: 1e-3
+    - DBPN: 1e-4
+
 ```python
 
 DBPN-S:

@@ -31,8 +31,8 @@ def train_argument(inhert=False):
     parser = ArgumentParser(add_help=not inhert)
 
     # doc setting
-    parser.add_argument('--doc', type=str, metavar='./doc/sample.yaml',
-                        help='load document file by position(default: None)')
+    parser.add_argument('--doc', type=str, metavar='./doc_path/doc',
+                        help='load document file by position (default: None)')
 
     # dataset setting
     parser.add_argument('--stroke-length', type=int, default=150,
@@ -337,6 +337,11 @@ if __name__ == '__main__':
     # replace args by document file
     if train_args.doc:
         train_args = config_loader(train_args.doc, train_args)
+    
+    
+    # model_config(train_args, save=True)     # print model configuration after training
+    # model_config(train_args, save='./light')     # print model configuration after training
+    # os._exit(0)
 
     # set cuda
     torch.cuda.set_device(train_args.gpu_id)
