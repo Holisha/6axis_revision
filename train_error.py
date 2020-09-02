@@ -101,7 +101,7 @@ def train_argument(inhert=False):
     parser.add_argument('--patience', type=int, default=5,
                         help='How long to wait after last time validation loss improved. (default: 5)')
     parser.add_argument('--threshold', type=float, default=0.1,
-                        help='Minimum change in the monitored quantity to qualify as an improvement. (default: 0.1)')
+                        help='Minimum change in the monitored quantity to qualify as an improvement. (default: 0.001)')
     parser.add_argument('--verbose', action='store_true', default=False,
                         help='If True, prints a message for each validation loss improvement. (default: False)')
 
@@ -157,7 +157,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
 
     # initialize the early_stopping object
     if args.early_stop:
-        early_stopping = EarlyStopping(patience=args.patience, verbose=args.verbose, threshold=args.threshold, path=model_path)
+        early_stopping = EarlyStopping(patience=args.patience, threshold=args.threshold, verbose=args.verbose, path=model_path)
 
     if args.scheduler:
         scheduler = schedule_builder(optimizer, args.scheduler, args.step, args.factor)
