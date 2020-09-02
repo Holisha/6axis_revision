@@ -5,7 +5,7 @@
 ## event type:
 
 - format: `event`: `where`: `what`
-    - ignore `event` case
+	- ignore `event` case
 
 - `update`: update **existed** object
 	- ex: rename file or variable
@@ -15,6 +15,13 @@
 - `other`: TBD
 
 ## Version 6
+
+### 9/2 - jefflin
+
+- Change the strategy of Early-Stop
+	- `update`: In train.py and train_error.py: change `threshold` argument default value and change the order of parameters in `EarlyStopping`
+	- `update`: In `EarlyStopping` in utils.py: Change the strategy of Early-Stop. eg, val_loss decrease less than 0.1% (default)
+	- `update`: In utils.py: Delete the comment of `csv2txt`
 
 ### 8/31 - fan
 
