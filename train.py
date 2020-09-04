@@ -15,7 +15,6 @@ from utils import (StorePair, writer_builder, model_builder, optimizer_builder, 
 from dataset import AxisDataSet, cross_validation
 from postprocessing import postprocessor
 
-
 def train_argument(inhert=False):
     """return train arguments
 

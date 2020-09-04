@@ -100,7 +100,7 @@ def train_argument(inhert=False):
                         help='Early stops the training if validation loss does not improve (default: True)')
     parser.add_argument('--patience', type=int, default=5,
                         help='How long to wait after last time validation loss improved. (default: 5)')
-    parser.add_argument('--threshold', type=float, default=0.1,
+    parser.add_argument('--threshold', type=float, default=0.001,
                         help='Minimum change in the monitored quantity to qualify as an improvement. (default: 0.001)')
     parser.add_argument('--verbose', action='store_true', default=False,
                         help='If True, prints a message for each validation loss improvement. (default: False)')
@@ -121,12 +121,12 @@ def train_argument(inhert=False):
     
     return parser.parse_args()
 
-# TODO: change path name, add other args
+
 def train(model, train_loader, valid_loader, optimizer, criterion, args):
     # content_loss
     best_err = None
-    # feature_extractor = FeatureExtractor().cuda()
-    # feature_extractor.eval()
+    feature_extractor = FeatureExtractor().cuda()
+    feature_extractor.eval()
 
     writer, log_path = writer_builder(
         args.log_path, args.model_name, load=args.load)
@@ -169,7 +169,6 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         'lr': args.lr,
     }
 
-
     for epoch in range(checkpoint['epoch'], args.epochs+1):
         model.train()
         err = 0.0
@@ -185,22 +184,23 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
             pred = model(inputs)
 
             # MSE loss
-            mse_loss = criterion(pred - inputs, target - inputs)
+            mse_loss = args.alpha *criterion(pred - inputs, target - inputs)
 
             # content loss
-            # gen_features = feature_extractor(pred)
-            # real_features = feature_extractor(target)
-            # content_loss = criterion(gen_features, real_features)
+            gen_features = feature_extractor(pred)
+            real_features = feature_extractor(target)
+            content_loss = args.beta * criterion(gen_features, real_features)
 
             # for compatible but bad for memory usage
-            loss = mse_loss
+            loss = mse_loss + content_loss
+
             # update progress bar
             pbar_postfix['MSE loss'] = mse_loss.item()
-            # pbar_postfix['Content loss'] = content_loss.item()
+            pbar_postfix['Content loss'] = content_loss.item()
 
             # show current lr
-            # if args.lr_sceduler:
-            #     pbar_postfix['lr'] = optimizer.param_groups[0]['lr']
+            if args.scheduler:
+                pbar_postfix['lr'] = optimizer.param_groups[0]['lr']
 
             train_bar.set_postfix(pbar_postfix)
 
@@ -210,9 +210,10 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
             loss.backward()
             optimizer.step()
 
-             # update writer
+            # update writer
             writer.add_scalar('Iteration/train loss', loss.sum().item(), checkpoint['train_iter'])
             checkpoint['train_iter'] += 1
+
         # cross validation
         valid_bar = tqdm(valid_loader, desc=f'Valid epoch:{epoch}/{args.epochs}', leave=False)
         model.eval()
@@ -229,24 +230,25 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
                 mse_loss = criterion(pred - inputs, target - inputs)
 
                 # content loss
-                # gen_features = feature_extractor(pred)
-                # real_features = feature_extractor(target)
-                # content_loss = criterion(gen_features, real_features)
+                gen_features = feature_extractor(pred)
+                real_features = feature_extractor(target)
+                content_loss = criterion(gen_features, real_features)
 
                 # for compatible
-                loss = mse_loss
+                loss = mse_loss + content_loss
+
                 # update progress bar
                 pbar_postfix['MSE loss'] = mse_loss.item()
-                # pbar_postfix['Content loss'] = content_loss.item()
+                pbar_postfix['Content loss'] = content_loss.item()
 
                 # show current lr
-                # if args.lr_sceduler:
-                #     pbar_postfix['lr'] = optimizer.param_groups[0]['lr']
+                if args.scheduler:
+                    pbar_postfix['lr'] = optimizer.param_groups[0]['lr']
 
                 valid_bar.set_postfix(pbar_postfix)
 
                 valid_err += loss.sum().item() * inputs.size(0)
-                
+
                 # update writer
                 writer.add_scalar('Iteration/valid loss', loss.sum().item(), checkpoint['valid_iter'])
                 checkpoint['valid_iter'] += 1
@@ -264,7 +266,6 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
             out2csv(input_epoch, f'{epoch}', 'input', args.out_num, args.save_path, args.stroke_length)
             out2csv(pred_epoch, f'{epoch}', 'output', args.out_num, args.save_path, args.stroke_length)
             out2csv(target_epoch, f'{epoch}', 'target', args.out_num, args.save_path, args.stroke_length)
-
 
         # compute loss
         err /= len(train_loader.dataset)
@@ -312,7 +313,6 @@ if __name__ == '__main__':
     # replace args by document file
     if train_args.doc:
         train_args = config_loader(train_args.doc, train_args)
-
     # set cuda
     torch.cuda.set_device(train_args.gpu_id)
 

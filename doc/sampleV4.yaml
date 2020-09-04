@@ -11,13 +11,13 @@ mean: 0.5
 std: 0.5
 
 # model setting
-model_name: ADBPN # FSRCNN, DDBPN, DBPN
+model_name: DBPN # FSRCNN, DDBPN, DBPN
 scale: 1
 model_args: # model args, for more detail, please take a look in model/model name/models.py
   stages: 2
   n0: 64
   nr: 18
-gpu_id: 1
+gpu_id: 0
 criterion: huber
 
 # optimizer

@@ -15,6 +15,12 @@
 - `other`: TBD
 
 ## Version 6
+### 9/3 - Angelowen
+
+- adding the content loss to new model training
+	- `update`: In train_error.py: add `content_loss` to MSE loss value 
+	- `update`: In train_error.py: add `pbar_postfix['Content loss']` 
+	- `update`: In train_error.py: add `args.scheduler` and `pbar_postfix['lr']` to record learning rate
 
 ### 9/2 - jefflin
 
