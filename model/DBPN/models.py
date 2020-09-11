@@ -88,13 +88,17 @@ class DDBPN(nn.Module):
         self.feature = nn.Sequential(
             nn.Conv2d(num_channels, n0, 3, padding=1),
             nn.PReLU(n0),
-            nn.Conv2d(n0, nr, 1),
-            nn.PReLU(nr)
         )
+
+        # Bottle Neck
+        self.bottle = nn.Sequential(
+            nn.Conv2d(n0, nr, 1),
+            nn.PReLU(nr),
+        )
+
         # Back Projection Stages
         # projection unit
-
-        # in order to assign parameters
+        # in order to assign parameters and forward func
         self.up_projection = nn.ModuleList([
             Projection(nr, kernel_size, stride, padding),
             Projection(nr, kernel_size, stride, padding),
@@ -128,8 +132,11 @@ class DDBPN(nn.Module):
                 nn.init.zeros_(m.bias)
 
     def forward(self, x):
-        # Bottle Neck
+        # Feature extraction
         x = self.feature(x)
+
+        # Bottle Neck
+        x = self.bottle(x)
 
         # Dense Connection
         h_list = []     # HR image
@@ -182,8 +189,12 @@ class DBPN(nn.Module):
         self.feature = nn.Sequential(
             nn.Conv2d(num_channels, n0, 3, padding=1),
             nn.PReLU(n0),
+        )
+
+        # Bottle neck layer
+        self.bottle = nn.Sequential(
             nn.Conv2d(n0, nr, 1),
-            nn.PReLU(nr)
+            nn.PReLU(nr),
         )
 
         # projection unit
@@ -223,6 +234,9 @@ class DBPN(nn.Module):
         # feature extraction
         x = self.feature(x)
 
+        # bottle neck
+        x = self.bottle(x)
+
         # DBPN
         hr = []
         for i in range(self.stages-1):
@@ -243,39 +257,121 @@ class DBPN(nn.Module):
 
 
 class ADBPN(DBPN):
-    def __init__(self, *args, col_slice=3, stroke_len=150, **kwargs):
+    def __init__(self, scale_factor, num_channels=1, stages=7, n0=256, nr=64, col_slice=3, stroke_len=150, atten='ch'):
         """
         Attention DBPN
-            pool -> fc -> tanh
+        atten:
+            col:
+                pool -> fc -> tanh
+            ch:
+                pool -> fc -> ReLU -> fc -> sigmoid
 
         Args:
             col_slice (int, optional): slice the column to reduce repetitively value impact on avg pool. Defaults to 3.
             stroke_len (int, optional): stroke length. Defaults to 150 (maximum stroke in dataset).
+            atten (str, optional): attention method. Defaults to ch
         """
-        super().__init__(*args, **kwargs)
-        self.stroke_len = stroke_len
-        
-        self.glob_avgpool = nn.AdaptiveAvgPool1d(6 * col_slice)
+        super().__init__(scale_factor, num_channels, stages, n0, nr)
 
-        self.attention = nn.Sequential(
-            nn.Linear(6 * col_slice, 6),
-            nn.Tanh(),
-        )
+        # parameter in DBPN
+        self.n0 = n0
+
+        # parameter for attention
+        self.stroke_len = stroke_len
+
+        # attention method
+        self.attention = {
+            # col attention
+            'col': nn.Sequential(
+                nn.Flatten(start_dim=2),
+                nn.AdaptiveAvgPool1d(6 * col_slice),
+                nn.Linear(6 * col_slice, 6),
+                nn.Tanh(),
+                ),
+            # channel attention
+            'ch': nn.Sequential(
+                nn.AdaptiveAvgPool2d(1),
+                nn.Flatten(),
+
+                nn.Linear(n0, n0//4),
+                nn.ReLU(),
+
+                nn.Linear(n0//4, n0),
+                nn.Sigmoid(),
+                ),
+        }[atten]
+
+        # control attention func
+        self.attention_func = {
+            'col': self.col_attention,
+            'ch': self.channel_attention,
+        }[atten]
+
+        # print(self.attention)
+        # print(self.attention_func)
 
         self.init_weight()
-    
-    def forward(self, x):
-        weight = x.view(-1, 1, self.stroke_len*6)
-        weight = self.glob_avgpool(weight)
-        weight = self.attention(weight).unsqueeze(2)
-        
-        return DBPN.forward(self, weight * x)
 
+    def col_attention(self, x):
+        """column attention
+
+        pool -> fc -> tanh
+        (-1, 1, len, 6) -> (-1, 1, len*6)
+
+        Args:
+            x (-1, 1, len, 6): batch of stroke
+
+        Returns:
+            feature of weighted stroke
+        """
+        weight = self.attention(x).unsqueeze(2)
+
+        return self.feature(weight * x)
+
+    def channel_attention(self, x):
+        """channel attention
+
+        Args:
+            x (-1, 1, len, 6): batch of stroke
+
+        Returns:
+            weighted feature
+        """
+        x = self.feature(x)
+        weight = self.attention(x).view(-1, self.n0, 1, 1)
+
+        return x * weight
+
+    def forward(self, x):
+        # feature extraction
+        x = self.attention_func(x)
+
+        # bottle neck
+        x = self.bottle(x)
+
+        # DBPN
+        hr = []
+        for i in range(self.stages-1):
+
+            x = self.up_projection[i](x)
+            hr.append(x)
+            x = self.down_projection[i](x)
+        
+        x = self.up_projection[i+1](x)
+        hr.append(x)
+
+        # reconstruction
+        x = self.reconstruction(
+            torch.cat(hr, dim=1)
+        )
+
+        return x
 
 if __name__ == '__main__':
     # model = DDBPN(1, 1, 7)
     # model = DBPN(1, 1, 2) 
-    model = ADBPN(1, 1, 2, col_slice=3, stroke_len=150)
+    model = ADBPN(1, 1, 2, col_slice=3, stroke_len=150, atten='ch')
+    # model = ADBPN(1, 1, 2, col_slice=3, stroke_len=150, atten='col')
 
     # print(model)
     # for idx, param in enumerate(model.modules()):
