@@ -20,6 +20,7 @@
 
 - Add new mechanic in ADBPN:
 	- `new`: Add weighted features
+	- `update`: update DBPN series coding style
 	- `update`: ADBPN now is use channel feature instead of col features
 		- to call col features, set `atten=col`
 
