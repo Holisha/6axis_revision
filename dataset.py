@@ -12,6 +12,9 @@ from sklearn.preprocessing import MinMaxScaler
 
 class AxisDataSet(Dataset):
     """
+    Version 6: 
+        save as .npy
+
     file location: PATH/task/word directory/stroke_num/*.csv
         ex: PATH/train/0042/05/0042_01.csv
 
@@ -52,7 +55,8 @@ class AxisDataSet(Dataset):
             for stroke_idx, stroke_num in enumerate(sorted(os.listdir(stroke_path))):
 
                 # store num of stroke path
-                file_path = os.path.join(stroke_path, stroke_num, '*.csv')
+                """ file_path = os.path.join(stroke_path, stroke_num, '*.csv') """
+                file_path = os.path.join(stroke_path, stroke_num, '*.npy')
 
                 # list all csv file in stroke num
                 for csv_path in glob(file_path):
@@ -68,14 +72,25 @@ class AxisDataSet(Dataset):
             # store list to control stroke_num
             self.target[word_dir] = []
 
+            """
             # list all csv file in target data
             for csv_path in sorted(glob(os.path.join(target_path, word_dir, '**/*.csv'))):
-                
                 # get csv file
                 tmp = pd.read_csv(csv_path, header=None)
 
                 # last column is no longer required
                 data = tmp.iloc[:, :-1].to_numpy()
+
+                # transform data from numpy.ndarray to torch.FloatTensor
+                data = torch.from_numpy(data).unsqueeze(0).float()
+                
+                self.target[word_dir].append(data)
+            """
+
+            # list all npy file in target data
+            for npy_path in sorted(glob(os.path.join(target_path, word_dir, '**/*.npy'))):
+                # get npy file
+                data = np.delete(np.load(npy_path), -1, axis=1)
 
                 # transform data from numpy.ndarray to torch.FloatTensor
                 data = torch.from_numpy(data).unsqueeze(0).float()
@@ -87,16 +102,27 @@ class AxisDataSet(Dataset):
 
     def __getitem__(self, idx):
         """
+        from Version 6:
+        csv list = (npy_path, directory name, stroke_num)
+
+        before V6:
         csv list = (csv_path, directory name, stroke_num)
+        
 
         return:
             input data
             target data
         """
+
+        """
         # csv to tensor
         csv_file = pd.read_csv(self.csv_list[idx][0], header=None)
 
         data = csv_file.iloc[:, :-1].to_numpy()
+        """
+
+        # npy to tensor
+        data = np.delete(np.load(self.csv_list[idx][0]), -1, axis=1)
         
         # data = MinMaxScaler(feature_range=(0, 1)).fit_transform(data)
         

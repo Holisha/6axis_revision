@@ -16,6 +16,14 @@
 
 ## Version 6
 
+### 9/12 - fan
+
+- **This commit is unstable**
+- `update`: In `preprocess.py`, save inputs file as npy file to improve performance
+	- inputs, target, test to npy file
+	- **output remain csv file**
+- `update`: In `dataset.py`, load and search npy file, instead of csv file
+
 ### 9/12 - jefflin
 
 - Add extend stroke lenght by interpolation in preprocessing
