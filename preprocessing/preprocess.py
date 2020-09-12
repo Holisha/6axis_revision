@@ -4,6 +4,8 @@ import pandas as pd
 from glob import glob
 from utils import argument_setting, stroke_statistics
 
+#TODO: save as .npy
+
 def addnoise(target_data, noise):
     """add noise in range [noise[0], noise[1]]
 
@@ -55,6 +57,9 @@ def extended_length(data, stroke_len, mode):
 def csv_parser(char_num, txt_name, target_path, train_path, stroke_len, args):
     """split txt file to csv file by stroke
 
+    Version 6:
+        save as npy
+
     Args:
         char_num (string): the number of the character
         txt_name (string): the txt file name of the character
@@ -99,14 +104,21 @@ def csv_parser(char_num, txt_name, target_path, train_path, stroke_len, args):
             file_path = f'{train_path}/{char_num}/{stroke_idx}'
             train_data = addnoise(target_data, args.noise)
 
-            # store training data
-            train_data.to_csv(f'{file_path}/{filename}', header=False, index=False)
+            """ # store training data
+            train_data.to_csv(f'{file_path}/{filename}', header=False, index=False) """
 
-        # store target data
+            # store as npy
+            np.save(f'{file_path}/{os.path.splitext(filename)[0]}', train_data.to_numpy())
+
+        """ # store target data
         target_data.to_csv(
             f'{target_path}/{char_num}/{stroke_idx}/{char_num}_{stroke_idx}.csv',
             header=False, index=False
-        )
+        ) """
+        
+        # store as npy
+        np.save(f'{target_path}/{char_num}/{stroke_idx}/{char_num}_{stroke_idx}', target_data.to_numpy())
+        
     return stroke_total
 
 def get_less_char(file_list, less_char, total_char):
@@ -196,7 +208,9 @@ def preprocess():
                 test_data = addnoise(target_data, args.noise)
 
                 # store training data
-                test_data.to_csv(f'{test_char_path}{stroke_idx}/{filename}', header=False ,index=False)
+                """ test_data.to_csv(f'{test_char_path}{stroke_idx}/{filename}', header=False ,index=False) """
+                np.save(f'{test_char_path}{stroke_idx}/{os.path.splitext(filename)[0]}', test_data.to_numpy())
+
         print(f'Build {char_num} testing data finished ...\n')
 
     print('All Done!!!')
