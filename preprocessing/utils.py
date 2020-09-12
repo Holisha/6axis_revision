@@ -53,6 +53,10 @@ def argument_setting():
     parser.add_argument('--total-char', type=int, default=900,
                         help='set the numbers of the total training characters (default: 900)')
 
+    # convert
+    parser.add_argument('--convert', action='store_true', default=False,
+                        help='convert csv to npy file (default: False)')    
+
     return parser.parse_args()
 
 def stroke_statistics(file_list, mode='max'):

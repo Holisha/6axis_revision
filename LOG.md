@@ -23,6 +23,9 @@
 	- inputs, target, test to npy file
 	- **output remain csv file**
 - `update`: In `dataset.py`, load and search npy file, instead of csv file
+- `new`: In `preprocess.py`, add function `csv2npy` convert 
+- `new`: In `preprocess/utils.py`, add argv `--convert` to call `csv2npy`
+	- `--root-path` to control `csv2npy` input path
 
 ### 9/12 - jefflin
 
