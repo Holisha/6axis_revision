@@ -16,6 +16,13 @@
 
 ## Version 6
 
+### 9/12 - jefflin
+
+- Add extend stroke lenght by interpolation in preprocessing
+    - `new`: Add extend stroke lenght by interpolation in preprocessing, 
+        - and add noise to the tail
+    - `update`: In .gitignore: delete `stroke_statistics` function
+
 ### 9/11 - fan
 
 - Add new mechanic in ADBPN:

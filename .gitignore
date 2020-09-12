@@ -23,5 +23,3 @@ output*/*
 train_beta.py
 
 *.txt
-# output folder
-output-v5-1c779cab/

@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 from glob import glob
-from utils import argument_setting
+from utils import argument_setting, stroke_statistics
 
 def addnoise(target_data, noise):
     """add noise in range [noise[0], noise[1]]
@@ -19,26 +19,40 @@ def addnoise(target_data, noise):
     )
     random_data[6] = [""] * random_data.shape[0]
     data = target_data.reset_index(drop=True).add(random_data)
-    
+
     return data
 
-def add_last_line(data, stroke_len):
+def extended_length(data, stroke_len, mode):
     """add last line to len of stroke_len.
 
     Args:
         data (pd.dataframe): data to be added last line
         stroke_len (int): the len of each stroke
+        mode (string): the mode of the extended method
 
     Returns:
         pd.dataframe: the data after added last line
     """
-    add_last_line_num = stroke_len - data.shape[0]
-    data = data.append(data.iloc[[-1] * add_last_line_num], ignore_index=True)
-    
-    return data
 
+    if mode == 'tail':
+        new_data = data.append(data.iloc[[-1] * (stroke_len - data.shape[0])], ignore_index=True)
 
-def csv_parser(char_num, txt_name, target_path, train_path, args):
+    # Interpolation
+    elif mode == 'inter':
+        new_data = data
+        index = 0
+        while new_data.shape[0] < stroke_len:
+            mid = new_data.iloc[index,:].copy()
+            mid[:-1] = (new_data.iloc[index, :-1] + new_data.iloc[index + 1, :-1]) / 2
+            tmp = pd.concat([new_data[:index + 1], mid.to_frame().transpose()], ignore_index=True)
+            new_data = pd.concat([tmp, new_data[index + 1:]], ignore_index=True)
+            index += 2
+            if index >= new_data.shape[0] - 1:
+                index = 0
+
+    return new_data
+
+def csv_parser(char_num, txt_name, target_path, train_path, stroke_len, args):
     """split txt file to csv file by stroke
 
     Args:
@@ -52,8 +66,6 @@ def csv_parser(char_num, txt_name, target_path, train_path, args):
         int: the number of strokes
     """
 
-    stroke_len = args.stroke_len
-
     if not os.path.exists(f'{target_path}/{char_num}'):
         os.mkdir(f'{target_path}/{char_num}')
     if not os.path.exists(f'{train_path}/{char_num}'):
@@ -62,21 +74,24 @@ def csv_parser(char_num, txt_name, target_path, train_path, args):
     data = pd.read_table(txt_name, header=None, sep=' ')    # read txt file to pandas dataframe
     data.drop(columns=[0, 1, 8], inplace=True)              # 把不用用到的column砍掉
     data.columns = range(data.shape[1])                     # 重新排列 column
-    stroke_total=len(data.groupby(data.iloc[:, -1]).groups) # 總筆畫
-    
+    stroke_total = len(data.groupby(data.iloc[:, -1]).groups) # 總筆畫
+
     for stroke_num in range(stroke_total):
         stroke_num = stroke_num + 1         # int
         stroke_idx = f'{stroke_num:0{args.stroke_idx}d}'    # string
-        
+
         # make directory
         if not os.path.exists(f'{target_path}/{char_num}/{stroke_idx}'):
             os.mkdir(f'{target_path}/{char_num}/{stroke_idx}')
         if not os.path.exists(f'{train_path}/{char_num}/{stroke_idx}'):
             os.mkdir(f'{train_path}/{char_num}/{stroke_idx}')
-        
+
         # index of each stroke
         each_stroke = data.groupby(data.iloc[:, -1]).groups.get(f'stroke{stroke_num}')
         target_data = data.iloc[each_stroke, :]
+
+        # extend target stroke
+        target_data = extended_length(target_data, stroke_len, args.extend)
 
         # build training data
         for train_num in range(args.train_num):
@@ -84,14 +99,8 @@ def csv_parser(char_num, txt_name, target_path, train_path, args):
             file_path = f'{train_path}/{char_num}/{stroke_idx}'
             train_data = addnoise(target_data, args.noise)
 
-            # add train data last line
-            train_data = add_last_line(train_data, stroke_len)
-            
             # store training data
-            train_data.to_csv(f'{file_path}/{filename}', header=False ,index=False)
-
-        # add target last line
-        target_data = add_last_line(target_data, stroke_len)
+            train_data.to_csv(f'{file_path}/{filename}', header=False, index=False)
 
         # store target data
         target_data.to_csv(
@@ -100,19 +109,25 @@ def csv_parser(char_num, txt_name, target_path, train_path, args):
         )
     return stroke_total
 
+def get_less_char(file_list, less_char, total_char):
+
+    new_file_list = file_list[0:total_char:int(total_char/less_char)]
+    max_len = stroke_statistics(new_file_list)
+
+    return new_file_list, max_len
+
 def preprocess():
-    # count the number of the strokes
-    stroke_count = 0
+
+    file_list = sorted(glob(os.path.join(args.input_path, '*.txt')))
+    if args.less == True:
+        file_list, stroke_len = get_less_char(file_list, args.less_char, args.total_char)
 
     # build training data
     if args.test_char == None:
         print('Build training data ...\n')
         print(f'input path = {args.input_path}')
-        print(f'root path = {args.root_path}')
         target_path = f'{args.root_path}/{args.target_path}/'
         train_path = f'{args.root_path}/{args.train_path}/'
-        print(f'target path = {target_path}')
-        print(f'train path = {train_path}')
         if not os.path.exists(args.root_path):
             os.mkdir(args.root_path)
         if not os.path.exists(target_path):
@@ -120,14 +135,21 @@ def preprocess():
         if not os.path.exists(train_path):
             os.mkdir(train_path)
 
-        for txt_name in sorted(glob(os.path.join(args.input_path, '*.txt'))):
+        # count the number of the strokes
+        stroke_count = 0
+
+        for txt_name in file_list:
             char_num = txt_name.split('_')[0][-1 * args.char_idx:]
-            stroke_add = csv_parser(char_num, txt_name, target_path, train_path, args)
+            stroke_add = csv_parser(char_num, txt_name, target_path, train_path, stroke_len, args)
             stroke_count += stroke_add
             print(f'{char_num} finished ...')
 
+        print(f'\nroot path = {args.root_path}')
+        print(f'target path = {target_path}')
+        print(f'train path = {train_path}')
         print(f'there are {stroke_count} strokes in all target data.')
-    
+        print(f'Each stroke length = {stroke_len}.')
+
     # build testing data
     else:
         char_num = f'{args.test_char:0{args.char_idx}d}'
@@ -146,13 +168,13 @@ def preprocess():
         if not os.path.exists(test_char_path):
             os.mkdir(test_char_path)
         print(f'Build the director {test_char_path} success ...\n')
-        
+
         txt_name = f'{args.input_path}/char0{char_num}_stroke.txt'
         data = pd.read_table(txt_name, header=None, sep=' ')        # read txt file to pandas dataframe
         data.drop(columns=[0, 1, 8], inplace=True)                  # 把不用用到的column砍掉
         data.columns = range(data.shape[1])                         # 重新排列 column
         stroke_total = len(data.groupby(data.iloc[:, -1]).groups)   # 總筆畫
-        
+
         for stroke_num in range(stroke_total):
             stroke_num = stroke_num + 1         # int
             stroke_idx = f'{stroke_num:0{args.stroke_idx}d}'    # string
@@ -160,7 +182,7 @@ def preprocess():
             # make testing directory
             if not os.path.exists(f'{test_char_path}/{stroke_idx}'):
                 os.mkdir(f'{test_char_path}/{stroke_idx}')
-            
+
             # index of each stroke
             each_stroke = data.groupby(data.iloc[:, -1]).groups.get(f'stroke{stroke_num}')
             target_data = data.iloc[each_stroke, :]
@@ -169,11 +191,10 @@ def preprocess():
             for test_num in range(args.test_num):
                 filename = f'{char_num}_{stroke_idx}_{test_num + 1:0{args.num_idx}d}.csv'
 
-                test_data = addnoise(target_data, args.noise)
-                
                 # add test data last line
-                test_data = add_last_line(test_data, args.stroke_len)
-                
+                target_data = extended_length(target_data, args.stroke_len, args.extend)
+                test_data = addnoise(target_data, args.noise)
+
                 # store training data
                 test_data.to_csv(f'{test_char_path}{stroke_idx}/{filename}', header=False ,index=False)
         print(f'Build {char_num} testing data finished ...\n')
@@ -186,5 +207,5 @@ if __name__ == '__main__':
     # checking
     if not os.path.isdir('6axis'):
         os.mkdir('6axis')
-    
+
     preprocess()
