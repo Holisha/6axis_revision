@@ -154,7 +154,17 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         state_dict: model's state dict
         epoch: parameters were updated in which epoch
         """
-        checkpoint = torch.load(model_path, map_location=f'cuda:{args.gpu_id}')
+        
+        # try-except to compatible
+        try:
+            model.load_state_dict(checkpoint['state_dict'])
+        except:
+            print('Warning: load older version')
+            model.feature = nn.Sequential(*model.feature, *model.bottle)
+            model.bottle = nn.Sequential()
+            model.load_state_dict(checkpoint['state_dict'])
+
+        # checkpoint = torch.load(model_path, map_location=f'cuda:{args.gpu_id}')
         checkpoint['epoch'] += 1        # start from next epoch
         checkpoint['train_iter'] += 1
         checkpoint['valid_iter'] += 1

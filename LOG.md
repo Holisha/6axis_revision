@@ -2,6 +2,10 @@
 
 - [toc]
 
+## TODO
+
+- remove try-except block
+
 ## event type:
 
 - format: `event`: `where`: `what`
@@ -15,6 +19,13 @@
 - `other`: TBD
 
 ## Version 6
+
+### 9/14 - fan
+
+- make model compatible temporarily
+	- `fixed`: In `train.py`, `test.py` add try-except block to load model
+	- `fixed`: In `test.py` add `--stroke-length` args
+		- same as `train.py --stroke-length`
 
 ### 9/13 - jefflin
 

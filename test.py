@@ -31,6 +31,8 @@ def test_argument(inhert=False):
                         help='load document file by position(default: None)')
 
     # dataset setting
+    parser.add_argument('--stroke-length', type=int, default=150,
+                        help='control the stroke length (default: 150)')
     parser.add_argument('--test-path', type=str, default='/home/jefflin/dataset/test_all',
                         help="test dataset path (default: '/home/jefflin/dataset/test_all')")
     parser.add_argument('--target-path', type=str, default='/home/jefflin/dataset/target',
@@ -87,7 +89,16 @@ def test(model, test_loader, criterion, args):
 
     # load model parameters
     checkpoint = torch.load(model_path, map_location=f'cuda:{args.gpu_id}')
-    model.load_state_dict(checkpoint['state_dict'])
+
+    # try-except to compatible
+    try:
+        model.load_state_dict(checkpoint['state_dict'])
+    except:
+        print('Warning: load older version')
+        model.feature = nn.Sequential(*model.feature, *model.bottle)
+        model.bottle = nn.Sequential()
+        model.load_state_dict(checkpoint['state_dict'])
+
     model.eval()
 
     # normalize scaler
