@@ -211,18 +211,23 @@ def config_loader(doc_path, args):
     except:
         print('There is no "doc" in args parser\n') """
         
+    # remove test_path in train.py
     try:
         # train path exist
         if args.train_path:
             args.test_path = None
 
-        # test path exist
-        elif args.test_path and args.load is False:
-            print('set --load to True')
-            args.load = True
-
     except:
         print(f'No "train_path" founded in {sys.argv[0]}\n')
+
+    # set load to True in test.py
+    try:
+        # test path exist
+        if args.test_path and args.load is False:
+            print('set --load to True')
+            args.load = True
+    except:
+        print(f'No "test_path" founded in {sys.argv[0]}\n')
 
     # check which key value is missing
     arg_dict = vars(args)
