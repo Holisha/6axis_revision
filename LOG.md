@@ -18,6 +18,12 @@
 
 ### 9/13 - fan
 
+- make `test.py` avaliable to current environment
+	- `update`: Add `writer_builder` and `criterion_builder` to `test.py`
+		- **`--criterition` defaults to MSE**
+	- `remove`: remove NormScaler which means data is uncompression
+	- `remove`: remove cross_validation
+
 - Add inverse func which convert npy back to csv file
 - `new`: In `preprocessing/preprocess.py`, add `_npy2csv` to convert npy to csv file
 	- `--root-path` to control root of npy directories

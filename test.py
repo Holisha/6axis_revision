@@ -7,8 +7,9 @@ from argparse import ArgumentParser
 
 # self defined
 from model import FeatureExtractor
-from utils import  (model_builder, out2csv, model_config, config_loader, StorePair, NormScaler)
-from dataset import AxisDataSet, cross_validation
+from utils import  (model_builder, out2csv, model_config, config_loader, StorePair, NormScaler,
+    criterion_builder, writer_builder)
+from dataset import AxisDataSet
 
 
 def test_argument(inhert=False):
@@ -58,6 +59,8 @@ def test_argument(inhert=False):
                         help="set loss 1's weight (default: 1e-3)")
     parser.add_argument('--beta', type=float, default=1,
                         help="set loss 2's weight (default: 1)")
+    parser.add_argument('--criterion', type=str, default='mse',
+                        help="set criterion (default: 'mse')")
 
     # logger setting
     parser.add_argument('--log-path', type=str, default='./logs',
@@ -72,16 +75,23 @@ def test_argument(inhert=False):
 
     return parser.parse_args()
 
-# same as with torch.no_grad()
+
 @torch.no_grad()
 def test(model, test_loader, criterion, args):
+    # set model path
+    if args.load:
+        _, log_path = writer_builder(
+            args.log_path, args.model_name, load=args.load
+        )
+        model_path = os.path.join(log_path, f'{args.model_name}_{args.scale}x.pt')
+
     # load model parameters
-    checkpoint = torch.load(f'{args.model_name}_{args.scale}x.pt', map_location=f'cuda:{args.gpu_id}')
+    checkpoint = torch.load(model_path, map_location=f'cuda:{args.gpu_id}')
     model.load_state_dict(checkpoint['state_dict'])
     model.eval()
 
     # normalize scaler
-    input_scaler = NormScaler()
+    # input_scaler = NormScaler()
 
     # declare content loss
     feature_extractor = FeatureExtractor().cuda()
@@ -98,16 +108,16 @@ def test(model, test_loader, criterion, args):
         inputs, target = inputs.cuda(), target.cuda()
 
         # normalize inputs and target
-        inputs = input_scaler.fit(inputs)
+        # inputs = input_scaler.fit(inputs)
 
         pred = model(inputs)
 
         # denormalize
-        pred = input_scaler.inverse_transform(pred)
+        # pred = input_scaler.inverse_transform(pred)
 
         # out2csv
         while j - (i * 64) < pred.size(0):
-            out2csv(inputs_inverse, f'test_{int(j/30)+1}_input', args.stroke_length, args.save_path, j - (i * 64))
+            out2csv(inputs, f'test_{int(j/30)+1}_input', args.stroke_length, args.save_path, j - (i * 64))
             out2csv(pred, f'test_{int(j/30)+1}_output', args.stroke_length, args.save_path, j - (i * 64))
             out2csv(target, f'test_{int(j/30)+1}_target', args.stroke_length, args.save_path, j - (i * 64))
             j += 30
@@ -146,7 +156,7 @@ if __name__ == '__main__':
     model = model_builder(test_args.model_name, test_args.scale, **test_args.model_args).cuda()
 
     # criteriohn
-    criterion = nn.MSELoss()
+    criterion = criterion_builder(test_args.criterion)
     # optimizer = None # don't need optimizer in test
 
     # dataset
