@@ -4,21 +4,47 @@ import pandas as pd
 from glob import glob
 from utils import argument_setting, stroke_statistics
 
-def csv2npy(csv_root: str):
+
+def _csv2npy(csv_root: str, keep=False):
     """
     convert augmented csv file to npy file
 
     Args:
         csv_root (str): root of csv file path
+        keep (bool): keep original data. Defaults to False.
     """
     from pathlib import Path
-    import shutil
+    from tqdm import tqdm
 
-    for csv_file in Path(csv_root).glob('**/*.csv'):
+    for csv_file in tqdm(Path(csv_root).glob('**/*.csv'), desc='Converting'):
         csv_arr = pd.read_csv(csv_file, header=None).to_numpy()
         np.save(os.path.splitext(csv_file)[0], csv_arr)
 
-        csv_file.unlink()
+        if keep == False:
+            csv_file.unlink()
+
+
+def _npy2csv(npy_root: str, keep=False):
+    """
+    convert augmented npy file to csv file
+
+    Args:
+        npy_root (str): root of npy file path
+        keep (bool): keep original data. Defaults to False.
+    """
+    from pathlib import Path
+    from tqdm import tqdm
+
+    for npy_file in tqdm(Path(npy_root).glob('**/*.npy'), desc='Inverse converting'):
+        # load npy file
+        npy_df = pd.DataFrame(np.load(npy_file))
+
+        # save as csv file
+        npy_df.to_csv(f'{os.path.splitext(npy_file)[0]}.csv', header=False, index=False)
+
+        if keep == False:
+            npy_file.unlink()
+
 
 def addnoise(target_data, noise):
     """add noise in range [noise[0], noise[1]]
@@ -238,7 +264,11 @@ if __name__ == '__main__':
 
     # convert root path
     if args.convert:
-        csv2npy(args.root_path)
+        _csv2npy(args.root_path)
+        os._exit(0)
+    
+    if args.inverse:
+        _npy2csv(args.root_path)
         os._exit(0)
 
     preprocess()

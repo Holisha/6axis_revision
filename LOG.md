@@ -16,15 +16,24 @@
 
 ## Version 6
 
+### 9/13 - fan
+
+- Add inverse func which convert npy back to csv file
+- `new`: In `preprocessing/preprocess.py`, add `_npy2csv` to convert npy to csv file
+	- `--root-path` to control root of npy directories
+- `update`: In `preprocessing/utils.py`, add `--keep` args to keep original data while converting or inverse converting
+- `update`: In `preprocessing/preprocess.py`, add tqdm to `_npy2csv` to show progress bar while converting
+- `rename`: In `preprocessing/preprocess.py`, rename `csv2npy` to `_csv2npy`
+
 ### 9/12 - fan
 
 - **This commit is unstable**
-- `update`: In `preprocess.py`, save inputs file as npy file to improve performance
+- `update`: In `preprocessing/preprocess.py`, save inputs file as npy file to improve performance
 	- inputs, target, test to npy file
 	- **output remain csv file**
 - `update`: In `dataset.py`, load and search npy file, instead of csv file
-- `new`: In `preprocess.py`, add function `csv2npy` convert 
-- `new`: In `preprocess/utils.py`, add argv `--convert` to call `csv2npy`
+- `new`: In `preprocessing/preprocess.py`, add function `csv2npy` convert 
+- `new`: In `preprocessing/utils.py`, add argv `--convert` to call `csv2npy`
 	- `--root-path` to control `csv2npy` input path
 
 ### 9/12 - jefflin

@@ -55,7 +55,12 @@ def argument_setting():
 
     # convert
     parser.add_argument('--convert', action='store_true', default=False,
-                        help='convert csv to npy file (default: False)')    
+                        help='convert csv to npy file (default: False)')
+    parser.add_argument('--inverse', action='store_true', default=False,
+                        help='convert npy to csv file (default: False)')
+    parser.add_argument('--keep', action='store_true', default=False,
+                        help='keep original data while converting or inversing (default: False)')
+
 
     return parser.parse_args()
 
