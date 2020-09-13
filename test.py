@@ -97,7 +97,7 @@ def test(model, test_loader, criterion, args):
         print('Warning: load older version')
         model.feature = nn.Sequential(*model.feature, *model.bottle)
         model.bottle = nn.Sequential()
-        model.load_state_dict(checkpoint['state_dict'])
+        model.load_state_dict(checkpoint['state_dict'], strict=False)
 
     model.eval()
 
