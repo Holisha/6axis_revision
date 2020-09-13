@@ -239,6 +239,7 @@ if __name__ == '__main__':
     # convert root path
     if args.convert:
         csv2npy(args.root_path)
+        os._exit(0)
 
     preprocess()
 
