@@ -90,7 +90,7 @@ class AxisDataSet(Dataset):
             # list all npy file in target data
             for npy_path in sorted(glob(os.path.join(target_path, word_dir, '**/*.npy'))):
                 # get npy file
-                data = np.delete(np.load(npy_path), -1, axis=1)
+                data = np.delete(np.load(npy_path, allow_pickle=True), -1, axis=1).astype(np.float32)
 
                 # transform data from numpy.ndarray to torch.FloatTensor
                 data = torch.from_numpy(data).unsqueeze(0).float()
@@ -122,8 +122,7 @@ class AxisDataSet(Dataset):
         """
 
         # npy to tensor
-        data = np.delete(np.load(self.csv_list[idx][0]), -1, axis=1)
-        
+        data = np.delete(np.load(self.csv_list[idx][0], allow_pickle = True), -1, axis=1).astype(np.float32)
         # data = MinMaxScaler(feature_range=(0, 1)).fit_transform(data)
         
         # regard 2d array to gray scale image format (*, 6) -> (1, *, 6)

@@ -16,6 +16,13 @@
 
 ## Version 6
 
+### 9/13 - jefflin
+
+- fix dataset bug and preprocess bug
+    - `fixed`: In dataset.py: fix np.load bug
+    - `fixed`: In preprocess.py: fix bug when only one line data
+    - `update`: In preprocessing/readme.md: update new feature
+
 ### 9/13 - fan
 
 - config_loader can load doc now
