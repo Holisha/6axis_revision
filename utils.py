@@ -215,6 +215,12 @@ def config_loader(doc_path, args):
         # train path exist
         if args.train_path:
             args.test_path = None
+
+        # test path exist
+        elif args.test_path and args.load is False:
+            print('set --load to True')
+            args.load = True
+
     except:
         print(f'No "train_path" founded in {sys.argv[0]}\n')
 
