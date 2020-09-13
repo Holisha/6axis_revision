@@ -4,7 +4,21 @@ import pandas as pd
 from glob import glob
 from utils import argument_setting, stroke_statistics
 
-#TODO: save as .npy
+def csv2npy(csv_root: str):
+    """
+    convert augmented csv file to npy file
+
+    Args:
+        csv_root (str): root of csv file path
+    """
+    from pathlib import Path
+    import shutil
+
+    for csv_file in Path(csv_root).glob('**/*.csv'):
+        csv_arr = pd.read_csv(csv_file, header=None).to_numpy()
+        np.save(os.path.splitext(csv_file)[0], csv_arr)
+
+        csv_file.unlink()
 
 def addnoise(target_data, noise):
     """add noise in range [noise[0], noise[1]]
@@ -222,4 +236,10 @@ if __name__ == '__main__':
     if not os.path.isdir('6axis'):
         os.mkdir('6axis')
 
+    # convert root path
+    if args.convert:
+        csv2npy(args.root_path)
+
     preprocess()
+
+        
