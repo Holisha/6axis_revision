@@ -471,7 +471,7 @@ class NormScaler:
         tensor = tensor.view(shape[0], -1)
 
         self.min = tensor.min(1, keepdim=True)[0]
-        self.interval = tensor.max(1, kpdimee=True)[0] - self.min
+        self.interval = tensor.max(1, keepdim=True)[0] - self.min
         tensor = (tensor - self.min) / self.interval
         tensor = tensor.view(shape)
 
@@ -530,16 +530,17 @@ def inverse_scaler_transform(pred, target):
     return pred_inverse
 
 
-def out2csv(inputs, epoch, file_string, out_num, save_path, stroke_length):
+def out2csv(inputs, epoch, file_string, out_num, save_path, stroke_length, spec_flag = False):
     """
     store input to csv file.
 
     inputs: tensor data, with cuda device and size = [batch 1 STROKE_LENGTH 6]
     epoch: string, the epoch number
     file_string: string, 'input', 'output' or 'target'
-    out_num: int, the number of model porcess data to get in one epoch
+    out_num: int, the number of model process data to get in one epoch
     save_path: string, the save path
     stroke_length: int, the length of each stroke 
+    spec_flag: boolean, decide get specify number or not (default: False)
 
     no output
     """
@@ -547,17 +548,27 @@ def out2csv(inputs, epoch, file_string, out_num, save_path, stroke_length):
         os.mkdir(save_path)
 
     output = np.squeeze(inputs.cpu().detach().numpy())
-    table = output[0:out_num]
 
-    for index in range(out_num):
-        with open(f'{save_path}/{epoch}_{index}_{file_string}.csv', 'w', newline='') as csvfile:
+    if spec_flag == False:
+        table = output[0:out_num]
+        for index in range(out_num):
+            with open(f'{save_path}/{epoch}_{index}_{file_string}.csv', 'w', newline='') as csvfile:
+                writer = csv.writer(csvfile)
+                for i in range(stroke_length):
+                    row = [] * 7
+                    row[1:6] = table[index][i][:]
+                    row.append('stroke' + str(1))
+                    writer.writerow(row)
+
+    elif spec_flag == True:
+        table = output[out_num]
+        with open(f'{save_path}/{epoch}_{file_string}.csv', 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             for i in range(stroke_length):
                 row = [] * 7
-                row[1:6] = table[index][i][:]
+                row[1:6] = table[i][:]
                 row.append('stroke' + str(1))
                 writer.writerow(row)
-
 
 def save_final_predict_and_new_dataset(inputs,stroke_num, file_string, args,store_data_cnt):
     output = np.squeeze(inputs.cpu().detach().numpy())

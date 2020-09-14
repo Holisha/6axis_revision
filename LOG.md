@@ -2,6 +2,10 @@
 
 - [toc]
 
+## TODO
+
+- remove try-except block
+
 ## event type:
 
 - format: `event`: `where`: `what`
@@ -15,6 +19,33 @@
 - `other`: TBD
 
 ## Version 6
+### 9/14 - Angelowen
+
+- fix test_error.py bug
+  - `update`: In `test_error.py`: add content loss
+  - `fixed`: In `test_error.py`: fix args.load bug
+
+### 9/14 - jefflin
+
+- fix test.py bug, fix out2csv bug
+  - `fixed`: In `test.py`: fix args.load bug
+  - `fixed`: In `test.py` and `utils.py`: update out2csv
+  - `fixed`: In `utils.py`: fix keepdim bug
+  - `new`: In `postprocessor.py`: add axis2img to test all files
+
+### 9/14 - fan
+
+- make model compatible temporarily
+	- `fixed`: In `train.py`, `test.py` add try-except block to load model
+	- `fixed`: In `test.py` add `--stroke-length` args
+		- same as `train.py --stroke-length`
+
+### 9/13 - jefflin
+
+- fix dataset bug and preprocess bug
+    - `fixed`: In dataset.py: fix np.load bug
+    - `fixed`: In preprocess.py: fix bug when only one line data
+    - `update`: In preprocessing/readme.md: update new feature
 
 ### 9/13 - fan
 

@@ -1,0 +1,57 @@
+# data setting
+stroke_length: 150
+train_path: /home/jefflin/dataset/train
+target_path: /home/jefflin/dataset/target
+test_path: /home/jefflin/dataset/test_all
+batch_size: 64
+num_workers: 22
+holdout_p: 0.8 # hold out cross validation probability
+# (x - mean) / std
+mean: 0.5
+std: 0.5
+
+# model setting
+model_name: FSRCNN # FSRCNN, DDBPN, DBPN
+scale: 1
+
+gpu_id: 0
+criterion: huber
+
+# optimizer
+lr: 0.001 # learning rate
+# Adam, SGD, ranger, rangerVA
+# noticed that different optimizer fit in different learning rate
+optim: rangerVA
+# load can be define by bool or path
+load: False # load exist .pickle file or not
+# load: ./path # load by path
+weight_decay: 0
+
+# scheduler
+# scheduler can be defined by name or bool
+scheduler: step # define by name
+# scheduler: true # define by bool
+step: 5
+factor: 0.9
+
+# early stopping
+early_stop: false
+patience: 10
+threshold: 0.3
+verbose: false
+
+# weighted loss
+alpha: 1 # mse loss weight
+beta: 1 # content loss weight
+epochs: 100000
+
+# logger setting
+log_path: ./logs
+
+# output setting
+save_path: ./output-fsrcnn
+check_interval: 3 # convert tensor to csv file
+out_num: 5
+
+# other
+amp: false # beta function developing
