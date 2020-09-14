@@ -173,7 +173,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         'Content loss': 0.0,
         'lr': args.lr,
     }
-    
+
     for epoch in range(checkpoint['epoch'], args.epochs+1):
         model.train()
         err = 0.0
@@ -224,7 +224,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
             # update writer
             writer.add_scalar('Iteration/train loss', loss.sum().item(), checkpoint['train_iter'])
             checkpoint['train_iter'] += 1
-            
+
         # cross validation
         valid_bar = tqdm(valid_loader, desc=f'Valid epoch:{epoch}/{args.epochs}', leave=False)
         model.eval()
