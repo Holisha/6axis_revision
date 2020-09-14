@@ -11,13 +11,16 @@ def _insert_test(test_data, input, stroke_idx):
     Returns:
         pandas.DataFrame: the test data after inserted
     """
-    start = 0  # for get the index to insert
+    start = -1  # for get the index to insert
 
     # find the correct index to insert the stroke
     for row in range(test_data.shape[0]):
         if stroke_idx < int(test_data.iloc[row, 6][6:]):
             start = row
-            break;
+            break
+
+    if start == -1:
+        start = test_data.shape[0]
 
     # output = test_data[:start] + input
     output = pd.concat([test_data.iloc[:start], input], ignore_index=True)
@@ -48,8 +51,8 @@ def stroke2char(
         stroke_idx (int): the stroke index
 
     Returns:
-        Boolean, pandas.DataFrame, pandas.DataFrame, pandas.DataFrame:
-                True, test_target, test_input, test_output
+        pandas.DataFrame, pandas.DataFrame, pandas.DataFrame:
+                test_target, test_input, test_output
     """
 
     # Update stroke number
@@ -62,4 +65,4 @@ def stroke2char(
     test_input = _insert_test(test_input, input_data, stroke_idx)
     test_output = _insert_test(test_output, output_data, stroke_idx)
 
-    return True, test_target, test_input, test_output
+    return test_target, test_input, test_output
