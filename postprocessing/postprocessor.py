@@ -75,6 +75,8 @@ def postprocessor_dir(dir_path, csv_list):
         test_target.to_csv(os.path.join(dir_path, 'test_all_target.csv'), header=False, index=False)
         test_input.to_csv(os.path.join(dir_path, 'test_all_input.csv'), header=False, index=False)
         test_output.to_csv(os.path.join(dir_path, 'test_all_output.csv'), header=False, index=False)
+        # axis2img
+        axis2img(test_target, test_input, test_output, 'test_all', dir_path)
 
 
 def postprocessor(path):

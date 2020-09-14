@@ -31,6 +31,8 @@ def test_argument(inhert=False):
                         help='load document file by position(default: None)')
 
     # dataset setting
+    parser.add_argument('--stroke-length', type=int, default=150,
+                        help='control the stroke length (default: 150)')
     parser.add_argument('--test-path', type=str, default='/home/jefflin/dataset/test_all',
                         help="test dataset path (default: '/home/jefflin/dataset/test_all')")
     parser.add_argument('--target-path', type=str, default='/home/jefflin/dataset/target',
@@ -79,7 +81,7 @@ def test_argument(inhert=False):
 @torch.no_grad()
 def test(model, test_loader, criterion, args):
     # set model path
-    if args.load:
+    if args.load is not False:
         _, log_path = writer_builder(
             args.log_path, args.model_name, load=args.load
         )
@@ -87,11 +89,21 @@ def test(model, test_loader, criterion, args):
 
     # load model parameters
     checkpoint = torch.load(model_path, map_location=f'cuda:{args.gpu_id}')
-    model.load_state_dict(checkpoint['state_dict'])
+
+    # try-except to compatible
+    try:
+        model.load_state_dict(checkpoint['state_dict'])
+    except:
+        print('Warning: load older version')
+        model.feature = nn.Sequential(*model.feature, *model.bottle)
+        model.bottle = nn.Sequential()
+        model.load_state_dict(checkpoint['state_dict'], strict=False)
+
     model.eval()
 
     # normalize scaler
     # input_scaler = NormScaler()
+    # target_scaler = NormScaler()
 
     # declare content loss
     feature_extractor = FeatureExtractor().cuda()
@@ -109,6 +121,7 @@ def test(model, test_loader, criterion, args):
 
         # normalize inputs and target
         # inputs = input_scaler.fit(inputs)
+        # target = target_scaler.fit(target)
 
         pred = model(inputs)
 
@@ -117,9 +130,9 @@ def test(model, test_loader, criterion, args):
 
         # out2csv
         while j - (i * 64) < pred.size(0):
-            out2csv(inputs, f'test_{int(j/30)+1}_input', args.stroke_length, args.save_path, j - (i * 64))
-            out2csv(pred, f'test_{int(j/30)+1}_output', args.stroke_length, args.save_path, j - (i * 64))
-            out2csv(target, f'test_{int(j/30)+1}_target', args.stroke_length, args.save_path, j - (i * 64))
+            out2csv(inputs, f'test_{int(j/30)+1}', 'input', j - (i * 64), args.save_path, args.stroke_length, spec_flag=True)
+            out2csv(pred, f'test_{int(j/30)+1}', 'output', j - (i * 64), args.save_path, args.stroke_length, spec_flag=True)
+            out2csv(target, f'test_{int(j/30)+1}', 'target', j - (i * 64), args.save_path, args.stroke_length, spec_flag=True)
             j += 30
         i += 1
 

@@ -22,15 +22,15 @@
 
 ### 生成 target 及 training data
 
-```python main.py```
+```python preprocess.py```
 
 ### 生成 testing data
 
-```python main.py --test-char=TEST_CHAR```
+```python preprocess.py --test-char=TEST_CHAR```
 
 #### Example
 
-```python main.py --test-char 436```
+```python preprocess.py --test-char 436```
 
 ---
 
@@ -92,6 +92,7 @@
 - ```--stroke-len STROKE_LEN```
 
   - 設定每一筆畫的長度 (預設值: 150)
+  > 注意: 生成 test 資料，需要手動更新 ```stroke-len```，以與target 資料長度一致
 
 - ```--test-char TEST_CHAR```
 
@@ -120,7 +121,8 @@
 - ```--root-path ROOT_PATH```
 
   - 設定輸出 data 的根資料夾 (預設值: ./dataset/)
-> 注意: target, train, test path 會接在 root path 底下
+  > 注意: target, train, test path 會接在 root path 底下
+
 - ```--target-path TARGET_PATH```
 
   - 設定 target datas 資料夾路徑 (預設值: ./target/)
@@ -131,3 +133,17 @@
 
 - ```--test-path TEST_PATH```
   - 設定 testing datas 資料夾路徑 (預設值: ./test/)
+
+- ```--extend tail, inter```
+  - 設定補筆畫長度的方法 (預設值: 'tail')
+  - tail: 補在尾端
+  - inter: 平均遞迴插值在兩點中間
+
+- ```--less```
+  - 設定是否要取得較少量的資料(以平均取字為原則) (預設值: False)
+
+- ```--less-char LESS_CHAR```
+  - 設定要取得多少字 (預設值: 100，代表每(900/100)筆取一筆)
+
+- ```--total-char TOTAL_CHAR```
+  - 設定總共有多少字 (預設值: 900)

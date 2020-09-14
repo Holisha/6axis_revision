@@ -368,9 +368,8 @@ class ADBPN(DBPN):
         return x
 
 if __name__ == '__main__':
-    # model = DDBPN(1, 1, 7)
-    # model = DBPN(1, 1, 2) 
-    model = ADBPN(1, 1, 2, col_slice=3, stroke_len=150, atten='ch')
+    model = DDBPN(1, 1, 7)    # model = DBPN(1, 1, 2) 
+    # model = ADBPN(1, 1, 2, col_slice=3, stroke_len=150, atten='ch')
     # model = ADBPN(1, 1, 2, col_slice=3, stroke_len=150, atten='col')
 
     # print(model)

@@ -76,7 +76,7 @@ def extended_length(data, stroke_len, mode):
         pd.dataframe: the data after added last line
     """
 
-    if mode == 'tail':
+    if mode == 'tail' or data.shape[0] == 1:
         new_data = data.append(data.iloc[[-1] * (stroke_len - data.shape[0])], ignore_index=True)
 
     # Interpolation
@@ -168,9 +168,10 @@ def get_less_char(file_list, less_char, total_char):
 
     return new_file_list, max_len
 
-def preprocess():
+def preprocess(args):
 
     file_list = sorted(glob(os.path.join(args.input_path, '*.txt')))
+    stroke_len = args.stroke_len
     if args.less == True:
         file_list, stroke_len = get_less_char(file_list, args.less_char, args.total_char)
 
@@ -271,6 +272,4 @@ if __name__ == '__main__':
         _npy2csv(args.root_path)
         os._exit(0)
 
-    preprocess()
-
-        
+    preprocess(args)
