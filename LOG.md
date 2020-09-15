@@ -22,6 +22,12 @@
 
 ### 9/15 - jefflin
 
+- fix postprocessing bug about test_all txt file
+  - `fixed`: In test.py: add inputs inverse_transform when test normalized
+  - `fixed`: In postprocessing.py: fix bug about test_all txt file
+  - `update`: In verification.py: update
+  - `other`: In postprocessing.py: add TODO to delete the uselee line about test_all file
+
 - fix test out2csv and postprocessing bug
   - `fixed`: In test.py: add `--test-num` args
   - `fixed`: In test.py: fix out2csv bug about batch size

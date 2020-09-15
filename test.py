@@ -126,6 +126,7 @@ def test(model, test_loader, criterion, args):
         pred = model(inputs)
 
         # denormalize
+        # inputs = input_scaler.inverse_transform(inputs)
         # pred = input_scaler.inverse_transform(pred)
 
         # out2csv

@@ -71,6 +71,7 @@ def postprocessor_dir(dir_path, csv_list):
 
     # save test char file
     if test_target.shape[0] != 0:
+        # TODO: delete the uselee line judging from the target files in the original txt file
         test_target.to_csv(os.path.join(dir_path, 'test_all_target.csv'), header=False, index=False)
         test_input.to_csv(os.path.join(dir_path, 'test_all_input.csv'), header=False, index=False)
         test_output.to_csv(os.path.join(dir_path, 'test_all_output.csv'), header=False, index=False)
@@ -79,9 +80,9 @@ def postprocessor_dir(dir_path, csv_list):
         axis2img(test_target, test_input, test_output, 'test_all', dir_path)
 
         # csv2txt
-        csv2txt(test_target, os.path.join(dir_path, f'{file_feature}_target.txt'))
-        csv2txt(test_input, os.path.join(dir_path, f'{file_feature}_input.txt'))
-        csv2txt(test_output, os.path.join(dir_path, f'{file_feature}_output.txt'))
+        csv2txt(test_target, os.path.join(dir_path, f'test_all_target.txt'))
+        csv2txt(test_input, os.path.join(dir_path, f'test_all_input.txt'))
+        csv2txt(test_output, os.path.join(dir_path, f'test_all_output.txt'))
 
 def postprocessor(path):
     """postprocess output files
