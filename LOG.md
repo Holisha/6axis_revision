@@ -25,6 +25,21 @@
   - `update`: In `test_error.py`: add content loss
   - `fixed`: In `test_error.py`: fix args.load bug
 
+### 9/15 - jefflin
+
+- fix postprocessing bug about test_all txt file
+  - `fixed`: In test.py: add inputs inverse_transform when test normalized
+  - `fixed`: In postprocessing.py: fix bug about test_all txt file
+  - `update`: In verification.py: update
+  - `other`: In postprocessing.py: add TODO to delete the uselee line about test_all file
+
+- fix test out2csv and postprocessing bug
+  - `fixed`: In test.py: add `--test-num` args
+  - `fixed`: In test.py: fix out2csv bug about batch size
+  - `update`: In postprocessing.py: add axis2img and csv2txt to test files
+  - `fixed`: In stroke2char.py: fix test file stroke order bug
+  - `new`: In verification.py: verify the all `test_all_target.txt` is correct or not
+
 ### 9/14 - jefflin
 
 - fix test.py bug, fix out2csv bug

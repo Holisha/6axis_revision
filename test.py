@@ -40,6 +40,8 @@ def test_argument(inhert=False):
                         help='set the batch size (default: 128)')
     parser.add_argument('--num-workers', type=int, default=8,
                         help='set the number of processes to run (default: 8)')
+    parser.add_argument('--test-num', type=int, default=30,
+                        help='set the number of each stroke in testing dataset (default: 30)')
 
     # model setting
     parser.add_argument('--model-name', type=str, default='FSRCNN',
@@ -101,8 +103,7 @@ def test(model, test_loader, criterion, args):
     model.eval()
 
     # normalize scaler
-    # input_scaler = NormScaler()
-    # target_scaler = NormScaler()
+    # input_scaler = NormScaler(mean=0.5, std=0.5)
 
     # declare content loss
     feature_extractor = FeatureExtractor().cuda()
@@ -120,19 +121,19 @@ def test(model, test_loader, criterion, args):
 
         # normalize inputs and target
         # inputs = input_scaler.fit(inputs)
-        # target = target_scaler.fit(target)
 
         pred = model(inputs)
 
         # denormalize
+        # inputs = input_scaler.inverse_transform(inputs)
         # pred = input_scaler.inverse_transform(pred)
 
         # out2csv
-        while j - (i * 64) < pred.size(0):
-            out2csv(inputs, f'test_{int(j/30)+1}', 'input', j - (i * 64), args.save_path, args.stroke_length, spec_flag=True)
-            out2csv(pred, f'test_{int(j/30)+1}', 'output', j - (i * 64), args.save_path, args.stroke_length, spec_flag=True)
-            out2csv(target, f'test_{int(j/30)+1}', 'target', j - (i * 64), args.save_path, args.stroke_length, spec_flag=True)
-            j += 30
+        while j - (i * args.batch_size) < pred.size(0):
+            out2csv(inputs, f'test_{int(j/args.test_num)+1}', 'input', j - (i * args.batch_size), args.save_path, args.stroke_length, spec_flag=True)
+            out2csv(pred, f'test_{int(j/args.test_num)+1}', 'output', j - (i * args.batch_size), args.save_path, args.stroke_length, spec_flag=True)
+            out2csv(target, f'test_{int(j/args.test_num)+1}', 'target', j - (i * args.batch_size), args.save_path, args.stroke_length, spec_flag=True)
+            j += args.test_num
         i += 1
 
         # MSE loss
