@@ -13,7 +13,11 @@ gpu_id: 0
 # load can be define by bool or path
 load: True # load exist .pickle file or not
 # load: ./path # load by path
-
+model_args: # model args, for more detail, please take a look in model/model name/models.py
+  stages: 2
+  n0: 64
+  nr: 18
+  atten: col
 
 # scheduler
 # scheduler can be defined by name or bool
