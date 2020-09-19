@@ -46,7 +46,8 @@ class AxisDataSet(Dataset):
         self.target = {}
 
         # list all word directory name
-        for word_dir in sorted(os.listdir(path)):
+        input_dir = sorted(os.listdir(path))
+        for word_dir in input_dir:
 
             # store stroke path
             stroke_path = os.path.join(path, word_dir)
@@ -68,6 +69,10 @@ class AxisDataSet(Dataset):
         
         # store target word directory name
         for word_dir in sorted(os.listdir(target_path)):
+
+            # memory efficiency
+            if word_dir not in input_dir:
+                continue
             
             # store list to control stroke_num
             self.target[word_dir] = []
