@@ -71,12 +71,15 @@ def postprocessor_dir(dir_path, csv_list,path):
 
     # save test char file
     if test_target.shape[0] != 0:
-        org_list=compare(test_target,path)
-        test_target,test_input,test_output=inverse_len(test_target,test_input,test_output,org_list)
-        print(test_target)
-        print(test_input)
 
-        # TODO: delete the uselee line judging from the target files in the original txt file
+        # 採用保存加入
+        # org_list = compare(test_target.round(4), dir_path)
+        # test_target,test_input,test_output=inverse_len(test_target,test_input,test_output,org_list)
+        
+        # 採用刪除法，較快
+        drop_list=compare_2(test_target.round(4),dir_path)
+        test_target,test_input,test_output=inverse_len_2(test_target,test_input,test_output,drop_list)
+
         test_target.to_csv(os.path.join(dir_path, 'test_all_target.csv'), header=False, index=False)
         test_input.to_csv(os.path.join(dir_path, 'test_all_input.csv'), header=False, index=False)
         test_output.to_csv(os.path.join(dir_path, 'test_all_output.csv'), header=False, index=False)
@@ -87,30 +90,56 @@ def postprocessor_dir(dir_path, csv_list,path):
         csv2txt(test_target, os.path.join(dir_path, f'test_all_target.txt'))
         csv2txt(test_input, os.path.join(dir_path, f'test_all_input.txt'))
         csv2txt(test_output, os.path.join(dir_path, f'test_all_output.txt'))
-def compare(test_target,path):
-    # pd.options.display.float_format='${:,.4f}'.format
-    # test_target=test_target.iloc[:,:].map('${:,.4f}'.format)
-    ### path 須為output/char00042
-    
-    path=path.split('/')
-    try:
-        filename="/home/jefflin/6axis/"+path[1]+"_stroke.txt"
-        data_txt = pd.read_csv(filename, sep=" ", header=None)
-    except:
-        print("Output file path is not found! Please check the format" )
-        print("Expecting the format such like output/char00042")
 
-    print(data_txt.iloc[1,2:8].values)
-    print(test_target.iloc[1,0:6].values)
+def compare(test_target, path):
+
+    path = os.path.abspath(path)
+    filename=f"/home/jefflin/6axis/char00{path[-3:]}_stroke.txt"
+    data_txt = pd.read_csv(filename, sep=" ", header=None).drop(columns=[0, 1, 8])
+    data_txt.columns = range(data_txt.shape[1])
+
     org_list=[]
     for i in range(test_target.shape[0]):
         for j in range(data_txt.shape[0]):
-            ans=(test_target.iloc[i,0:6].values==data_txt.iloc[j,2:8].values)
+            ans=(test_target.iloc[i,:6].values==data_txt.iloc[j,:6].values)
             if ans.all():
                 org_list.append(i)
                 continue
-    print(org_list)
     return org_list
+
+def compare_2(test_target, path):
+    """Compare org data and target data， return a list stored the useless row index
+
+    Args:
+        test_target (pandas.Dataframe): the data to compare
+        path (string): current directory path
+
+    Returns:
+        List: a list stored the useless row index
+    """
+    # 取得字元編號
+    path = os.path.abspath(path)
+    filename = f"/home/jefflin/6axis/char00{path[-3:]}_stroke.txt"
+
+    # 讀入原始 txt 檔，並捨去不需要的 column
+    data_txt = pd.read_csv(filename, sep=" ", header=None).drop(columns=[0, 1, 8])
+    data_txt.columns = range(data_txt.shape[1])
+
+    j = 0
+    drop_list = []
+    for i in range(test_target.shape[0]):
+        # 比較兩 row 的值是不是不相等
+        if len(test_target.iloc[i,:].eq(data_txt.iloc[j,:])) != test_target.shape[1]:
+            drop_list.append(i)  # 存入到紀錄要丟棄的 list 裡
+        else:  # 移動原始資料的 index
+            j += 1
+        if j == data_txt.shape[0]:
+            break
+
+    # 加入多餘的尾端
+    drop_list = drop_list + list(range(data_txt.shape[0], test_target.shape[0]))
+
+    return drop_list
 
 def inverse_len(test_target,test_input,test_output,org_list):
     
@@ -123,7 +152,17 @@ def inverse_len(test_target,test_input,test_output,org_list):
         new_input=pd.concat([new_input,test_input.iloc[idx]],axis=1)
         new_output=pd.concat([new_output,test_output.iloc[idx]],axis=1)
     
-    return new_target.T,new_input.T,new_output.T
+    return new_target.T, new_input.T, new_output.T
+def inverse_len_2(test_target, test_input, test_output, drop_list):
+    print(drop_list)
+    print(test_target.shape)
+    test_target = test_target.drop(drop_list)
+    print(test_target.shape)
+    test_input = test_input.drop(drop_list)
+    test_output = test_output.drop(drop_list)
+
+    return test_target,test_input,test_output
+
 def postprocessor(path):
     """postprocess output files
 

@@ -19,7 +19,20 @@
 - `other`: TBD
 
 ## Version 6
-### 9/14 - Angelowen
+
+### 9/19 - jefflin
+
+- fix postprocessing bug about test whole character output length
+  - `update`: In postprocessor.py:
+      - adapt the test directory name generally
+      - update the process to speed up
+  - `update`: In preprocess.py and utils.py:
+      - fix the test directory path bug
+      - TODO: 解決225字以外的 testing data 的 target，長度問題及存放位置
+  - `update`: In verification.py and README.md in preprocessing/:
+      - Update explanation
+
+### 9/19 - Angelowen
 
 - fix test_error.py bug
   - `new`: In postprocessing/postprocessing.py: inverse the length of the data when combine strokes into a word after using interpolate adding way 
@@ -40,6 +53,7 @@
   - `update`: In postprocessing.py: add axis2img and csv2txt to test files
   - `fixed`: In stroke2char.py: fix test file stroke order bug
   - `new`: In verification.py: verify the all `test_all_target.txt` is correct or not
+
 ### 9/14 - Angelowen
 
 - fix test_error.py bug

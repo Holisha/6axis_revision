@@ -10,7 +10,7 @@ def argument_setting():
     parser.add_argument('--path', type=str, default='./output',
                         help='set the data path (default: ./output)')
     parser.add_argument('--dataset-path', type=str, default='/home/jefflin/6axis/',
-                        help='set the data path (default: /home/jefflin/6axis/)')
+                        help='set the original 6axis data path (default: /home/jefflin/6axis/)')
 
     return parser.parse_args()
 

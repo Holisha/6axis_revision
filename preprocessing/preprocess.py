@@ -4,6 +4,7 @@ import pandas as pd
 from glob import glob
 from utils import argument_setting, stroke_statistics
 
+# TODO: 解決225字以外的 testing data 的 target，長度問題及存放位置
 
 def _csv2npy(csv_root: str, keep=False):
     """
@@ -207,19 +208,26 @@ def preprocess(args):
     else:
         char_num = f'{args.test_char:0{args.char_idx}d}'
         test_path = f'{args.root_path}/{args.test_path}'
+        # test_target_path = f'{args.root_path}/{args.test_target_path}'
         if not os.path.exists(args.root_path):
             os.mkdir(args.root_path)
         if not os.path.exists(test_path):
             os.mkdir(test_path)
-        test_char_path = f'{test_path}{char_num}/'
+        # if not os.path.exists(test_target_path):
+        #     os.mkdir(test_target_path)
+        test_char_path = f'{test_path}/{char_num}/'
+        # test_target_char_path = f'{test_target_path}/{char_num}/'
 
         print(f'Building {char_num} testing data ...\n')
         print(f'input path = {args.input_path}')
         print(f'root path = {args.root_path}')
         print(f'test path = {test_path}\n')
+        # print(f'test target path = {test_target_path}\n')
 
         if not os.path.exists(test_char_path):
             os.mkdir(test_char_path)
+        # if not os.path.exists(test_target_char_path):
+        #     os.mkdir(test_target_char_path)
         print(f'Build the director {test_char_path} success ...\n')
 
         txt_name = f'{args.input_path}/char0{char_num}_stroke.txt'
@@ -248,6 +256,10 @@ def preprocess(args):
                 target_data = extended_length(target_data, args.stroke_len, args.extend)
                 test_data = addnoise(target_data, args.noise)
 
+                # store target data
+                # if not os.path.exists(f'{target_path}/{char_num}'):
+	            #     os.mkdir(f'{target_path}/{char_num}')
+                # np.save(f'{target_path}/{char_num}/{stroke_idx}/{char_num}_{stroke_idx}', target_data.to_numpy())
                 # store training data
                 """ test_data.to_csv(f'{test_char_path}{stroke_idx}/{filename}', header=False ,index=False) """
                 np.save(f'{test_char_path}{stroke_idx}/{os.path.splitext(filename)[0]}', test_data.to_numpy())

@@ -40,6 +40,8 @@ def argument_setting():
                         help='set the path of the training datas (default: ./train/)')
     parser.add_argument('--test-path', type=str, default='./test/',
                         help='set the path of the testing datas (default: ./test/)')
+    parser.add_argument('--test-target-path', type=str, default='./test_target/',
+                        help='set the path of the target datas for testing (default: ./test_target/)')
 
     # for extended length
     parser.add_argument('--extend', type=str, default='tail',

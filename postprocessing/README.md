@@ -1,32 +1,48 @@
 # Postprocessing for 6axis_revision Project
 > 開發及維護人員: jefflin
 
-> 最新更新時間: 2020/08/07
+> 最新更新時間: 2020/09/19
 
 - [Postprocessing for 6axis_revision Project](#postprocessing-for-6axis_revision-project)
 	- [Quik Run](#quik-run)
 	- [Arguments Setting](#arguments-setting)
-		- [Example](#example)
+		- [postprocessor.py](#postprocessorpy)
+			- [Example](#example)
+		- [verification.py](#verificationpy)
 	- [Program Running Rule](#program-running-rule)
 		- [**注意事項**](#注意事項)
 
 ## Quik Run
-Run the following command for running without any arguments
-```
-python postprocessor.py
-```
+- Run the following command for running postprocess without any arguments
+	```
+	python postprocessor.py
+	```
+- Run the following command for verify all test_all_targe.txt is same as original 6axis txt file or not.
+	```
+	python verification.py
+	```
 
 ## Arguments Setting
-Set the path of the directory. (default : `./output/char00042` )
-路徑須為`./output/char字元編號`
+### postprocessor.py
+Set the path of the directory. (default : `./output` )
 ```
 --path PATH
 ```
-### Example
+
+#### Example
 ```
 python postprocessor.py --path ./output_path
 ```
 
+### verification.py
+- Set the data path (default: `./output`)
+	```
+	--path PATH
+	```
+- Set the original 6axis data path (default: /home/jefflin/6axis/)
+	```
+	----dataset-path DATASET_PATH
+	```
 ## Program Running Rule
 採遞迴方式取出預設資料夾底下所有層的 csv 檔，完成以下三個功能:
 1. stroke2char: 把 `test_` 開頭的 csv 檔，依筆畫順序合併成單一完整書法字的 csv 檔，輸出檔名為 `test_all_(target|input|output).csv`
@@ -38,3 +54,5 @@ python postprocessor.py --path ./output_path
 - test data 的檔名須為 `test_` 開頭
 - 檔名須以 `_target.csv`, `_input.csv` 或 `_output.csv` 為結尾形式命名
 - 因此，同一層資料夾下的 csv 檔個數須為 3 的倍數，不然會報錯
+- 存放 test 輸出資料的資料夾名稱的結尾須為`字元編號`，且長度須為 **3**
+  - eg. `test_042`、`char00042`、`771`
