@@ -71,12 +71,11 @@ def postprocessor_dir(dir_path, csv_list,path):
 
     # save test char file
     if test_target.shape[0] != 0:
-        print(test_input)
         org_list=compare(test_target,path)
         test_target,test_input,test_output=inverse_len(test_target,test_input,test_output,org_list)
-        # print(test_target)
-        # print(test_input)
-        exit(0)
+        print(test_target)
+        print(test_input)
+
         # TODO: delete the uselee line judging from the target files in the original txt file
         test_target.to_csv(os.path.join(dir_path, 'test_all_target.csv'), header=False, index=False)
         test_input.to_csv(os.path.join(dir_path, 'test_all_input.csv'), header=False, index=False)
