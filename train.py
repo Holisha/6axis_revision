@@ -147,7 +147,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
     model_config(train_args, save=log_path)     # save model configuration before training
 
     # load model from exist .pt file
-    if args.load and os.path.isfile(model_path):
+    if args.load is not False and os.path.isfile(model_path):
         r"""
         load a pickle file from exist parameter
 

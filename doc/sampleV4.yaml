@@ -25,10 +25,13 @@ lr: 0.0001 # learning rate
 # Adam, SGD, ranger, rangerVA
 # noticed that different optimizer fit in different learning rate
 optim: rangerVA
-# load can be define by bool or path
-load: False # load exist .pickle file or not
-# load: ./path # load by path
 weight_decay: 0
+
+# load exist pickle file
+# load can be define by bool or int
+load: False # load latest .pickle file or not
+# load: 1 # load by version number
+
 
 # scheduler
 # scheduler can be defined by name or bool
