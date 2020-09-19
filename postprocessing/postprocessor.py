@@ -43,7 +43,7 @@ def postprocessor_dir(dir_path, csv_list,path):
         input = pd.read_csv(
                     os.path.join(dir_path, f'{file_feature}_input.csv'),
                     nrows=stroke_len,
-                    header=None
+                    header=None,
                 )
         output = pd.read_csv(
                     os.path.join(dir_path, f'{file_feature}_output.csv'),
@@ -71,17 +71,15 @@ def postprocessor_dir(dir_path, csv_list,path):
 
     # save test char file
     if test_target.shape[0] != 0:
-        print(test_input)
         org_list=compare(test_target,path)
         test_target,test_input,test_output=inverse_len(test_target,test_input,test_output,org_list)
-        # print(test_target)
-        # print(test_input)
-        exit(0)
+        print(test_target)
+        print(test_input)
+
         # TODO: delete the uselee line judging from the target files in the original txt file
         test_target.to_csv(os.path.join(dir_path, 'test_all_target.csv'), header=False, index=False)
         test_input.to_csv(os.path.join(dir_path, 'test_all_input.csv'), header=False, index=False)
         test_output.to_csv(os.path.join(dir_path, 'test_all_output.csv'), header=False, index=False)
-
         # axis2img
         axis2img(test_target, test_input, test_output, 'test_all', dir_path)
 
@@ -95,13 +93,12 @@ def compare(test_target,path):
     ### path 須為output/char00042
     
     path=path.split('/')
-    # try:
-    filename="/home/jefflin/6axis/"+path[1]+"_stroke.txt"
-    # filename="./output/char00042/test_all_target.txt"
-    data_txt = pd.read_csv(filename, sep=" ", header=None)
-    # except:
-    #     print("Output file path is not found! Please check the format" )
-    #     print("Expecting the format such like output/char00042")
+    try:
+        filename="/home/jefflin/6axis/"+path[1]+"_stroke.txt"
+        data_txt = pd.read_csv(filename, sep=" ", header=None)
+    except:
+        print("Output file path is not found! Please check the format" )
+        print("Expecting the format such like output/char00042")
 
     print(data_txt.iloc[1,2:8].values)
     print(test_target.iloc[1,0:6].values)
