@@ -1,6 +1,6 @@
 # data setting
 stroke_length: 150
-test_path: /home/jefflin/dataset/test_all
+test_path: /home/jefflin/dataset/test_0406
 target_path: /home/jefflin/dataset/target
 batch_size: 128
 num_workers: 8
@@ -30,5 +30,5 @@ criterion: huber
 # logger setting
 log_path: ./logs
 
-# output setting
-save_path: ./output
+# # # output setting
+# save_path: ./output/char00042

@@ -26,7 +26,7 @@ def test_argument(inhert=False):
     parser = ArgumentParser(add_help=not inhert)
 
     # doc setting
-    parser.add_argument('--doc', type=str, metavar='./doc/fsrcnn.yaml',
+    parser.add_argument('--doc', type=str, metavar='./doc/fsrcnn_res_test.yaml',
                         help='load document file by position(default: None)')
 
     # dataset setting
@@ -40,6 +40,8 @@ def test_argument(inhert=False):
                         help='set the batch size (default: 128)')
     parser.add_argument('--num-workers', type=int, default=8,
                         help='set the number of processes to run (default: 8)')
+    parser.add_argument('--test-num', type=int, default=30,
+                        help='set the number of each stroke in testing dataset (default: 30)')
 
     # model setting
     parser.add_argument('--model-name', type=str, default='FSRCNN',
@@ -66,9 +68,6 @@ def test_argument(inhert=False):
     # logger setting
     parser.add_argument('--log-path', type=str, default='./logs',
                         help='set the logger path of pytorch model (default: ./logs)')
-    # save setting
-    parser.add_argument('--save-path', type=str, default='./output',
-                        help='set the output file (csv or txt) path (default: ./output)')
 
     # for the compatiable
     if inhert is True:
@@ -79,6 +78,9 @@ def test_argument(inhert=False):
 
 @torch.no_grad()
 def test(model, test_loader, criterion, args):
+    number=args.test_path.split('test_')[1]
+    save_path='./output/char0'+number
+    print(f'Saving data in {save_path}')
     # set model path
     if args.load is not False:
         _, log_path = writer_builder(
@@ -123,11 +125,11 @@ def test(model, test_loader, criterion, args):
         # pred = input_scaler.inverse_transform(pred)
 
         # out2csv
-        while j - (i * 64) < pred.size(0):
-            out2csv(inputs, f'test_{int(j/30)+1}', 'input', j - (i * 64), args.save_path, args.stroke_length, spec_flag=True)
-            out2csv(pred, f'test_{int(j/30)+1}', 'output', j - (i * 64), args.save_path, args.stroke_length, spec_flag=True)
-            out2csv(target, f'test_{int(j/30)+1}', 'target', j - (i * 64), args.save_path, args.stroke_length, spec_flag=True)
-            j += 30
+        while j - (i * args.batch_size) < pred.size(0):
+            out2csv(inputs, f'test_{int(j/args.test_num)+1}', 'input', j - (i * args.batch_size), save_path, args.stroke_length, spec_flag=True)
+            out2csv(pred, f'test_{int(j/args.test_num)+1}', 'output', j - (i * args.batch_size), save_path, args.stroke_length, spec_flag=True)
+            out2csv(target, f'test_{int(j/args.test_num)+1}', 'target', j - (i * args.batch_size), save_path, args.stroke_length, spec_flag=True)
+            j += args.test_num
         i += 1
 
         # MSE loss
