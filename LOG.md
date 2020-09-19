@@ -22,8 +22,9 @@
 ### 9/14 - Angelowen
 
 - fix test_error.py bug
-  - `update`: In `test_error.py`: add content loss
-  - `fixed`: In `test_error.py`: fix args.load bug
+  - `new`: In postprocessing/postprocessing.py: inverse the length of the data when combine strokes into a word after using interpolate adding way 
+  - `update`: .gitigonre add doc/*.yaml
+  - `update`: test_error.py storing path
 
 ### 9/15 - jefflin
 
@@ -39,6 +40,11 @@
   - `update`: In postprocessing.py: add axis2img and csv2txt to test files
   - `fixed`: In stroke2char.py: fix test file stroke order bug
   - `new`: In verification.py: verify the all `test_all_target.txt` is correct or not
+### 9/14 - Angelowen
+
+- fix test_error.py bug
+  - `update`: In `test_error.py`: add content loss
+  - `fixed`: In `test_error.py`: fix args.load bug
 
 ### 9/14 - jefflin
 
