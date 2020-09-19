@@ -19,6 +19,11 @@
 - `other`: TBD
 
 ## Version 6
+### 9/14 - Angelowen
+
+- fix test_error.py bug
+  - `update`: In `test_error.py`: add content loss
+  - `fixed`: In `test_error.py`: fix args.load bug
 
 ### 9/15 - jefflin
 

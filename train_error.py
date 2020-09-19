@@ -138,6 +138,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         'valid_iter': 0,    # valid iteration
     }   
     model_path = os.path.join(log_path, f'{args.model_name}_{args.scale}x.pt')
+
     # config
     model_config(train_args, save=log_path)     # save model configuration before training
 

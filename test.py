@@ -11,7 +11,6 @@ from utils import  (model_builder, out2csv, model_config, config_loader, StorePa
     criterion_builder, writer_builder)
 from dataset import AxisDataSet
 
-
 def test_argument(inhert=False):
     """return test arguments
 
@@ -152,14 +151,12 @@ def test(model, test_loader, criterion, args):
     err /= len(test_loader.dataset)
     print(f'test error:{err:.4f}')
 
-
 if __name__ == '__main__':
     # argument setting
     test_args = test_argument()
     
     if test_args.doc:
         test_args = config_loader(test_args.doc, test_args)
-
     # config
     model_config(test_args, save=False)     # print model configuration of evaluation
 
