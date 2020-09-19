@@ -16,9 +16,20 @@
 - `new`: **new** features
 - `fixed`: **bug fixed**
 - `bug`: bug found but **yet fix**
+- `doc`: add comment
 - `other`: TBD
 
 ## Version 6
+
+### 9/20 - fan
+
+- Now can sort by numerical suffix and fix a tiny bug
+	- `new`: In `utils.py`: add `_key_func` to sort integer key
+	- `update`: In `utils.py`: replace `sorted` by `.sort()`
+	- `fixed`: In `train.py`: now can get version 0
+	- `doc`: In `doc/sampleV4.yaml`: add hint about arugment `load` and remove error message
+		- **DO NOT declare `version` in doc file, modified `load` instead**
+
 ### 9/14 - Angelowen
 
 - fix test_error.py bug

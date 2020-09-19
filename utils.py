@@ -17,6 +17,19 @@ from pathlib import Path
 from typing import Union, Optional
 
 
+def _key_func(key):
+    """
+    manipulate key to sort list by numerical suffix
+
+    Args:
+        key (str): element of list
+
+    Returns:
+        [int]: key which is int 
+    """
+
+    return int(key.split('_')[-1])
+
 ################################################################
 ########################## model info ##########################
 ################################################################
@@ -74,7 +87,8 @@ def writer_builder(log_root, model_name, load: Union[bool, int]=False):
         os.mkdir(log_root)
 
     # list version of model
-    version = sorted(os.listdir(log_root))
+    version = os.listdir(log_root)
+    version.sort(key=_key_func)
 
     # load exist logs
     if version and type(load) is int:
@@ -228,7 +242,7 @@ def config_loader(doc_path, args):
             args.load = True
     except:
         print(f'No "test_path" founded in {sys.argv[0]}\n')
-
+    
     # check which key value is missing
     arg_dict = vars(args)
     if arg_dict.keys() != doc_args.keys():
@@ -242,6 +256,7 @@ def config_loader(doc_path, args):
         print('\nWarning: missing above key in document file, which would raising error')
         print('Missing value would be argv value instead')
         # os._exit(0)
+
 
     print(f'config loaded: {doc_path}')
     return Namespace(**doc_args)
