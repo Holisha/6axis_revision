@@ -1,6 +1,6 @@
 # data setting
 stroke_length: 150
-test_path: /home/jefflin/dataset/test_all
+test_path: /home/jefflin/dataset/test_0605
 target_path: /home/jefflin/dataset/target
 batch_size: 128
 num_workers: 8
@@ -11,12 +11,13 @@ scale: 1
 
 gpu_id: 0
 # load can be define by bool or path
-load: True # load exist .pickle file or not
+# load: True # load exist .pickle file or not
+# version: 5
 # load: ./path # load by path
 model_args: # model args, for more detail, please take a look in model/model name/models.py
   stages: 2
-  n0: 64
-  nr: 18
+  n0: 128
+  nr: 32
   atten: col
 
 # scheduler

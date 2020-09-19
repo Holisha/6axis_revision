@@ -17,7 +17,8 @@ python postprocessor.py
 ```
 
 ## Arguments Setting
-Set the path of the directory. (default : `./output` )
+Set the path of the directory. (default : `./output/char00042` )
+路徑須為`./output/char字元編號`
 ```
 --path PATH
 ```

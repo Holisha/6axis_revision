@@ -1,0 +1,39 @@
+# data setting
+stroke_length: 150
+test_path: /home/jefflin/dataset/test_0042
+target_path: /home/jefflin/dataset/target
+batch_size: 128
+num_workers: 8
+
+# model setting
+model_name: DBPN # FSRCNN, DDBPN, DBPN
+scale: 1
+
+gpu_id: 0
+# load can be define by bool or path
+# load: True # load exist .pickle file or not
+# version: 5
+# load: ./path # load by path
+model_args: # model args, for more detail, please take a look in model/model name/models.py
+  stages: 2
+  n0: 64
+  nr: 18
+
+
+# scheduler
+# scheduler can be defined by name or bool
+scheduler: step # define by name
+# scheduler: true # define by bool
+step: 5
+factor: 0.9
+
+# weighted loss
+alpha: 1 # mse loss weight
+beta: 1 # content loss weight
+criterion: huber
+
+# logger setting
+log_path: ./logs
+
+# output setting
+save_path: ./output/char00042

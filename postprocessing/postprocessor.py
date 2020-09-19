@@ -8,7 +8,7 @@ from axis2img import axis2img
 from csv2txt import csv2txt
 from post_utils import get_len, argument_setting
 
-def postprocessor_dir(dir_path, csv_list):
+def postprocessor_dir(dir_path, csv_list,path):
     """Do postprocessor to the directory
 
     Args:
@@ -71,6 +71,12 @@ def postprocessor_dir(dir_path, csv_list):
 
     # save test char file
     if test_target.shape[0] != 0:
+        print(test_input)
+        org_list=compare(test_target,path)
+        test_target,test_input,test_output=inverse_len(test_target,test_input,test_output,org_list)
+        # print(test_target)
+        # print(test_input)
+        exit(0)
         # TODO: delete the uselee line judging from the target files in the original txt file
         test_target.to_csv(os.path.join(dir_path, 'test_all_target.csv'), header=False, index=False)
         test_input.to_csv(os.path.join(dir_path, 'test_all_input.csv'), header=False, index=False)
@@ -83,7 +89,44 @@ def postprocessor_dir(dir_path, csv_list):
         csv2txt(test_target, os.path.join(dir_path, f'test_all_target.txt'))
         csv2txt(test_input, os.path.join(dir_path, f'test_all_input.txt'))
         csv2txt(test_output, os.path.join(dir_path, f'test_all_output.txt'))
+def compare(test_target,path):
+    # pd.options.display.float_format='${:,.4f}'.format
+    # test_target=test_target.iloc[:,:].map('${:,.4f}'.format)
+    ### path 須為output/char00042
+    
+    path=path.split('/')
+    # try:
+    filename="/home/jefflin/6axis/"+path[1]+"_stroke.txt"
+    # filename="./output/char00042/test_all_target.txt"
+    data_txt = pd.read_csv(filename, sep=" ", header=None)
+    # except:
+    #     print("Output file path is not found! Please check the format" )
+    #     print("Expecting the format such like output/char00042")
 
+    print(data_txt.iloc[1,2:8].values)
+    print(test_target.iloc[1,0:6].values)
+    org_list=[]
+    for i in range(test_target.shape[0]):
+        for j in range(data_txt.shape[0]):
+            ans=(test_target.iloc[i,0:6].values==data_txt.iloc[j,2:8].values)
+            if ans.all():
+                org_list.append(i)
+                continue
+    print(org_list)
+    return org_list
+
+def inverse_len(test_target,test_input,test_output,org_list):
+    
+    new_target,new_input,new_output=pd.DataFrame(),pd.DataFrame(),pd.DataFrame()
+    for idx in org_list:
+        new_target.append(test_target.iloc[idx],ignore_index=True)
+        new_input.append(test_input.iloc[idx],ignore_index=True)
+        new_output.append(test_output.iloc[idx],ignore_index=True)
+        new_target=pd.concat([new_target,test_target.iloc[idx]],axis=1)
+        new_input=pd.concat([new_input,test_input.iloc[idx]],axis=1)
+        new_output=pd.concat([new_output,test_output.iloc[idx]],axis=1)
+    
+    return new_target.T,new_input.T,new_output.T
 def postprocessor(path):
     """postprocess output files
 
@@ -102,7 +145,7 @@ def postprocessor(path):
         csv_files = sorted(list(filter(lambda x: re.match(r'(.*).csv', x), files)))
 
         # postprocess
-        postprocessor_dir(root, csv_files)
+        postprocessor_dir(root, csv_files, path)
 
         print(f'{root}\tfinished...')
 
