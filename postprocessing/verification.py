@@ -30,12 +30,13 @@ def ver(args):
             if root[-4:] == '_all':
                 print('\tskip test_all/...')
                 continue
-            with open(f'{args.dataset_path}/char0{root[-4:]}_stroke.txt', mode='r') as correct_file:
+            char_num = os.path.abspath(root)[-3:]
+            with open(f'{args.dataset_path}/char00{char_num}_stroke.txt', mode='r') as correct_file:
                 correct_content = correct_file.read()
                 with open(f'{root}/{csv_files[0]}') as test_file:
                     test_content = test_file.read()
                     if correct_content != test_content:
-                        print(f'\nError: {root[-4:]} is NOT Correct!!!\n')
+                        print(f'\nError: {char_num} is NOT Correct!!!\n')
                         flag = False
                         continue
     if flag is True:

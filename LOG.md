@@ -21,6 +21,18 @@
 
 ## Version 6
 
+### 9/22 - jefflin
+
+- fix preprocessing bug about np.load
+    - `fixed`: In `postprocessor.py`: fix bug about test_all
+    - `fixed`: In `verification.py`: get char number by abspath
+    - `fixed`: In `preprocess.py`:
+        - fix np.load bug
+        - comment saving target data
+    - `update`: In `utils.py`:
+        - change default input path
+        - delete `--test-target-path`
+
 ### 9/20 - fan
 
 - Now can sort by numerical suffix and fix a tiny bug
