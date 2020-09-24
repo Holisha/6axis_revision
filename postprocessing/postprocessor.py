@@ -122,7 +122,11 @@ def compare_2(test_target, path):
     filename = f"/home/jefflin/6axis/char00{path[-3:]}_stroke.txt"
 
     # 讀入原始 txt 檔，並捨去不需要的 column
-    data_txt = pd.read_csv(filename, sep=" ", header=None).drop(columns=[0, 1, 8])
+    try:
+        data_txt = pd.read_csv(filename, sep=" ", header=None).drop(columns=[0, 1, 8])
+    except:
+        return []
+
     data_txt.columns = range(data_txt.shape[1])
 
     j = 0
@@ -154,10 +158,8 @@ def inverse_len(test_target,test_input,test_output,org_list):
     
     return new_target.T, new_input.T, new_output.T
 def inverse_len_2(test_target, test_input, test_output, drop_list):
-    print(drop_list)
-    print(test_target.shape)
+
     test_target = test_target.drop(drop_list)
-    print(test_target.shape)
     test_input = test_input.drop(drop_list)
     test_output = test_output.drop(drop_list)
 

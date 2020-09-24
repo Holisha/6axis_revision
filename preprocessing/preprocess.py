@@ -4,7 +4,6 @@ import pandas as pd
 from glob import glob
 from utils import argument_setting, stroke_statistics
 
-# TODO: 解決225字以外的 testing data 的 target，長度問題及存放位置
 
 def _csv2npy(csv_root: str, keep=False):
     """
@@ -38,7 +37,7 @@ def _npy2csv(npy_root: str, keep=False):
 
     for npy_file in tqdm(Path(npy_root).glob('**/*.npy'), desc='Inverse converting'):
         # load npy file
-        npy_df = pd.DataFrame(np.load(npy_file))
+        npy_df = pd.DataFrame(np.load(npy_file, allow_pickle = True))
 
         # save as csv file
         npy_df.to_csv(f'{os.path.splitext(npy_file)[0]}.csv', header=False, index=False)
@@ -112,8 +111,8 @@ def csv_parser(char_num, txt_name, target_path, train_path, stroke_len, args):
         int: the number of strokes
     """
 
-    if not os.path.exists(f'{target_path}/{char_num}'):
-        os.mkdir(f'{target_path}/{char_num}')
+    # if not os.path.exists(f'{target_path}/{char_num}'):
+    #     os.mkdir(f'{target_path}/{char_num}')
     if not os.path.exists(f'{train_path}/{char_num}'):
         os.mkdir(f'{train_path}/{char_num}')
 
@@ -127,8 +126,8 @@ def csv_parser(char_num, txt_name, target_path, train_path, stroke_len, args):
         stroke_idx = f'{stroke_num:0{args.stroke_idx}d}'    # string
 
         # make directory
-        if not os.path.exists(f'{target_path}/{char_num}/{stroke_idx}'):
-            os.mkdir(f'{target_path}/{char_num}/{stroke_idx}')
+        # if not os.path.exists(f'{target_path}/{char_num}/{stroke_idx}'):
+        #     os.mkdir(f'{target_path}/{char_num}/{stroke_idx}')
         if not os.path.exists(f'{train_path}/{char_num}/{stroke_idx}'):
             os.mkdir(f'{train_path}/{char_num}/{stroke_idx}')
 
@@ -158,7 +157,7 @@ def csv_parser(char_num, txt_name, target_path, train_path, stroke_len, args):
         ) """
         
         # store as npy
-        np.save(f'{target_path}/{char_num}/{stroke_idx}/{char_num}_{stroke_idx}', target_data.to_numpy())
+        # np.save(f'{target_path}/{char_num}/{stroke_idx}/{char_num}_{stroke_idx}', target_data.to_numpy())
         
     return stroke_total
 
@@ -174,7 +173,8 @@ def preprocess(args):
     file_list = sorted(glob(os.path.join(args.input_path, '*.txt')))
     stroke_len = args.stroke_len
     if args.less == True:
-        file_list, stroke_len = get_less_char(file_list, args.less_char, args.total_char)
+        # file_list, stroke_len = get_less_char(file_list, args.less_char, args.total_char)
+        file_list, _ = get_less_char(file_list, args.less_char, args.total_char)
 
     # build training data
     if args.test_char == None:
@@ -184,8 +184,8 @@ def preprocess(args):
         train_path = f'{args.root_path}/{args.train_path}/'
         if not os.path.exists(args.root_path):
             os.mkdir(args.root_path)
-        if not os.path.exists(target_path):
-            os.mkdir(target_path)
+        # if not os.path.exists(target_path):
+        #     os.mkdir(target_path)
         if not os.path.exists(train_path):
             os.mkdir(train_path)
 
@@ -208,26 +208,20 @@ def preprocess(args):
     else:
         char_num = f'{args.test_char:0{args.char_idx}d}'
         test_path = f'{args.root_path}/{args.test_path}'
-        # test_target_path = f'{args.root_path}/{args.test_target_path}'
+
         if not os.path.exists(args.root_path):
             os.mkdir(args.root_path)
         if not os.path.exists(test_path):
             os.mkdir(test_path)
-        # if not os.path.exists(test_target_path):
-        #     os.mkdir(test_target_path)
         test_char_path = f'{test_path}/{char_num}/'
-        # test_target_char_path = f'{test_target_path}/{char_num}/'
 
         print(f'Building {char_num} testing data ...\n')
         print(f'input path = {args.input_path}')
         print(f'root path = {args.root_path}')
         print(f'test path = {test_path}\n')
-        # print(f'test target path = {test_target_path}\n')
 
         if not os.path.exists(test_char_path):
             os.mkdir(test_char_path)
-        # if not os.path.exists(test_target_char_path):
-        #     os.mkdir(test_target_char_path)
         print(f'Build the director {test_char_path} success ...\n')
 
         txt_name = f'{args.input_path}/char0{char_num}_stroke.txt'
@@ -270,10 +264,6 @@ def preprocess(args):
 
 if __name__ == '__main__':
     args = argument_setting()
-
-    # checking
-    if not os.path.isdir('6axis'):
-        os.mkdir('6axis')
 
     # convert root path
     if args.convert:
