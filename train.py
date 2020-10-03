@@ -155,6 +155,8 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         epoch: parameters were updated in which epoch
         """
 
+        checkpoint = torch.load(model_path, map_location=f'cuda:{args.gpu_id}') 
+
         # try-except to compatible
         try:
             model.load_state_dict(checkpoint['state_dict'])
@@ -168,7 +170,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         checkpoint['epoch'] += 1        # start from next epoch
         checkpoint['train_iter'] += 1
         checkpoint['valid_iter'] += 1
-        model.load_state_dict(checkpoint['state_dict'])
+        # model.load_state_dict(checkpoint['state_dict'])
 
     # initialize the early_stopping object
     if args.early_stop:
@@ -317,7 +319,7 @@ def train(model, train_loader, valid_loader, optimizer, criterion, args):
         # early_stopping needs the validation loss to check if it has decresed, 
         # and if it has, it will make a checkpoint of the current model
         if args.early_stop:
-            early_stopping(valid_err, model, epoch)
+            early_stopping(valid_err, model, epoch, checkpoint)
 
             if early_stopping.early_stop:
                 print("Early stopping")

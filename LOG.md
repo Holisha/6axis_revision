@@ -21,6 +21,12 @@
 
 ## Version 6
 
+### 10/3 - fan
+
+- Now can load pickle file in train normally
+	- `fixed`: In `train.py`: add torch.load before try-except block and commented load_state_dict
+	- `fixed`: In `utils.py`: pass checkpoint to `EarlyStop` to save iteration info
+
 ### 9/22 - jefflin
 
 - fix preprocessing bug about np.load
