@@ -77,12 +77,13 @@ def postprocessor_dir(dir_path, csv_list,path):
         # test_target,test_input,test_output=inverse_len(test_target,test_input,test_output,org_list)
         
         # 採用刪除法，較快
-        drop_list=compare_2(test_target.round(4),dir_path)
-        test_target,test_input,test_output=inverse_len_2(test_target,test_input,test_output,drop_list)
+        drop_list = compare_2(test_target.round(4), dir_path)
+        test_target, test_input, test_output = inverse_len_2(test_target, test_input, test_output, drop_list)
 
         test_target.to_csv(os.path.join(dir_path, 'test_all_target.csv'), header=False, index=False)
         test_input.to_csv(os.path.join(dir_path, 'test_all_input.csv'), header=False, index=False)
         test_output.to_csv(os.path.join(dir_path, 'test_all_output.csv'), header=False, index=False)
+
         # axis2img
         axis2img(test_target, test_input, test_output, 'test_all', dir_path)
 
@@ -133,15 +134,13 @@ def compare_2(test_target, path):
     drop_list = []
     for i in range(test_target.shape[0]):
         # 比較兩 row 的值是不是不相等
-        if len(test_target.iloc[i,:].eq(data_txt.iloc[j,:])) != test_target.shape[1]:
+        tmp = test_target.iloc[i,:].eq(data_txt.iloc[j,:])
+        if len(tmp.index[tmp]) != 7:
             drop_list.append(i)  # 存入到紀錄要丟棄的 list 裡
         else:  # 移動原始資料的 index
             j += 1
         if j == data_txt.shape[0]:
             break
-
-    # 加入多餘的尾端
-    drop_list = drop_list + list(range(data_txt.shape[0], test_target.shape[0]))
 
     return drop_list
 
@@ -159,9 +158,9 @@ def inverse_len(test_target,test_input,test_output,org_list):
     return new_target.T, new_input.T, new_output.T
 def inverse_len_2(test_target, test_input, test_output, drop_list):
 
-    test_target = test_target.drop(drop_list)
-    test_input = test_input.drop(drop_list)
-    test_output = test_output.drop(drop_list)
+    test_target = test_target.drop(drop_list).reset_index(drop=True)
+    test_input = test_input.drop(drop_list).reset_index(drop=True)
+    test_output = test_output.drop(drop_list).reset_index(drop=True)
 
     return test_target,test_input,test_output
 
