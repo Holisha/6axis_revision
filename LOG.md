@@ -21,6 +21,11 @@
 
 ## Version 6
 
+### 10/5 - jefflin
+
+- fix postprocessing bug about test_all
+    - `fixed`: In `postprocessor.py`: fix bug about test_all
+
 ### 10/3 - fan
 
 - Now can load pickle file in train normally
