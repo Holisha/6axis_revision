@@ -637,7 +637,7 @@ class EarlyStopping:
 
         if self.best_score is None:
             self.best_score = score
-            self.save_checkpoint(val_loss, model, epoch)
+            self.save_checkpoint(val_loss, model, epoch, checkpoint)
 
         # val_loss decrease less than 0.1% (default)
         elif score < self.best_score * (1. - self.threshold):
