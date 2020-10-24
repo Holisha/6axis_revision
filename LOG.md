@@ -21,6 +21,11 @@
 
 ## Version 6
 
+### 10/14 - fan
+
+- fix early stop argument missed
+	- `fixed`: add `checkpoint` to early stop `__call__()`
+
 ### 10/5 - jefflin
 
 - fix postprocessing bug about test_all

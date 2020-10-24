@@ -631,13 +631,13 @@ class EarlyStopping:
         self.threshold = threshold
         self.path = path
 
-    def __call__(self, val_loss, model, epoch):
+    def __call__(self, val_loss, model, epoch, checkpoint):
 
         score = -val_loss
 
         if self.best_score is None:
             self.best_score = score
-            self.save_checkpoint(val_loss, model, epoch)
+            self.save_checkpoint(val_loss, model, epoch, checkpoint)
 
         # val_loss decrease less than 0.1% (default)
         elif score < self.best_score * (1. - self.threshold):
@@ -649,7 +649,7 @@ class EarlyStopping:
                 self.early_stop = True
         else:
             self.best_score = score
-            self.save_checkpoint(val_loss, model, epoch)
+            self.save_checkpoint(val_loss, model, epoch, checkpoint)
             self.counter = 0
 
     def save_checkpoint(self, val_loss, model, epoch, checkpoint):
