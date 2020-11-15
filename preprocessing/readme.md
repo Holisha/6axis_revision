@@ -100,7 +100,7 @@
 
 - ```--test-num TEST_NUM```
 
-  - 設定產生 training data 之 每一 stroke 的筆數 (預設值: 30)
+  - 設定產生 testing data 之 每一 stroke 的筆數 (預設值: 30)
 
 - ```--char-idx CHAR_IDX```
 

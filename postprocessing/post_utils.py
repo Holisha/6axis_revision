@@ -24,8 +24,9 @@ def argument_setting():
     return arguments
     """
     parser = ArgumentParser()
-
-    parser.add_argument('--path', type=str, default='./output',
-                        help='set the data path (default: ./output)')
+    parser.add_argument('--input-path', type=str, default='./home/jefflin/6axis/',
+                        help='set the input data path (default: ./home/jefflin/6axis/)')
+    parser.add_argument('--save-path', type=str, default='./output',
+                        help='set the save data path (default: ./output)')
 
     return parser.parse_args()

@@ -8,13 +8,20 @@ from axis2img import axis2img
 from csv2txt import csv2txt
 from post_utils import get_len, argument_setting
 
-def postprocessor_dir(dir_path, csv_list,path):
+def postprocessor_dir(dir_path, csv_list, path, input_path):
     """Do postprocessor to the directory
 
     Args:
         dir_path (string): the directory path
         csv_list (list of string): the list of csv files
     """
+    # Build directory
+    if not os.path.exists(f'{dir_path}/txt/'):
+        os.mkdir(f'{dir_path}/txt/')
+    if not os.path.exists(f'{dir_path}/pic/'):
+        os.mkdir(f'{dir_path}/pic/')
+    if not os.path.exists(f'{dir_path}/test_all/'):
+        os.mkdir(f'{dir_path}/test_all/')
 
     # initialize for test files
     test_target = pd.DataFrame(None)
@@ -62,53 +69,33 @@ def postprocessor_dir(dir_path, csv_list,path):
                 )
 
         # axis2img
-        axis2img(target, input, output, file_feature, dir_path)
+        axis2img(target, input, output, file_feature, f'{dir_path}/pic/')
 
         # csv2txt
-        csv2txt(target, os.path.join(dir_path, f'{file_feature}_target.txt'))
-        csv2txt(input, os.path.join(dir_path, f'{file_feature}_input.txt'))
-        csv2txt(output, os.path.join(dir_path, f'{file_feature}_output.txt'))
+        csv2txt(target, os.path.join(f'{dir_path}/txt/', f'{file_feature}_target.txt'))
+        csv2txt(input, os.path.join(f'{dir_path}/txt/', f'{file_feature}_input.txt'))
+        csv2txt(output, os.path.join(f'{dir_path}/txt/', f'{file_feature}_output.txt'))
 
     # save test char file
     if test_target.shape[0] != 0:
 
-        # 採用保存加入
-        # org_list = compare(test_target.round(4), dir_path)
-        # test_target,test_input,test_output=inverse_len(test_target,test_input,test_output,org_list)
-        
         # 採用刪除法，較快
-        drop_list = compare_2(test_target.round(4), dir_path)
-        test_target, test_input, test_output = inverse_len_2(test_target, test_input, test_output, drop_list)
+        drop_list = compare(test_target.round(4), dir_path, input_path)
+        test_target, test_input, test_output = inverse_len(test_target, test_input, test_output, drop_list)
 
         test_target.to_csv(os.path.join(dir_path, 'test_all_target.csv'), header=False, index=False)
         test_input.to_csv(os.path.join(dir_path, 'test_all_input.csv'), header=False, index=False)
         test_output.to_csv(os.path.join(dir_path, 'test_all_output.csv'), header=False, index=False)
 
         # axis2img
-        axis2img(test_target, test_input, test_output, 'test_all', dir_path)
+        axis2img(test_target, test_input, test_output, 'test_all', f'{dir_path}/test_all/')
 
         # csv2txt
-        csv2txt(test_target, os.path.join(dir_path, f'test_all_target.txt'))
-        csv2txt(test_input, os.path.join(dir_path, f'test_all_input.txt'))
-        csv2txt(test_output, os.path.join(dir_path, f'test_all_output.txt'))
+        csv2txt(test_target, os.path.join(f'{dir_path}/test_all/', f'test_all_target.txt'))
+        csv2txt(test_input, os.path.join(f'{dir_path}/test_all/', f'test_all_input.txt'))
+        csv2txt(test_output, os.path.join(f'{dir_path}/test_all/', f'test_all_output.txt'))
 
-def compare(test_target, path):
-
-    path = os.path.abspath(path)
-    filename=f"/home/jefflin/6axis/char00{path[-3:]}_stroke.txt"
-    data_txt = pd.read_csv(filename, sep=" ", header=None).drop(columns=[0, 1, 8])
-    data_txt.columns = range(data_txt.shape[1])
-
-    org_list=[]
-    for i in range(test_target.shape[0]):
-        for j in range(data_txt.shape[0]):
-            ans=(test_target.iloc[i,:6].values==data_txt.iloc[j,:6].values)
-            if ans.all():
-                org_list.append(i)
-                continue
-    return org_list
-
-def compare_2(test_target, path):
+def compare(test_target, path, input_path):
     """Compare org data and target data， return a list stored the useless row index
 
     Args:
@@ -120,7 +107,7 @@ def compare_2(test_target, path):
     """
     # 取得字元編號
     path = os.path.abspath(path)
-    filename = f"/home/jefflin/6axis/char00{path[-3:]}_stroke.txt"
+    filename = f"{input_path}/char00{path[-3:]}_stroke.txt"
 
     # 讀入原始 txt 檔，並捨去不需要的 column
     try:
@@ -144,19 +131,7 @@ def compare_2(test_target, path):
 
     return drop_list
 
-def inverse_len(test_target,test_input,test_output,org_list):
-    
-    new_target,new_input,new_output=pd.DataFrame(),pd.DataFrame(),pd.DataFrame()
-    for idx in org_list:
-        new_target.append(test_target.iloc[idx],ignore_index=True)
-        new_input.append(test_input.iloc[idx],ignore_index=True)
-        new_output.append(test_output.iloc[idx],ignore_index=True)
-        new_target=pd.concat([new_target,test_target.iloc[idx]],axis=1)
-        new_input=pd.concat([new_input,test_input.iloc[idx]],axis=1)
-        new_output=pd.concat([new_output,test_output.iloc[idx]],axis=1)
-    
-    return new_target.T, new_input.T, new_output.T
-def inverse_len_2(test_target, test_input, test_output, drop_list):
+def inverse_len(test_target, test_input, test_output, drop_list):
 
     test_target = test_target.drop(drop_list).reset_index(drop=True)
     test_input = test_input.drop(drop_list).reset_index(drop=True)
@@ -164,7 +139,7 @@ def inverse_len_2(test_target, test_input, test_output, drop_list):
 
     return test_target,test_input,test_output
 
-def postprocessor(path):
+def postprocessor(path, input_path):
     """postprocess output files
 
     Args:
@@ -182,7 +157,7 @@ def postprocessor(path):
         csv_files = sorted(list(filter(lambda x: re.match(r'(.*).csv', x), files)))
 
         # postprocess
-        postprocessor_dir(root, csv_files, path)
+        postprocessor_dir(root, csv_files, path, input_path)
 
         print(f'{root}\tfinished...')
 
@@ -191,4 +166,4 @@ def postprocessor(path):
 
 if __name__ == '__main__':
     args = argument_setting()
-    postprocessor(args.path)
+    postprocessor(args.save_path, args.input_path)

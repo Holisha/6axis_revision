@@ -21,6 +21,14 @@
 
 ## Version 6
 
+### 11/16 - jefflin
+
+- Automatic pre-processing, testing and post-processing
+    - `new`: In `demo/`: add demo program
+    - `update`: In `preprocessing/`: compatible
+    - `update`: In `postprocessing/':
+        - compatible
+        - Group files into folders
 ### 10/14 - fan
 
 - fix early stop argument missed
