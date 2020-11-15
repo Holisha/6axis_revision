@@ -1,14 +1,12 @@
 # Postprocessing for 6axis_revision Project
 > 開發及維護人員: jefflin
 
-> 最新更新時間: 2020/09/19
+> 最新更新時間: 2020/11/16
 
 - [Postprocessing for 6axis_revision Project](#postprocessing-for-6axis_revision-project)
 	- [Quik Run](#quik-run)
 	- [Arguments Setting](#arguments-setting)
-		- [postprocessor.py](#postprocessorpy)
 			- [Example](#example)
-		- [verification.py](#verificationpy)
 	- [Program Running Rule](#program-running-rule)
 		- [**注意事項**](#注意事項)
 
@@ -23,26 +21,17 @@
 	```
 
 ## Arguments Setting
-### postprocessor.py
-Set the path of the directory. (default : `./output` )
+
 ```
---path PATH
+--input-path INPUT_PATH (default: ./home/jefflin/6axis/)
+--save-path SAVE_PATH (default : `./output` ) 
 ```
 
 #### Example
 ```
-python postprocessor.py --path ./output_path
+python postprocessor.py --save-path ./output_path --input-path ./6axis/
 ```
 
-### verification.py
-- Set the data path (default: `./output`)
-	```
-	--path PATH
-	```
-- Set the original 6axis data path (default: /home/jefflin/6axis/)
-	```
-	----dataset-path DATASET_PATH
-	```
 ## Program Running Rule
 採遞迴方式取出預設資料夾底下所有層的 csv 檔，完成以下三個功能:
 1. stroke2char: 把 `test_` 開頭的 csv 檔，依筆畫順序合併成單一完整書法字的 csv 檔，輸出檔名為 `test_all_(target|input|output).csv`

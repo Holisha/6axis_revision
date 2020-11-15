@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 from glob import glob
-from utils import argument_setting, stroke_statistics
+from pre_utils import argument_setting, stroke_statistics
 
 
 def _csv2npy(csv_root: str, keep=False):
@@ -168,7 +168,7 @@ def get_less_char(file_list, less_char, total_char):
 
     return new_file_list, max_len
 
-def preprocess(args):
+def preprocessor(args):
 
     file_list = sorted(glob(os.path.join(args.input_path, '*.txt')))
     stroke_len = args.stroke_len
@@ -274,4 +274,4 @@ if __name__ == '__main__':
         _npy2csv(args.root_path)
         os._exit(0)
 
-    preprocess(args)
+    preprocessor(args)

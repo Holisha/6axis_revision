@@ -1,23 +1,10 @@
 import os, re
-from argparse import ArgumentParser
-
-def argument_setting():
-    r"""
-    return arguments
-    """
-    parser = ArgumentParser()
-
-    parser.add_argument('--path', type=str, default='./output',
-                        help='set the data path (default: ./output)')
-    parser.add_argument('--dataset-path', type=str, default='/home/jefflin/6axis/',
-                        help='set the original 6axis data path (default: /home/jefflin/6axis/)')
-
-    return parser.parse_args()
+from post_utils import argument_setting
 
 def ver(args):
 
     flag = True
-    for root, _ , files in os.walk(args.path):
+    for root, _ , files in os.walk(args.save_path):
             # get the list of the csv file name
             csv_files = list(filter(lambda x: re.match(r'test_all_target.txt', x), files))
             # no test_all_target.txt in root
@@ -31,7 +18,7 @@ def ver(args):
                 print('\tskip test_all/...')
                 continue
             char_num = os.path.abspath(root)[-3:]
-            with open(f'{args.dataset_path}/char00{char_num}_stroke.txt', mode='r') as correct_file:
+            with open(f'{args.input_path}/char00{char_num}_stroke.txt', mode='r') as correct_file:
                 correct_content = correct_file.read()
                 with open(f'{root}/{csv_files[0]}') as test_file:
                     test_content = test_file.read()
