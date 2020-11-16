@@ -89,7 +89,7 @@
 
   - 設定雜點範圍 (預設值: [-1, 1])
 
-- ```--stroke-len STROKE_LEN```
+- ```--stroke-length STROKE_LEN```
 
   - 設定每一筆畫的長度 (預設值: 150)
   > 注意: 生成 test 資料，需要手動更新 ```stroke-len```，以與target 資料長度一致
@@ -121,7 +121,7 @@
 - ```--root-path ROOT_PATH```
 
   - 設定輸出 data 的根資料夾 (預設值: ./dataset/)
-  > 注意: target, train, test path 會接在 root path 底下
+  > 注意: target, train path 會接在 root path 底下，test path 則不會
 
 - ```--target-path TARGET_PATH```
 
@@ -132,7 +132,7 @@
   - 設定 training datas 資料夾路徑 (預設值: ./train/)
 
 - ```--test-path TEST_PATH```
-  - 設定 testing datas 資料夾路徑 (預設值: ./test/)
+  - 設定 testing datas 資料夾路徑 (預設值: ./dataset/test/)
 
 - ```--extend tail, inter```
   - 設定補筆畫長度的方法 (預設值: 'tail')
