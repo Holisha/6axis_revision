@@ -19,7 +19,13 @@
 - `doc`: add comment
 - `other`: TBD
 
-## Version 6
+## Version 7
+
+### 11/16 - fan
+
+- Solve compatible problem
+	- `rename`: `test.py` -> `eval.py`
+	- `fix`: in `demo_util.py`: add parent path and import `utlis.StorePair`
 
 ### 11/16 - jefflin
 
@@ -29,6 +35,9 @@
     - `update`: In `postprocessing/':
         - compatible
         - Group files into folders
+
+## Version 6
+
 ### 10/14 - fan
 
 - fix early stop argument missed

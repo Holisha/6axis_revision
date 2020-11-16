@@ -6,12 +6,15 @@ from tqdm import tqdm
 from argparse import ArgumentParser
 
 # self defined
-DIR_NAME = r'../'
-sys.path.insert(0, DIR_NAME)
+# DIR_NAME = r'../'
+# sys.path.insert(0, DIR_NAME)
+sys.path.append(r'..')
+sys.path.append(r'../postprocessing')
+sys.path.append(r'../preprocessing')
 from demo_util import argument_setting
 from preprocessing import preprocessor
 from postprocessing import postprocessor
-from test import test
+from eval import test
 
 # test defined
 from model import FeatureExtractor
