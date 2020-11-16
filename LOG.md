@@ -21,6 +21,9 @@
 
 ## Version 7
 
+### 11/16 - jefflin
+- Solve demo bugs
+
 ### 11/16 - fan
 
 - Solve compatible problem

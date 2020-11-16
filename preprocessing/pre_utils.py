@@ -14,7 +14,7 @@ def argument_setting():
                         help='set the start number of the training datas (default: 0)')
     parser.add_argument('--noise', type=float, nargs=2, default=[-1,1],
                         help='set the noise range (default: [-1, 1])')
-    parser.add_argument('--stroke-len', type=int, default=150,
+    parser.add_argument('--stroke-length', type=int, default=150,
                         help='set the length of each stroke (default: 150)')
     
     parser.add_argument('--test-char', type=int, default=None,
@@ -39,7 +39,7 @@ def argument_setting():
     parser.add_argument('--train-path', type=str, default='./train/',
                         help='set the path of the training datas (default: ./train/)')
     parser.add_argument('--test-path', type=str, default='./test/',
-                        help='set the path of the testing datas (default: ./test/)')
+                        help='set the path of the testing datas (default: ./dataset/test/)')
 
     # for extended length
     parser.add_argument('--extend', type=str, default='tail',

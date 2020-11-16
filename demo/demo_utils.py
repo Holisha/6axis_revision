@@ -21,7 +21,7 @@ def argument_setting():
     ## dataset setting
     parser.add_argument('--noise', type=float, nargs=2, default=[-1,1],
                         help='set the noise range (default: [-1, 1])')
-    parser.add_argument('--stroke-len', type=int, default=150,
+    parser.add_argument('--stroke-length', type=int, default=150,
                         help='set the length of each stroke (default: 150)')
     
     parser.add_argument('--test-char', type=int, default=None,
@@ -46,8 +46,8 @@ def argument_setting():
                         help='set the root path (default: ./dataset/)')
     parser.add_argument('--input-path', type=str, default='./dataset/6axis/',
                         help='set the path of the original datas (default: ./dataset/6axis/)')
-    parser.add_argument('--test-path', type=str, default='./test/',
-                        help='set the path of the testing datas (default: ./test/)')
+    parser.add_argument('--test-path', type=str, default='./dataset/test/',
+                        help='set the path of the testing datas (default: ./dataset/test/)')
     parser.add_argument('--target-path', type=str, default='./dataset/target/',
                         help="target dataset path (default: './dataset/target/')")
 
@@ -63,15 +63,15 @@ def argument_setting():
     parser.add_argument('--save-path', type=str, default='./output/',
                         help='set the output file (csv or txt) path (default: ./output/)')
 
-	##########################
+    ##########################
     # testing args
 	# doc setting
     parser.add_argument('--doc', type=str, metavar='../doc/sample.yaml',
                         help='load document file by position(default: None)')
 
     # dataset setting
-    parser.add_argument('--batch-size', type=int, default=1,
-                        help='set the batch size (default: 1)')
+    parser.add_argument('--batch-size', type=int, default=64,
+                        help='set the batch size (default: 64)')
     parser.add_argument('--num-workers', type=int, default=8,
                         help='set the number of processes to run (default: 8)')
 

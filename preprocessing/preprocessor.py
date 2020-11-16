@@ -171,7 +171,7 @@ def get_less_char(file_list, less_char, total_char):
 def preprocessor(args):
 
     file_list = sorted(glob(os.path.join(args.input_path, '*.txt')))
-    stroke_len = args.stroke_len
+    stroke_len = args.stroke_length
     if args.less == True:
         # file_list, stroke_len = get_less_char(file_list, args.less_char, args.total_char)
         file_list, _ = get_less_char(file_list, args.less_char, args.total_char)
@@ -207,7 +207,7 @@ def preprocessor(args):
     # build testing data
     else:
         char_num = f'{args.test_char:0{args.char_idx}d}'
-        test_path = f'{args.root_path}/{args.test_path}'
+        test_path = args.test_path
 
         if not os.path.exists(args.root_path):
             os.mkdir(args.root_path)
@@ -216,13 +216,13 @@ def preprocessor(args):
         test_char_path = f'{test_path}/{char_num}/'
 
         print(f'Building {char_num} testing data ...\n')
-        print(f'input path = {args.input_path}')
-        print(f'root path = {args.root_path}')
-        print(f'test path = {test_path}\n')
+        # print(f'input path = {args.input_path}')
+        # print(f'root path = {args.root_path}')
+        # print(f'test path = {test_path}\n')
 
         if not os.path.exists(test_char_path):
             os.mkdir(test_char_path)
-        print(f'Build the director {test_char_path} success ...\n')
+        # print(f'Build the director {test_char_path} success ...\n')
 
         txt_name = f'{args.input_path}/char0{char_num}_stroke.txt'
         data = pd.read_table(txt_name, header=None, sep=' ')        # read txt file to pandas dataframe
@@ -247,7 +247,7 @@ def preprocessor(args):
                 filename = f'{char_num}_{stroke_idx}_{test_num + 1:0{args.num_idx}d}.csv'
 
                 # add test data last line
-                target_data = extended_length(target_data, args.stroke_len, args.extend)
+                target_data = extended_length(target_data, stroke_len, args.extend)
                 test_data = addnoise(target_data, args.noise)
 
                 # store target data
@@ -260,7 +260,7 @@ def preprocessor(args):
 
         print(f'Build {char_num} testing data finished ...\n')
 
-    print('All Done!!!')
+    print('Pre-Processing Done!!!')
 
 if __name__ == '__main__':
     args = argument_setting()
