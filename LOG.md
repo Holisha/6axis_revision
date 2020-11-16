@@ -23,6 +23,10 @@
 
 ### 11/16 - jefflin
 - Solve demo bugs
+  
+- Add demo/README.md
+
+- Fix input_path bug
 
 ### 11/16 - fan
 
