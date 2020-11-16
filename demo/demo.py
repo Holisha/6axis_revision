@@ -37,7 +37,7 @@ def demo_test(args):
     criterion = criterion_builder(args.criterion)
 
     # dataset
-    test_set = AxisDataSet(os.path.join(args.root_path, args.test_path), args.target_path)
+    test_set = AxisDataSet(args.test_path, args.target_path)
 
     test_loader = DataLoader(test_set,
                              batch_size=args.batch_size,

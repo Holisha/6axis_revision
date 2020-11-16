@@ -26,6 +26,8 @@
   
 - Add demo/README.md
 
+- Fix input_path bug
+
 ### 11/16 - fan
 
 - Solve compatible problem
