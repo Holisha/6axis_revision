@@ -23,6 +23,8 @@
 
 ### 11/16 - jefflin
 - Solve demo bugs
+  
+- Add demo/README.md
 
 ### 11/16 - fan
 

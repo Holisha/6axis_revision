@@ -9,6 +9,7 @@
 			- [Example](#example)
 	- [Program Running Rule](#program-running-rule)
 		- [**注意事項**](#注意事項)
+	- [Folder Structure](#folder-structure)
 
 ## Quik Run
 - Run the following command for running postprocess without any arguments
@@ -34,4 +35,40 @@ python demo.py --version 0
    - 合併筆畫，及檢測輸出長度是否正確
 
 ### **注意事項**
-- 輸出檔會照檔案類型分類到 `pic/`、`txt/`、`test_char/` 三個資料夾，其中
+- 請注意資料夾存放結構，否則容易報錯
+- 輸出檔會照檔案類型分類到 `pic/`、`txt/`、`test_char/` 三個資料夾，其中 `test_char/` 存放Demo過程必需之資料，分別為以下四項
+  - test_all_compare.png
+  - test_all_input.txt
+  - test_all_output.txt
+  - test_all_target.txt
+
+## Folder Structure
+
+- `test.py`
+- preprocessing/
+- postprocessing/
+- doc/
+    - sample.yaml          ————————————————— doc
+- demo/
+    - `demo.py`
+    - demo_util.py
+    - dataset/             ——————————————————— root-path
+        - 6axis/           ————————————————— input-path
+            - char_00436_stroke.txt ...
+        - test/             —————————————————— test-path
+        - target/         ————————————————— target-path
+    - logs/                  ———————————————————— logs-path
+        - FSRCNN/
+            - version_0/
+                - FSRCNN_1x.pt
+    - output/              ——————————————————— save-path
+        - test_1_input.csv ...
+        - pic/
+            - test_1_compare.png ...
+        - txt/
+            - test_1_input.txt ...
+        - test_char/
+            - test_all_compare.png
+            - test_all_input.txt
+            - test_all_output.txt
+            - test_all_target.txt
