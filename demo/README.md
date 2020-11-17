@@ -13,7 +13,7 @@
 
 ## Quik Run
 - **請在 `demo/` 資料夾裡執行**
-- Run the following command for running postprocess without any arguments
+- Run the following command for running demo process without any arguments
 	```
 	python demo.py
 	```
