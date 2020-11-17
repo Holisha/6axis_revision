@@ -21,6 +21,14 @@
 
 ## Version 7
 
+### 11/17 - fan
+
+- feat: compute execution time and then analyze them.
+	- `new`: In `demo_utils.py`: add `timer` function to compute execution time
+		- add `--timer` argument to activate timer
+	- `new`: In `demo.py`: now can analyze the execution time with `--timer`
+	- `doc`: In `.gitignore`: add `*.tar.gz` avoid to push dataset to github
+
 ### 11/17 - jefflin
 - Improve the demo process
     - `new`: In `demo/demo_utils.py`: 

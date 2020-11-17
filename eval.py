@@ -89,6 +89,7 @@ def test(model, test_loader, criterion, args):
         model_path = os.path.join(log_path, f'{args.model_name}_{args.scale}x.pt')
 
     # load model parameters
+    # print(model_path)
     checkpoint = torch.load(model_path, map_location=f'cuda:{args.gpu_id}')
 
     # try-except to compatible
