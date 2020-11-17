@@ -28,5 +28,6 @@ def argument_setting():
                         help='set the input data path (default: ./home/jefflin/6axis/)')
     parser.add_argument('--save-path', type=str, default='./output',
                         help='set the save data path (default: ./output)')
-
+    parser.add_argument('--demo-post', action='store_true', default=False,
+                        help='Just post-process the demo required files (default: False)')
     return parser.parse_args()

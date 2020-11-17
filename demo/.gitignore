@@ -1,5 +1,6 @@
 dataset/
-*tar.gz
+logs/
+*.tar.gz
 output/
 test_output/
-logs/
+events.out.tfevents*

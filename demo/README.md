@@ -1,24 +1,25 @@
 # Automatic processing for 6axis_revision Project
 > 開發及維護人員: jefflin
 
-> 最新更新時間: 2020/11/16
+> 最新更新時間: 2020/11/17
 
 - [Automatic processing for 6axis_revision Project](#automatic-processing-for-6axis_revision-project)
-	- [Quik Run](#quik-run)
-	- [Arguments Setting](#arguments-setting)
-			- [Example](#example)
-	- [Program Running Rule](#program-running-rule)
-		- [**注意事項**](#注意事項)
-	- [Folder Structure](#folder-structure)
+  - [Quik Run](#quik-run)
+  - [Arguments Setting](#arguments-setting)
+      - [Example](#example)
+  - [Program Running Rule](#program-running-rule)
+    - [**注意事項**](#注意事項)
+  - [Folder Structure](#folder-structure)
 
 ## Quik Run
+- **請在 `demo/` 資料夾裡執行**
 - Run the following command for running postprocess without any arguments
 	```
 	python demo.py
 	```
 
 ## Arguments Setting
-See ```python demo.py -h``` output message.
+Merge the arguments of pre-processing, testing and post-processing. The details please see ```python demo.py -h``` message.
 
 #### Example
 ```
@@ -35,8 +36,10 @@ python demo.py --version 0
    - 合併筆畫，及檢測輸出長度是否正確
 
 ### **注意事項**
-- 請注意資料夾存放結構，否則容易報錯
-- 輸出檔會照檔案類型分類到 `pic/`、`txt/`、`test_char/` 三個資料夾，其中 `test_char/` 存放Demo過程必需之資料，分別為以下四項
+- 初次執行，請把 `demo.tar.gz` 裡的 `dataset/`、`logs/` 兩資料夾移到 `demo/` 資料夾底下。
+- **請維持相同的資料夾環境**，否則容易報錯。 ( 詳見 [Folder Structure](#Folder-Structure) )
+- 程式最後會驗證 target 輸出檔是否正確。如 cmd 輸出有顯示 **`Verification All Correct!!!`**，則代表正確，否則代表輸出檔有錯。
+- 為有效降低執行時間，後處理只產生 Demo 過程所需之資料，並存放於 `test_char/`。其中 Demo 過程必需之資料，分別為以下四項
   - test_all_compare.png
   - test_all_input.txt
   - test_all_output.txt
@@ -51,7 +54,7 @@ python demo.py --version 0
     - sample.yaml          ————————————————— doc
 - demo/
     - `demo.py`
-    - demo_util.py
+    - `demo_util.py`
     - dataset/             ——————————————————— root-path
         - 6axis/           ————————————————— input-path
             - char_00436_stroke.txt ...
@@ -63,10 +66,6 @@ python demo.py --version 0
                 - FSRCNN_1x.pt
     - output/              ——————————————————— save-path
         - test_1_input.csv ...
-        - pic/
-            - test_1_compare.png ...
-        - txt/
-            - test_1_input.txt ...
         - test_char/
             - test_all_compare.png
             - test_all_input.txt
