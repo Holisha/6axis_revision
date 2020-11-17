@@ -41,6 +41,10 @@
     - `update`: In `postprocessor.py`, `post_utils.py` and `README.md` in `postprocessing/`:
         - add `demo_post` argument to switch to demo post-processing
 
+- fix out2csv bug
+    - `fixed`: In `out2csv` in `utils.py`:
+        - fix np.squeeze bugs when the shape of output is [1, 1, 150, 6]
+
 ### 11/16 - jefflin
 - Solve demo bugs
   
