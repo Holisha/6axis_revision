@@ -1,5 +1,6 @@
 import sys
 sys.path.append('..')
+import time
 
 from argparse import ArgumentParser
 from utils import StorePair
@@ -99,4 +100,26 @@ def argument_setting():
     parser.add_argument('--criterion', type=str, default='huber',
                         help="set criterion (default: 'huber')")
 
+    # timer setting
+    parser.add_argument('--timer', default=False, action='store_true',
+                        help='compute execution time function by function (default: False)')
+
     return parser.parse_args()
+
+
+def timer(func):
+    def wrapper(*args, **kwargs):
+        
+        print(f'evaluate "{func.__name__}" execution time')
+        start = time.time()
+
+        func(*args, **kwargs)
+
+        end = time.time()
+        print(f'"{func.__name__}" execution time: {end - start:.2f}')
+        
+        # return execution time
+        return end - start
+
+    return wrapper
+        

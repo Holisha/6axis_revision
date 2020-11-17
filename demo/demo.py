@@ -7,7 +7,7 @@ from argparse import ArgumentParser
 sys.path.append(r'..')
 sys.path.append(r'../postprocessing')
 sys.path.append(r'../preprocessing')
-from demo_utils import argument_setting
+from demo_utils import argument_setting, timer
 from preprocessing import preprocessor
 from postprocessing import (postprocessor, verification)
 from eval import test
@@ -15,6 +15,10 @@ from eval import test
 # test defined
 from utils import  (model_builder, model_config, config_loader, criterion_builder)
 from dataset import AxisDataSet
+
+# execution statistics
+exe_stat = []
+
 
 def demo_test(args):
 
@@ -46,6 +50,7 @@ def demo_test(args):
     # test
     test(model, test_loader, criterion, args)
 
+@timer
 def demo(args):
 
     # Input the number of the character
@@ -73,16 +78,24 @@ def demo(args):
     if os.path.exists(args.save_path):
         shutil.rmtree(args.save_path)
 
-    preprocessor(args)
+    exe_stat.append(
+        preprocessor(args)
+    )
 
     print('\n===================================================')
-    demo_test(args)
+    exe_stat.append(
+        demo_test(args)
+    )
 
     print('\n===================================================')
-    postprocessor(args)
+    exe_stat.append(
+        postprocessor(args)
+    )
 
     print('\n===================================================')
-    verification(args)
+    exe_stat.append(
+        verification(args)
+    )
 
     print('\n===================================================')
     print(f'Testing number {args.test_char} with noise {args.noise}, Done!!!')
@@ -91,6 +104,30 @@ if __name__ == '__main__':
 	
     # argument setting
     args = argument_setting()
+    # os._exit(0)
     # config
     # model_config(args, save=False)   # print model configuration of evaluation
+    
+    # attach timer function
+    if args.timer:
+        preprocessor = timer(preprocessor)
+        demo_test = timer(demo_test)
+        postprocessor = timer(postprocessor)
+        verification = timer(verification)
+
+
+    # execution main function
     demo(args)
+
+    # timer statistics
+    if args.timer:
+        import pandas as pd
+        stat = pd.DataFrame(exe_stat, index=['preprocessor', 'demo_test', 'postprocessor', 'verification'], columns=['time'])
+
+        stat['percent'] = stat / stat.sum() * 100
+
+        stat = stat.round(
+            {'time': 2, 'percent': 2,}
+        )
+        print(f'\nperformance statistics:\n{stat}')
+        print(f'total execution time: {stat["time"].sum()}')
