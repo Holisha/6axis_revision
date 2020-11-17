@@ -16,6 +16,8 @@ def argument_setting():
                         help='set the upper limit of characters number (default: 900)')
     parser.add_argument('--noise-max', type=float, default=10,
                         help='set the maximun amplitude of noise range (default: 10)')
+    parser.add_argument('--demo-post', action='store_true', default=True,
+                        help='Just post-process the demo required files (default: True)')
 
     #################################
     ## dataset setting

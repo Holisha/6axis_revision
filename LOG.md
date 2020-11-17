@@ -21,6 +21,18 @@
 
 ## Version 7
 
+### 11/17 - jefflin
+- Improve the demo process
+    - `new`: In `demo/demo_utils.py`: 
+        - add `--demo-post` argument to switch to demo post-processing
+    - `update`: In `demo/demo.py`:
+        - remove useless libraries
+        - fixed test_path bug
+        - improve output message
+    - `update`: In `demo/README.md`: improve content
+    - `update`: In `postprocessor.py`, `post_utils.py` and `README.md` in `postprocessing/`:
+        - add `demo_post` argument to switch to demo post-processing
+
 ### 11/16 - jefflin
 - Solve demo bugs
   

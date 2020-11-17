@@ -1,8 +1,6 @@
 import os, sys, shutil
 import torch
-import torch.nn as nn
 from torch.utils.data import DataLoader
-from tqdm import tqdm
 from argparse import ArgumentParser
 
 # self defined
@@ -15,9 +13,7 @@ from postprocessing import (postprocessor, verification)
 from eval import test
 
 # test defined
-from model import FeatureExtractor
-from utils import  (model_builder, out2csv, model_config, config_loader, NormScaler,
-    criterion_builder, writer_builder)
+from utils import  (model_builder, model_config, config_loader, criterion_builder)
 from dataset import AxisDataSet
 
 def demo_test(args):
@@ -25,7 +21,7 @@ def demo_test(args):
     if args.doc:
         args = config_loader(args.doc, args)
     # config
-    model_config(args, save=False)     # print model configuration of evaluation
+    # model_config(args, save=False)     # print model configuration of evaluation
 
     # set cuda
     torch.cuda.set_device(args.gpu_id)
@@ -72,8 +68,8 @@ def demo(args):
             args.noise = [-1 * noise, noise]
             break
     
-    if os.path.exists(f'{args.root_path}/{args.test_path}'):
-        shutil.rmtree(f'{args.root_path}/{args.test_path}')
+    if os.path.exists(args.test_path):
+        shutil.rmtree(args.test_path)
     if os.path.exists(args.save_path):
         shutil.rmtree(args.save_path)
 
@@ -89,7 +85,7 @@ def demo(args):
     verification(args)
 
     print('\n===================================================')
-    print(f'Testing {args.test_char} with {args.noise}, Done!!!')
+    print(f'Testing number {args.test_char} with noise {args.noise}, Done!!!')
 
 if __name__ == '__main__':
 	

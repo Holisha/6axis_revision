@@ -30,12 +30,12 @@ def postprocessor_dir(dir_path, csv_list, path, input_path, args):
 
     # Build directory
     if file_len != 0:
-        if not os.path.exists(f'{dir_path}/txt/'):
-            os.mkdir(f'{dir_path}/txt/')
-        if not os.path.exists(f'{dir_path}/pic/'):
-            os.mkdir(f'{dir_path}/pic/')
         if not os.path.exists(f'{dir_path}/test_char/'):
             os.mkdir(f'{dir_path}/test_char/')
+        if args.demo_post is False and not os.path.exists(f'{dir_path}/txt/'):
+            os.mkdir(f'{dir_path}/txt/')
+        if args.demo_post is False and not os.path.exists(f'{dir_path}/pic/'):
+            os.mkdir(f'{dir_path}/pic/')
 
     for file_idx in range(file_len):
 	
@@ -70,13 +70,14 @@ def postprocessor_dir(dir_path, csv_list, path, input_path, args):
                     dir_path, stroke_len, int(file_feature[5:])
                 )
 
-        # axis2img
-        axis2img(target, input, output, file_feature, f'{dir_path}/pic/')
+        if args.demo_post is False:
+            # axis2img
+            axis2img(target, input, output, file_feature, f'{dir_path}/pic/')
 
-        # csv2txt
-        csv2txt(target, os.path.join(f'{dir_path}/txt/', f'{file_feature}_target.txt'))
-        csv2txt(input, os.path.join(f'{dir_path}/txt/', f'{file_feature}_input.txt'))
-        csv2txt(output, os.path.join(f'{dir_path}/txt/', f'{file_feature}_output.txt'))
+            # csv2txt
+            csv2txt(target, os.path.join(f'{dir_path}/txt/', f'{file_feature}_target.txt'))
+            csv2txt(input, os.path.join(f'{dir_path}/txt/', f'{file_feature}_input.txt'))
+            csv2txt(output, os.path.join(f'{dir_path}/txt/', f'{file_feature}_output.txt'))
 
     # save test char file
     if test_target.shape[0] != 0:
@@ -85,9 +86,10 @@ def postprocessor_dir(dir_path, csv_list, path, input_path, args):
         drop_list = compare(test_target.round(4), dir_path, input_path, args)
         test_target, test_input, test_output = inverse_len(test_target, test_input, test_output, drop_list)
 
-        test_target.to_csv(os.path.join(dir_path, 'test_all_target.csv'), header=False, index=False)
-        test_input.to_csv(os.path.join(dir_path, 'test_all_input.csv'), header=False, index=False)
-        test_output.to_csv(os.path.join(dir_path, 'test_all_output.csv'), header=False, index=False)
+        if args.demo_post is False:
+            test_target.to_csv(os.path.join(dir_path, 'test_all_target.csv'), header=False, index=False)
+            test_input.to_csv(os.path.join(dir_path, 'test_all_input.csv'), header=False, index=False)
+            test_output.to_csv(os.path.join(dir_path, 'test_all_output.csv'), header=False, index=False)
 
         # axis2img
         axis2img(test_target, test_input, test_output, 'test_all', f'{dir_path}/test_char/')

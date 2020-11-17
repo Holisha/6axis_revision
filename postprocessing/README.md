@@ -24,7 +24,8 @@
 
 ```
 --input-path INPUT_PATH (default: ./home/jefflin/6axis/)
---save-path SAVE_PATH (default : `./output` ) 
+--save-path SAVE_PATH (default : `./output` )
+--demo-post DEMO_POST (default: False)
 ```
 
 #### Example
@@ -45,3 +46,8 @@ python postprocessor.py --save-path ./output_path --input-path ./6axis/
 - 因此，同一層資料夾下的 csv 檔個數須為 3 的倍數，不然會報錯
 - 存放 test 輸出資料的資料夾名稱的結尾須為`字元編號`，且長度須為 **3**
   - eg. `test_042`、`char00042`、`771`
+- 輸出檔會照檔案類型分類到 `pic/`、`txt/`、`test_char/` 三個資料夾。如果參數 `--demo-post` 設為 `False`，則只產生 Demo 過程所需之資料，並存放於 `test_char/`，不會產生單一筆畫的執行檔及比較圖檔。其中 Demo 過程所需之資料分別為以下四項:
+  - test_all_compare.png
+  - test_all_input.txt
+  - test_all_output.txt
+  - test_all_target.txt
