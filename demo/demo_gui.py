@@ -180,7 +180,7 @@ def demo(args,noise,test_char):
     print('\n===================================================')
     print(f'Testing number {args.test_char} with noise {args.noise}, Done!!!')
 
-def main(noise,word_idx):
+def main(noise,word_idx,eff=False):
 	
     # argument setting
     args = argument_setting()
@@ -194,7 +194,7 @@ def main(noise,word_idx):
         postprocessor = timer(postprocessor)
         verification = timer(verification)
 
-
+    args.efficient=eff
     # execution main function
     demo_func = efficient_demo if args.efficient else demo
     demo_func(args,noise,word_idx)
