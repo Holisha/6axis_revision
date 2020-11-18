@@ -83,9 +83,7 @@ def data_env(args):
 
 @timer
 def efficient_demo(args,noise,test_char):
-    # construction env first
-    model, critetion, extractor = model_env(args)
-    data_loader = data_env(args)
+    
 
     args.test_char = test_char
     args.noise = [-1 * noise, noise]
@@ -98,6 +96,10 @@ def efficient_demo(args,noise,test_char):
     exe_stat.append(
         preprocessor(args)
     )
+
+    # construction env first
+    model, critetion, extractor = model_env(args)
+    data_loader = data_env(args)
 
     print('\n===================================================')
     exe_stat.append(
