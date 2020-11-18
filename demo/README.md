@@ -17,6 +17,12 @@
 	```
 	python demo.py
 	```
+- **GUI執行方式**
+- Run the following command
+    ```
+	python gui.py
+	```
+- 介面打開後請選擇參數後按執行
 
 ## Arguments Setting
 Merge the arguments of pre-processing, testing and post-processing. The details please see ```python demo.py -h``` message.
