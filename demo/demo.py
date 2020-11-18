@@ -86,9 +86,6 @@ def data_env(args):
 
 @timer
 def efficient_demo(args):
-    # construction env first
-    model, critetion, extractor = model_env(args)
-    data_loader = data_env(args)
 
     # Input the number of the character
     test_char = 0
@@ -120,6 +117,10 @@ def efficient_demo(args):
     )
 
     print('\n===================================================')
+    # construction env first
+    model, critetion, extractor = model_env(args)
+    data_loader = data_env(args)
+
     exe_stat.append(
         demo_eval(model, data_loader, critetion, args, extractor)
     )
