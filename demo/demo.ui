@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1101</width>
-    <height>861</height>
+    <width>1231</width>
+    <height>863</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -112,70 +112,13 @@
      </property>
     </item>
    </widget>
-   <widget class="QLabel" name="input">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>360</y>
-      <width>241</width>
-      <height>241</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap>imgs/YONG_input.png</pixmap>
-    </property>
-    <property name="scaledContents">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLabel" name="slim">
-    <property name="geometry">
-     <rect>
-      <x>800</x>
-      <y>360</y>
-      <width>241</width>
-      <height>241</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap>imgs/red_blue.png</pixmap>
-    </property>
-    <property name="scaledContents">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLabel" name="target">
-    <property name="geometry">
-     <rect>
-      <x>420</x>
-      <y>360</y>
-      <width>241</width>
-      <height>241</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap>imgs/YONG.png</pixmap>
-    </property>
-    <property name="scaledContents">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_6">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>260</y>
-      <width>151</width>
-      <height>51</height>
+      <x>170</x>
+      <y>250</y>
+      <width>72</width>
+      <height>38</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -188,10 +131,10 @@
    <widget class="QLabel" name="label_9">
     <property name="geometry">
      <rect>
-      <x>480</x>
-      <y>260</y>
-      <width>151</width>
-      <height>51</height>
+      <x>560</x>
+      <y>250</y>
+      <width>81</width>
+      <height>38</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -220,10 +163,10 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>820</x>
+      <x>930</x>
       <y>250</y>
-      <width>221</width>
-      <height>71</height>
+      <width>198</width>
+      <height>38</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -232,6 +175,78 @@
     <property name="text">
      <string>細線化對照圖</string>
     </property>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>320</y>
+      <width>1216</width>
+      <height>402</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <property name="spacing">
+      <number>7</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="input">
+       <property name="maximumSize">
+        <size>
+         <width>400</width>
+         <height>400</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap>imgs/YONG_input.png</pixmap>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="target">
+       <property name="maximumSize">
+        <size>
+         <width>400</width>
+         <height>400</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap>imgs/YONG.png</pixmap>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="slim">
+       <property name="maximumSize">
+        <size>
+         <width>400</width>
+         <height>400</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap>imgs/red_blue.png</pixmap>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>

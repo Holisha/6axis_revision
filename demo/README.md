@@ -17,11 +17,12 @@
 	```
 	python demo.py
 	```
-- **GUI執行方式**
+## **GUI執行方式**
 - Run the following command
     ```
 	python gui.py
 	```
+- 可加入參數`--efficient`加速執行
 - 介面打開後請選擇參數後按執行
 
 ## Arguments Setting
