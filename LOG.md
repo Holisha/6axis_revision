@@ -21,6 +21,16 @@
 
 ## Version 7
 
+### 11/18 - fan
+
+- feat: improve execution time and keep model in gpu
+	- `new`: In `eval.py`: add `demo_eval` for demo only
+		- remove unnecessary functions and features for demo
+	- `new`: In `demo.py`: now can call `efficient_demo` with argument `--efficient`
+		- `--efficient`: build envirnoment first in order to avoiding to re-instantiate model
+		- `--content-loss`: compute content loss or not
+
+
 ### 11/17 - fan
 
 - feat: compute execution time and then analyze them.
@@ -40,6 +50,10 @@
     - `update`: In `demo/README.md`: improve content
     - `update`: In `postprocessor.py`, `post_utils.py` and `README.md` in `postprocessing/`:
         - add `demo_post` argument to switch to demo post-processing
+
+- fix out2csv bug
+    - `fixed`: In `out2csv` in `utils.py`:
+        - fix np.squeeze bugs when the shape of output is [1, 1, 150, 6]
 
 ### 11/16 - jefflin
 - Solve demo bugs

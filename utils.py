@@ -562,7 +562,7 @@ def out2csv(inputs, epoch, file_string, out_num, save_path, stroke_length, spec_
     if not os.path.exists(save_path):
         os.mkdir(save_path)
 
-    output = np.squeeze(inputs.cpu().detach().numpy())
+    output = np.squeeze(inputs.cpu().detach().numpy(), axis=1)
 
     if spec_flag == False:
         table = output[0:out_num]
