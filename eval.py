@@ -80,6 +80,71 @@ def test_argument(inhert=False):
 
 
 @torch.no_grad()
+def demo_eval(model, test_loader, criterion, args, feature_extractor=None):
+    """evaluate function for demo only
+
+    Notice that model and feature_extractor must store in cuda before call the function
+
+    Args:
+        model (torch.nn): must store in gpu
+        test_loader (torch.utils.data.DataLoader): one calligraphy only
+        criterion (torch.nn): Defaults to mse loss
+        args : defined by demo arguments 
+        feature_extractor (torch.nn, optional): Ignore it for improving execution time. Defaults to None.
+    """
+
+    model.eval()
+    err = 0.0
+
+    # out2csv
+    i = 0   # count the number of loops
+    j = 0   # count the number of data
+
+    for data in tqdm(test_loader, desc=f'scale: {args.scale}'):
+        inputs, target, _ = data
+        inputs, target = inputs.cuda(), target.cuda()
+
+        # normalize inputs and target
+        # inputs = input_scaler.fit(inputs)
+
+        pred = model(inputs)
+
+        # denormalize
+        # inputs = input_scaler.inverse_transform(inputs)
+        # pred = input_scaler.inverse_transform(pred)
+
+        # out2csv
+        while j - (i * args.batch_size) < pred.size(0):
+            out2csv(inputs, f'test_{int(j/args.test_num)+1}', 'input', j - (i * args.batch_size), args.save_path, args.stroke_length, spec_flag=True)
+            out2csv(pred, f'test_{int(j/args.test_num)+1}', 'output', j - (i * args.batch_size), args.save_path, args.stroke_length, spec_flag=True)
+            out2csv(target, f'test_{int(j/args.test_num)+1}', 'target', j - (i * args.batch_size), args.save_path, args.stroke_length, spec_flag=True)
+            j += args.test_num
+        i += 1
+
+        # MSE loss
+        mse_loss = args.alpha * criterion(pred, target)
+        loss = mse_loss
+
+        # compute content loss by vgg features
+        if feature_extractor:
+            feature_extractor.eval()
+
+            # content loss
+            gen_feature = feature_extractor(pred)
+            real_feature = feature_extractor(target)
+            content_loss = args.beta * criterion(gen_feature, real_feature)
+
+            # add content loss to loss function
+            loss += content_loss
+
+        # for compatible
+        err += loss.sum().item() * inputs.size(0)
+
+    err /= len(test_loader.dataset)
+    print(f'test error:{err:.4f}')
+
+
+@torch.no_grad()
 def test(model, test_loader, criterion, args):
     # set model path
     if args.load is not False:

@@ -100,9 +100,13 @@ def argument_setting():
     parser.add_argument('--criterion', type=str, default='huber',
                         help="set criterion (default: 'huber')")
 
-    # timer setting
+    # performance setting
     parser.add_argument('--timer', default=False, action='store_true',
                         help='compute execution time function by function (default: False)')
+    parser.add_argument('--content-loss', default=False, action='store_true',
+                        help='compute content loss (default: False)')
+    parser.add_argument('--efficient', default=False, action='store_true',
+                        help='improve demo execution time (default: False)')
 
     return parser.parse_args()
 
@@ -117,7 +121,7 @@ def timer(func):
 
         end = time.time()
         print(f'"{func.__name__}" execution time: {end - start:.2f}')
-        
+
         # return execution time
         return end - start
 
