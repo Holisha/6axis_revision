@@ -21,6 +21,10 @@
 
 ## Version 7
 
+### 11/18 - jefflin
+- fix efficient demo bug
+    - `fixed`: In `demo.py`: fix efficent demo bug about get test path in `data_env`
+
 ### 11/18 - fan
 
 - feat: improve execution time and keep model in gpu
@@ -40,6 +44,7 @@
 	- `doc`: In `.gitignore`: add `*.tar.gz` avoid to push dataset to github
 
 ### 11/17 - jefflin
+
 - Improve the demo process
     - `new`: In `demo/demo_utils.py`: 
         - add `--demo-post` argument to switch to demo post-processing
