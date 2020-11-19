@@ -316,9 +316,9 @@ background-color: #FFFACD;
    <widget class="QLabel" name="label_11">
     <property name="geometry">
      <rect>
-      <x>440</x>
+      <x>420</x>
       <y>80</y>
-      <width>331</width>
+      <width>371</width>
       <height>201</height>
      </rect>
     </property>
@@ -335,10 +335,10 @@ background-color: #FFFACD;
    <widget class="QLabel" name="label_12">
     <property name="geometry">
      <rect>
-      <x>860</x>
-      <y>50</y>
-      <width>331</width>
-      <height>241</height>
+      <x>830</x>
+      <y>20</y>
+      <width>381</width>
+      <height>291</height>
      </rect>
     </property>
     <property name="text">
@@ -354,7 +354,7 @@ background-color: #FFFACD;
    <widget class="QLabel" name="label_13">
     <property name="geometry">
      <rect>
-      <x>920</x>
+      <x>910</x>
       <y>180</y>
       <width>201</width>
       <height>31</height>
@@ -392,10 +392,10 @@ background-color: #FFFACD;
    <widget class="QLabel" name="label_8">
     <property name="geometry">
      <rect>
-      <x>460</x>
-      <y>710</y>
-      <width>181</width>
-      <height>151</height>
+      <x>310</x>
+      <y>690</y>
+      <width>251</width>
+      <height>191</height>
      </rect>
     </property>
     <property name="text">
@@ -446,7 +446,27 @@ background-color: #FFFACD;
      <bool>true</bool>
     </property>
    </widget>
+   <widget class="QLabel" name="label_16">
+    <property name="geometry">
+     <rect>
+      <x>350</x>
+      <y>670</y>
+      <width>181</width>
+      <height>151</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>C:/Users/ASUS/Pictures/hand.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
    <zorder>label_3</zorder>
+   <zorder>label_11</zorder>
    <zorder>label_15</zorder>
    <zorder>label_14</zorder>
    <zorder>label_4</zorder>
@@ -458,13 +478,13 @@ background-color: #FFFACD;
    <zorder>label_5</zorder>
    <zorder>label_9</zorder>
    <zorder>label_6</zorder>
-   <zorder>label_11</zorder>
    <zorder>label_10</zorder>
    <zorder>label_12</zorder>
    <zorder>label_13</zorder>
    <zorder>label_7</zorder>
-   <zorder>label_8</zorder>
    <zorder>label_2</zorder>
+   <zorder>label_16</zorder>
+   <zorder>label_8</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
