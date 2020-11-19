@@ -107,6 +107,8 @@ def argument_setting():
                         help='compute content loss (default: False)')
     parser.add_argument('--efficient', default=False, action='store_true',
                         help='improve demo execution time (default: False)')
+    parser.add_argument('--gui', default=False, action='store_true',
+                        help='Demo with gui (default: False)')
 
     return parser.parse_args()
 
