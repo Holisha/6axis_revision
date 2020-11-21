@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5 import QtCore,QtGui,QtWidgets,QtWebEngineWidgets
-from demo_gui import main
+from demo import demo_main
 from calligraphy.code import draw_pic
 from argparse import ArgumentParser
 
@@ -61,6 +61,8 @@ def argument_setting():
     parser = ArgumentParser()
     parser.add_argument('--efficient', default=False, action='store_true',
                         help='improve demo execution time (default: False)')
+    parser.add_argument('--gui', default=False, action='store_true',
+                        help='Demo with gui (default: False)')
 
     return parser.parse_args()
 
@@ -68,7 +70,7 @@ def argument_setting():
 def go_web(args):
     
     noise = w.doubleSpinBox.value()
-    main(noise,word_idx,args.efficient)
+    demo_main(args.efficient,args.gui,noise,word_idx)
     draw_pic()
     w.slim.setPixmap(QPixmap("output/test_char/test_all_compare.png"))
     w.input.setPixmap(QPixmap("./output/visual/test_all_input.png"))
@@ -82,10 +84,14 @@ def go_web(args):
 
 if __name__ == "__main__":
     args = argument_setting()
-    app = QApplication(sys.argv)
-    w = loadUi('demo.ui')
-    windows.append(w)
-    ui=ExComboBox(w)
-    w.pushButton.clicked.connect(lambda: go_web(args))
-    w.show()
-    app.exec_()
+    
+    if args.gui:
+        app = QApplication(sys.argv)
+        w = loadUi('demo.ui')
+        windows.append(w)
+        ui=ExComboBox(w)
+        w.pushButton.clicked.connect(lambda: go_web(args))
+        w.show()
+        app.exec_()
+    else:
+        demo_main(args.efficient,args.gui)

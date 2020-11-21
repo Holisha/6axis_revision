@@ -15,14 +15,10 @@
 - **請在 `demo/` 資料夾裡執行**
 - Run the following command for running demo process without any arguments
 	```
-	python demo.py
-	```
-## **GUI執行方式**
-- Run the following command
-    ```
-	python gui.py
+	python project.py
 	```
 - 可加入參數`--efficient`加速執行
+- 加入參數`--gui`以GUI介面執行(EX:`python project.py --efficient --gui`)
 - 介面打開後請選擇參數後按執行
 
 ## Arguments Setting
