@@ -5,7 +5,7 @@ from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5 import QtCore,QtGui,QtWidgets,QtWebEngineWidgets
 from demo import demo_main
 from calligraphy.code import draw_pic
-from argparse import ArgumentParser
+from demo_utils import argument_setting
 
 windows = []
 meetingUrl="https://meet.google.com/ose-krmk-zzg"
@@ -53,24 +53,26 @@ class ExComboBox(object):
         elif w.comboBox.currentText() == "引":
             w.target.setPixmap(QPixmap("imgs/YIN.jpg"))
             word_idx = 277
+ 
+# def argument_setting():
+#     r"""
+#     return the arguments
+#     """
+#     parser = ArgumentParser()
+#     parser.add_argument('--efficient', default=False, action='store_true',
+#                         help='improve demo execution time (default: False)')
+#     parser.add_argument('--gui', default=False, action='store_true',
+#                         help='Demo with gui (default: False)')
+#     parser.add_argument('--usb-path', type=str,
+#                         help='set the USB path to copy to (default: None)')
 
-def argument_setting():
-    r"""
-    return the arguments
-    """
-    parser = ArgumentParser()
-    parser.add_argument('--efficient', default=False, action='store_true',
-                        help='improve demo execution time (default: False)')
-    parser.add_argument('--gui', default=False, action='store_true',
-                        help='Demo with gui (default: False)')
-
-    return parser.parse_args()
+#     return parser.parse_args()
 
 
 def go_web(args):
     
     noise = w.doubleSpinBox.value()
-    demo_main(args.efficient,args.gui,noise,word_idx)
+    demo_main(args, noise, word_idx)
     draw_pic()
     w.slim.setPixmap(QPixmap("output/test_char/test_all_compare.png"))
     w.input.setPixmap(QPixmap("./output/visual/test_all_input.png"))
@@ -94,4 +96,4 @@ if __name__ == "__main__":
         w.show()
         app.exec_()
     else:
-        demo_main(args.efficient,args.gui)
+        demo_main(args)

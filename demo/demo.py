@@ -10,7 +10,7 @@ sys.path.append(r'../preprocessing')
 sys.path.append(r'../model')
 
 # self defined
-from demo_utils import argument_setting, timer
+from demo_utils import (argument_setting, timer, copy2usb)
 from preprocessing import preprocessor
 from postprocessing import (postprocessor, verification)
 from model import FeatureExtractor
@@ -140,6 +140,12 @@ def efficient_demo(args,noise=0,test_char=42):
         verification(args)
     )
 
+    if args.usb_path != None:
+        print('\n===================================================')
+        exe_stat.append(
+            copy2usb(args.save_path, args.usb_path)
+        )
+
     print('\n===================================================')
     print(f'Testing number {args.test_char} with noise {args.noise}, Done!!!')
 
@@ -226,12 +232,18 @@ def demo(args,noise=0,test_char=42):
         verification(args)
     )
 
+    if args.usb_path != None:
+        print('\n===================================================')
+        exe_stat.append(
+            copy2usb(args.save_path, args.usb_path)
+        )
+
     print('\n===================================================')
     print(f'Testing number {args.test_char} with noise {args.noise}, Done!!!')
 
-def demo_main(eff=False,gui=False,noise=0,word_idx=42):
+def demo_main(args, noise=0, word_idx=42):
     # argument setting
-    args = argument_setting()
+    # args = argument_setting()
 
     # config
     # model_config(args, save=False)   # print model configuration of evaluation
@@ -246,9 +258,8 @@ def demo_main(eff=False,gui=False,noise=0,word_idx=42):
 
         postprocessor = timer(postprocessor)
         verification = timer(verification)
+        copy2usb = timer(copy2usb)
 
-    args.efficient=eff
-    args.gui = gui
     # execution main function
     demo_func = efficient_demo if args.efficient else demo
     if args.gui:
@@ -259,7 +270,7 @@ def demo_main(eff=False,gui=False,noise=0,word_idx=42):
     # timer statistics
     if args.timer:
         import pandas as pd
-        stat = pd.DataFrame(exe_stat, index=['preprocessor', 'demo_efficient', 'postprocessor', 'verification'], columns=['time'])
+        stat = pd.DataFrame(exe_stat, index=['preprocessor', 'demo_efficient', 'postprocessor', 'verification', 'copy2usb'], columns=['time'])
 
         stat['percent'] = stat / stat.sum() * 100
 
@@ -268,3 +279,8 @@ def demo_main(eff=False,gui=False,noise=0,word_idx=42):
         )
         print(f'\nperformance statistics:\n{stat}')
         print(f'total execution time: {stat["time"].sum()}')
+
+if __name__ == '__main__':
+    # argument setting
+    args = argument_setting()
+    demo_main(args)
