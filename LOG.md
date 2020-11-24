@@ -21,6 +21,12 @@
 
 ## Version 7
 
+### 11/24 - jefflin
+- Add copy2usb and update argument setting
+    - `fixed`: In `project.py` and `demo.py`: merge argument_setting
+    - `new`: In `demo.py` and `demo_utils.py`: add copy2usb and `--usb-path` argument
+    - `update`: In `demo.py`: update `demo_main` parameters
+
 ### 11/18 - jefflin
 - fix efficient demo bug
     - `fixed`: In `demo.py`: fix efficent demo bug about get test path in `data_env`

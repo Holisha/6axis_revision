@@ -66,6 +66,10 @@ def argument_setting():
     parser.add_argument('--save-path', type=str, default='./output/',
                         help='set the output file (csv or txt) path (default: ./output/)')
 
+    # usb path
+    parser.add_argument('--usb-path', type=str,
+                        help='set the USB path to copy to (default: None)')
+
     ##########################
     # testing args
 	# doc setting
@@ -128,4 +132,8 @@ def timer(func):
         return end - start
 
     return wrapper
-        
+
+def copy2usb(save_path, usb_path):
+    import shutil
+    shutil.copyfile(f'{save_path}/test_char/test_all_output.txt', f'{usb_path}/test_all_output.txt')
+    print(f'Copy test_all_output.txt to \'{usb_path}\', Finish!!!')
