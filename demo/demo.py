@@ -10,7 +10,7 @@ sys.path.append(r'../preprocessing')
 sys.path.append(r'../model')
 
 # self defined
-from demo_utils import (argument_setting, timer, copy2usb)
+from demo_utils import (argument_setting, timer, copy2usb, translation)
 from preprocessing import preprocessor
 from postprocessing import (postprocessor, verification)
 from model import FeatureExtractor
@@ -124,6 +124,8 @@ def efficient_demo(args,noise=0,test_char=42):
     print('\n===================================================')
     # construction env first
     model, critetion, extractor = model_env(args)
+
+    # construction dataset
     data_loader = data_env(args)
 
     exe_stat.append(
@@ -143,7 +145,15 @@ def efficient_demo(args,noise=0,test_char=42):
     if args.usb_path != None:
         print('\n===================================================')
         exe_stat.append(
-            copy2usb(args.save_path, args.usb_path)
+            translation(
+                f'{args.save_path}/test_char/test_all_output.txt'
+            )
+        )
+        exe_stat.append(
+            copy2usb(
+                f'{args.save_path}/test_char/test_all_output.txt',
+                f'{args.usb_path}/test_all_output.txt'
+            )
         )
 
     print('\n===================================================')
@@ -235,7 +245,15 @@ def demo(args,noise=0,test_char=42):
     if args.usb_path != None:
         print('\n===================================================')
         exe_stat.append(
-            copy2usb(args.save_path, args.usb_path)
+            translation(
+                f'{args.save_path}/test_char/test_all_output.txt'
+            )
+        )
+        exe_stat.append(
+            copy2usb(
+                f'{args.save_path}/test_char/test_all_output.txt',
+                f'{args.usb_path}/test_all_output.txt'
+            )
         )
 
     print('\n===================================================')
@@ -259,6 +277,7 @@ def demo_main(args, noise=0, word_idx=42):
         postprocessor = timer(postprocessor)
         verification = timer(verification)
         copy2usb = timer(copy2usb)
+        translation = timer(translation)
 
     # execution main function
     demo_func = efficient_demo if args.efficient else demo
@@ -270,7 +289,7 @@ def demo_main(args, noise=0, word_idx=42):
     # timer statistics
     if args.timer:
         import pandas as pd
-        stat = pd.DataFrame(exe_stat, index=['preprocessor', 'demo_efficient', 'postprocessor', 'verification', 'copy2usb'], columns=['time'])
+        stat = pd.DataFrame(exe_stat, index=['preprocessor', 'demo_efficient', 'postprocessor', 'verification', 'translation', 'copy2usb'], columns=['time'])
 
         stat['percent'] = stat / stat.sum() * 100
 
