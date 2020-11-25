@@ -133,7 +133,56 @@ def timer(func):
 
     return wrapper
 
-def copy2usb(save_path, usb_path):
+def copy2usb(source, dest):
     import shutil
-    shutil.copyfile(f'{save_path}/test_char/test_all_output.txt', f'{usb_path}/test_all_output.txt')
-    print(f'Copy test_all_output.txt to \'{usb_path}\', Finish!!!')
+    shutil.copyfile(source, dest)
+    print(f'Copy {source} to {dest} , Finish!!!')
+
+def getmidxy(input_path, char_num):
+    import pandas as pd
+    char_num = f'{char_num:04d}'
+    txt_name = f'{input_path}/char0{char_num}_stroke.txt'
+    data = pd.read_table(txt_name, header=None, sep=' ')  # read txt file to pandas dataframe
+
+    mid_x = (data[2].max() + data[2].min()) / 2
+    mid_y = (data[3].max() + data[3].min()) / 2
+    print(f'Datun X = {mid_x},\nDatum Y = {mid_y}')
+
+    return mid_x, mid_y
+
+def translation(source, dest=None):
+    """Translation to datum position and add initial positon to the end
+
+    Args:
+        source (string): the source file to processing
+        dest (string, optional): the destination file to store. Defaults to None.
+    """
+    import pandas as pd
+
+    # value from getmidxy('./dataset/6axis/', 42)
+    datum_x = -31.78475
+    datum_y = 366.56565
+
+    # read source file to pandas dataframe
+    data = pd.read_table(source, header=None, sep=' ')
+
+    # get displacement
+    disp_x = datum_x - (data[2].max() + data[2].min()) / 2
+    disp_y = datum_y - (data[3].max() + data[3].min()) / 2
+
+    # translation
+    data[2] = data[2].add(disp_x)
+    data[3] = data[3].add(disp_y)
+
+    # initial position
+    init_pos = pd.DataFrame([['movl', '0', '0', '0', '0', '0', '0', '0', '100.0']])
+    init_pos[9] = data.iloc[-1, 9]
+    data = data.append(init_pos, ignore_index=True)
+
+    if dest == None:
+        dest = source
+
+    # store back to source
+    data.to_csv(dest, header=False, index=False, sep=' ')
+
+    print('Translation finished...')
