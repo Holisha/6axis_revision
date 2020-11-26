@@ -21,6 +21,10 @@
 
 ## Version 7
 
+### 11/27 - fan
+
+- doc: modified and detailed `README.md`
+
 ### 11/26 - fan
 
 - refactor: reconstruct project

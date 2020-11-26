@@ -128,29 +128,23 @@
     ```
 
 ## Demo
+
 - To run the demo of evaluating process
-    1. Extract `demo.tar.gz`  
-    
-    2. Put `dataset/` under `6axis_revision/` 
-   
-    3. Put `logs/` under `demo/` 
-
+    1. Extract folder `dataset/` in `demo.tar.gz` under `6axis_revision/`
+    2. Extract folder `logs/` in `demo.tar.gz` under `demo/`
+    3. Change directory to `demo/`.
     4. Run the following command in shell.
-        ```shell
-        cd `demo/`
-        python demo.py
-        ```
-
-    5. Input the character number and the range of noise.
-
-    6. Program will display the test loss on the screen.
-
-- You could add `--gui` argument to run for GUI, also add `--usb-path` to store the demo files to USB or others path . Example:
     ```shell
-    python demo.py --gui --usb-path USB_PATH
+    python demo.py
     ```
-
+    5. Input the character number and the range of noise.
+    6. Program will display the test loss on the screen.
+- You could add `--gui` argument to run for GUI, also add `--usb-path` to store the demo files to USB or others path . Example:
+```shell
+python demo.py --gui --usb-path USB_PATH
+```
 - The evaluating result, including input, output and target of Robot command file, and 2D visualization compare picture, will store in `demo/output/test_char/`.
+
 ## Training
 
 - To train with document file
