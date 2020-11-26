@@ -197,7 +197,7 @@ def demo_post(args):
         demo_data = test_all_output
 
     # initial position
-    init_pos = pd.DataFrame([['movl', '0', '0', '0', '0', '0', '0', '0', '100.0']])
+    init_pos = pd.DataFrame([['movl', '0', '-120', '330', '440', '175', '0', '180', '100.0']])
     init_pos[9] = demo_data.iloc[-1, 9]
     demo_data = demo_data.append(init_pos, ignore_index=True)
 
