@@ -215,7 +215,7 @@ def preprocessor(args):
             os.mkdir(test_path)
         test_char_path = f'{test_path}/{char_num}/'
 
-        print(f'Building {char_num} testing data ...\n')
+        # print(f'Building {char_num} testing data ...\n')
         # print(f'input path = {args.input_path}')
         # print(f'root path = {args.root_path}')
         # print(f'test path = {test_path}\n')
