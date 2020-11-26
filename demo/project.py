@@ -54,21 +54,6 @@ class ExComboBox(object):
             w.target.setPixmap(QPixmap("imgs/YIN.jpg"))
             word_idx = 277
  
-# def argument_setting():
-#     r"""
-#     return the arguments
-#     """
-#     parser = ArgumentParser()
-#     parser.add_argument('--efficient', default=False, action='store_true',
-#                         help='improve demo execution time (default: False)')
-#     parser.add_argument('--gui', default=False, action='store_true',
-#                         help='Demo with gui (default: False)')
-#     parser.add_argument('--usb-path', type=str,
-#                         help='set the USB path to copy to (default: None)')
-
-#     return parser.parse_args()
-
-
 def go_web(args):
     
     noise = w.doubleSpinBox.value()
@@ -76,12 +61,12 @@ def go_web(args):
     draw_pic()
     w.slim.setPixmap(QPixmap("output/test_char/test_all_compare.png"))
     w.input.setPixmap(QPixmap("./output/visual/test_all_input.png"))
-    newtab =   WebEngineView()
-    newtab.load(QtCore.QUrl(meetingUrl))
-    newwindow= MainWindow()
-    newwindow.setCentralWidget(newtab)
-    newwindow.show()
-    windows.append(newwindow)
+    # newtab =   WebEngineView()
+    # newtab.load(QtCore.QUrl(meetingUrl))
+    # newwindow= MainWindow()
+    # newwindow.setCentralWidget(newtab)
+    # newwindow.show()
+    # windows.append(newwindow)
     
 
 if __name__ == "__main__":

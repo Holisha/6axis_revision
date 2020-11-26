@@ -27,6 +27,7 @@ train_beta.py
 
 *.txt
 doc/*.yaml
+!requirements.txt
 
 # dataset
 dataset/
