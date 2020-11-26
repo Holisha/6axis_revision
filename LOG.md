@@ -21,6 +21,38 @@
 
 ## Version 7
 
+### 11/26 - fan
+
+- refactor: reconstruct project
+	- `update` divide project into: `demo`, `src`, `doc`, `dataset`
+		- `src`: source code
+		- `demo`: demo scripts
+		- `doc`: documents
+		- `dataset`: dataset for training
+	- `remove`: remove some file in `doc`
+
+### 11/26 - jefflin
+
+- Add combine input and output txt files
+    - `new`: In `demo.py` and `demo_utils`:
+        - add combine input and output txt files
+    - `update`: In `project.py` and `demo.py`:
+        - move construction env to reduce execution time
+    - `update`: In `demo.py` and `demo_utils`:
+        - improve demo post-processing
+    - `other`: In `calligraphy_transform.py`: comment print
+
+- Add translation to demo processing
+    - `update`: In `demo.py` and `demo_utils.py`: update parameters
+    - `new`: In `demo.py` and `demo_utils.py`:
+        - add `translation` and add initial positon to the end of txt file
+
+### 11/24 - jefflin
+- Add copy2usb and update argument setting
+    - `fixed`: In `project.py` and `demo.py`: merge argument_setting
+    - `new`: In `demo.py` and `demo_utils.py`: add copy2usb and `--usb-path` argument
+    - `update`: In `demo.py`: update `demo_main` parameters
+
 ### 11/18 - jefflin
 - fix efficient demo bug
     - `fixed`: In `demo.py`: fix efficent demo bug about get test path in `data_env`

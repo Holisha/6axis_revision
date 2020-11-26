@@ -1,7 +1,7 @@
 import sys
 sys.path.append('..')
 import time
-
+import pandas as pd
 from argparse import ArgumentParser
 from utils import StorePair
 
@@ -45,14 +45,14 @@ def argument_setting():
                         help='set the length of each stroke (default: 4)')
 
     # dataset path
-    parser.add_argument('--root-path', type=str, default='./dataset/',
-                        help='set the root path (default: ./dataset/)')
-    parser.add_argument('--input-path', type=str, default='./dataset/6axis/',
-                        help='set the path of the original datas (default: ./dataset/6axis/)')
-    parser.add_argument('--test-path', type=str, default='./dataset/test/',
-                        help='set the path of the testing datas (default: ./dataset/test/)')
-    parser.add_argument('--target-path', type=str, default='./dataset/target/',
-                        help="target dataset path (default: './dataset/target/')")
+    parser.add_argument('--root-path', type=str, default='../dataset/',
+                        help='set the root path (default: ../dataset/)')
+    parser.add_argument('--input-path', type=str, default='../dataset/6axis/',
+                        help='set the path of the original datas (default: ../dataset/6axis/)')
+    parser.add_argument('--test-path', type=str, default='../dataset/test/',
+                        help='set the path of the testing datas (default: ../dataset/test/)')
+    parser.add_argument('--target-path', type=str, default='../dataset/target/',
+                        help="target dataset path (default: '../dataset/target/')")
 
     # for preprocessor setting
     parser.add_argument('--less', action='store_true', default=False,
@@ -65,6 +65,10 @@ def argument_setting():
     # save setting
     parser.add_argument('--save-path', type=str, default='./output/',
                         help='set the output file (csv or txt) path (default: ./output/)')
+
+    # usb path
+    parser.add_argument('--usb-path', type=str,
+                        help='set the USB path to copy to (default: None)')
 
     ##########################
     # testing args
@@ -105,10 +109,12 @@ def argument_setting():
                         help='compute execution time function by function (default: False)')
     parser.add_argument('--content-loss', default=False, action='store_true',
                         help='compute content loss (default: False)')
-    parser.add_argument('--efficient', default=False, action='store_true',
+    parser.add_argument('--nonefficient', default=False, action='store_true',
                         help='improve demo execution time (default: False)')
     parser.add_argument('--gui', default=False, action='store_true',
                         help='Demo with gui (default: False)')
+    parser.add_argument('--combine', default=False, action='store_true',
+                        help='Combine input and output txt file(default: False)')
 
     return parser.parse_args()
 
@@ -128,4 +134,74 @@ def timer(func):
         return end - start
 
     return wrapper
-        
+
+def getmidxy(input_path, char_num):
+
+    # python -c "from demo_utils import getmidxy; getmidxy('./dataset/6axis/', 42)"
+    # Results:
+    #    Datun X = -31.784749999999995
+    #    Datum Y = 366.56565
+
+    char_num = f'{char_num:04d}'
+    txt_name = f'{input_path}/char0{char_num}_stroke.txt'
+    data = pd.read_table(txt_name, header=None, sep=' ')  # read txt file to pandas dataframe
+
+    mid_x = (data[2].max() + data[2].min()) / 2
+    mid_y = (data[3].max() + data[3].min()) / 2
+    print(f'Datun X = {mid_x}\nDatum Y = {mid_y}')
+
+    return mid_x, mid_y
+
+def translation(source):
+    """Translation to datum position
+
+    Args:
+        source (string): the source file to processing
+    """
+
+    # value from getmidxy('./dataset/6axis/', 42)
+    datum_x = -31.78475
+    datum_y = 366.56565
+
+    # read source file to pandas dataframe
+    data = pd.read_table(source, header=None, sep=' ')
+
+    # get displacement
+    disp_x = datum_x - (data[2].max() + data[2].min()) / 2
+    disp_y = datum_y - (data[3].max() + data[3].min()) / 2
+
+    # translation
+    data[2] = data[2].add(disp_x)
+    data[3] = data[3].add(disp_y)
+
+    return data
+
+def combine2txt(input, output):
+
+    input[2] = input[2].sub(60)
+    data = input.append(output, ignore_index=True)
+
+    return data
+
+def demo_post(args):
+
+    test_all_output = translation(f'{args.save_path}/test_char/test_all_output.txt')
+
+    if args.combine:
+        test_all_input = translation(f'{args.save_path}/test_char/test_all_input.txt')
+
+        # combine input and output txt files
+        demo_data = combine2txt(test_all_input, test_all_output)
+
+    else:
+        demo_data = test_all_output
+
+    # initial position
+    init_pos = pd.DataFrame([['movl', '0', '0', '0', '0', '0', '0', '0', '100.0']])
+    init_pos[9] = demo_data.iloc[-1, 9]
+    demo_data = demo_data.append(init_pos, ignore_index=True)
+
+    # store to USB
+    demo_data.to_csv(f'{args.usb_path}/demo_output.txt', header=False, index=False, sep=' ')
+
+    print('Demo Postprocessing Finished!!!')

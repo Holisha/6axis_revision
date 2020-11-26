@@ -4,13 +4,13 @@ from torch.utils.data import DataLoader
 from argparse import ArgumentParser
 
 # system path
-sys.path.append(r'..')
-sys.path.append(r'../postprocessing')
-sys.path.append(r'../preprocessing')
-sys.path.append(r'../model')
+sys.path.append(r'../src/')
+sys.path.append(r'../src/postprocessing')
+sys.path.append(r'../src/preprocessing')
+sys.path.append(r'../src/model')
 
 # self defined
-from demo_utils import argument_setting, timer
+from demo_utils import (argument_setting, timer, demo_post)
 from preprocessing import preprocessor
 from postprocessing import (postprocessor, verification)
 from model import FeatureExtractor
@@ -122,12 +122,12 @@ def efficient_demo(args,noise=0,test_char=42):
     )
 
     print('\n===================================================')
-    # construction env first
-    model, critetion, extractor = model_env(args)
+
+    # construction dataset
     data_loader = data_env(args)
 
     exe_stat.append(
-        demo_eval(model, data_loader, critetion, args, extractor)
+        demo_eval(args.model, data_loader, args.critetion, args, args.extractor)
     )
 
     print('\n===================================================')
@@ -139,6 +139,12 @@ def efficient_demo(args,noise=0,test_char=42):
     exe_stat.append(
         verification(args)
     )
+
+    if args.usb_path != None:
+        print('\n===================================================')
+        exe_stat.append(
+            demo_post(args)
+        )
 
     print('\n===================================================')
     print(f'Testing number {args.test_char} with noise {args.noise}, Done!!!')
@@ -226,12 +232,18 @@ def demo(args,noise=0,test_char=42):
         verification(args)
     )
 
+    if args.usb_path != None:
+        print('\n===================================================')
+        exe_stat.append(
+            demo_post(args)
+        )
+
     print('\n===================================================')
     print(f'Testing number {args.test_char} with noise {args.noise}, Done!!!')
 
-def demo_main(eff=False,gui=False,noise=0,word_idx=42):
+def demo_main(args, noise=0, word_idx=42):
     # argument setting
-    args = argument_setting()
+    # args = argument_setting()
 
     # config
     # model_config(args, save=False)   # print model configuration of evaluation
@@ -246,11 +258,11 @@ def demo_main(eff=False,gui=False,noise=0,word_idx=42):
 
         postprocessor = timer(postprocessor)
         verification = timer(verification)
+        copy2usb = timer(copy2usb)
+        translation = timer(translation)
 
-    args.efficient=eff
-    args.gui = gui
     # execution main function
-    demo_func = efficient_demo if args.efficient else demo
+    demo_func = efficient_demo if not args.nonefficient else demo
     if args.gui:
         demo_func(args,noise,word_idx)
     else:
@@ -259,7 +271,7 @@ def demo_main(eff=False,gui=False,noise=0,word_idx=42):
     # timer statistics
     if args.timer:
         import pandas as pd
-        stat = pd.DataFrame(exe_stat, index=['preprocessor', 'demo_efficient', 'postprocessor', 'verification'], columns=['time'])
+        stat = pd.DataFrame(exe_stat, index=['preprocessor', 'demo_efficient', 'postprocessor', 'verification', 'translation', 'copy2usb'], columns=['time'])
 
         stat['percent'] = stat / stat.sum() * 100
 
@@ -268,3 +280,8 @@ def demo_main(eff=False,gui=False,noise=0,word_idx=42):
         )
         print(f'\nperformance statistics:\n{stat}')
         print(f'total execution time: {stat["time"].sum()}')
+
+if __name__ == '__main__':
+    # argument setting
+    args = argument_setting()
+    demo_main(args)
