@@ -4,10 +4,10 @@ from torch.utils.data import DataLoader
 from argparse import ArgumentParser
 
 # system path
-sys.path.append(r'..')
-sys.path.append(r'../postprocessing')
-sys.path.append(r'../preprocessing')
-sys.path.append(r'../model')
+sys.path.append(r'../src/')
+sys.path.append(r'../src/postprocessing')
+sys.path.append(r'../src/preprocessing')
+sys.path.append(r'../src/model')
 
 # self defined
 from demo_utils import (argument_setting, timer, demo_post)

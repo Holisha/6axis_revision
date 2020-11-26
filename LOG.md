@@ -21,6 +21,16 @@
 
 ## Version 7
 
+### 11/26 - fan
+
+- refactor: reconstruct project
+	- `update` divide project into: `demo`, `src`, `doc`, `dataset`
+		- `src`: source code
+		- `demo`: demo scripts
+		- `doc`: documents
+		- `dataset`: dataset for training
+	- `remove`: remove some file in `doc`
+
 ### 11/26 - jefflin
 
 - Add combine input and output txt files

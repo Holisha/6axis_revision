@@ -45,14 +45,14 @@ def argument_setting():
                         help='set the length of each stroke (default: 4)')
 
     # dataset path
-    parser.add_argument('--root-path', type=str, default='./dataset/',
-                        help='set the root path (default: ./dataset/)')
-    parser.add_argument('--input-path', type=str, default='./dataset/6axis/',
-                        help='set the path of the original datas (default: ./dataset/6axis/)')
-    parser.add_argument('--test-path', type=str, default='./dataset/test/',
-                        help='set the path of the testing datas (default: ./dataset/test/)')
-    parser.add_argument('--target-path', type=str, default='./dataset/target/',
-                        help="target dataset path (default: './dataset/target/')")
+    parser.add_argument('--root-path', type=str, default='../dataset/',
+                        help='set the root path (default: ../dataset/)')
+    parser.add_argument('--input-path', type=str, default='../dataset/6axis/',
+                        help='set the path of the original datas (default: ../dataset/6axis/)')
+    parser.add_argument('--test-path', type=str, default='../dataset/test/',
+                        help='set the path of the testing datas (default: ../dataset/test/)')
+    parser.add_argument('--target-path', type=str, default='../dataset/target/',
+                        help="target dataset path (default: '../dataset/target/')")
 
     # for preprocessor setting
     parser.add_argument('--less', action='store_true', default=False,
