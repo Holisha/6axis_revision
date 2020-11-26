@@ -33,6 +33,9 @@
 
 ### 11/26 - jefflin
 
+- Update initial position
+    - `update`: In `demo_utils.py`: update initial position
+
 - Add combine input and output txt files
     - `new`: In `demo.py` and `demo_utils`:
         - add combine input and output txt files
