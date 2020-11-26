@@ -21,6 +21,25 @@
     |   LOG.md
     |   README.md
     |
+    +---dataset
+    |   +---6axis
+    |   |       char00001_stroke.txt
+    |   |       ...
+    |   |
+    |   +---target
+    |   |   +---0001
+    |   |   |   +---01
+    |   |   |           0001_01.npy
+    |   |   |
+    |   |   +---0002 ...
+    |   |
+    |   +---test
+    |   |   +---0042
+    |   |       +---01
+    |   |       |       0042_01_0001.npy
+    |   |       |
+    |   |       +---02 ...
+    |   |
     +---demo
     |   |   .gitignore
     |   |   README.md
@@ -42,21 +61,13 @@
     |   |           tools.py
     |   |           
     |   +---imgs
-    |           BING.jpg
-    |           SHA.jpg
-    |           SHI.jpg
-    |           YIN.jpg
-    |           YONG.jpg
-    |           YONG.png
-    |           YONG_input.png
-    |           dot-removebg-preview.png
-    |           images-removebg-preview.png
-    |           loading.gif
-    |           mm.png
-    |           monkey.png
-    |           mountain.png
-    |           red_blue.png
-    |           
+    |   |       ...
+    |   |       
+    |   +---logs
+    |       +---FSRCNN
+    |           +---version_0
+    |                   FSRCNN_1x.pt
+    |
     +---doc
     |       sampleV4.json
     |       sampleV4.yaml
