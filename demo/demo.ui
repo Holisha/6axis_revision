@@ -224,25 +224,6 @@ background-color: #FFFACD;
      </item>
     </layout>
    </widget>
-   <widget class="QLabel" name="label_3">
-    <property name="geometry">
-     <rect>
-      <x>-80</x>
-      <y>-10</y>
-      <width>1381</width>
-      <height>911</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap>imgs/mm.png</pixmap>
-    </property>
-    <property name="scaledContents">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_4">
     <property name="geometry">
      <rect>
@@ -279,9 +260,9 @@ background-color: #FFFACD;
     <property name="geometry">
      <rect>
       <x>70</x>
-      <y>140</y>
-      <width>291</width>
-      <height>121</height>
+      <y>130</y>
+      <width>301</width>
+      <height>131</height>
      </rect>
     </property>
     <property name="text">
@@ -370,48 +351,10 @@ background-color: #FFFACD;
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt; font-weight:600;&quot;&gt;細線化對照圖&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QLabel" name="monkey">
-    <property name="geometry">
-     <rect>
-      <x>890</x>
-      <y>620</y>
-      <width>231</width>
-      <height>271</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap>imgs/monkey.png</pixmap>
-    </property>
-    <property name="scaledContents">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_8">
-    <property name="geometry">
-     <rect>
-      <x>300</x>
-      <y>710</y>
-      <width>251</width>
-      <height>191</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap>imgs/images-removebg-preview.png</pixmap>
-    </property>
-    <property name="scaledContents">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_14">
     <property name="geometry">
      <rect>
-      <x>-380</x>
+      <x>-350</x>
       <y>-130</y>
       <width>691</width>
       <height>431</height>
@@ -446,26 +389,6 @@ background-color: #FFFACD;
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QLabel" name="label_16">
-    <property name="geometry">
-     <rect>
-      <x>340</x>
-      <y>710</y>
-      <width>181</width>
-      <height>151</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap>C:/Users/ASUS/Pictures/hand.png</pixmap>
-    </property>
-    <property name="scaledContents">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <zorder>label_3</zorder>
    <zorder>label_11</zorder>
    <zorder>label_15</zorder>
    <zorder>label_14</zorder>
@@ -481,10 +404,7 @@ background-color: #FFFACD;
    <zorder>label_10</zorder>
    <zorder>label_12</zorder>
    <zorder>label_13</zorder>
-   <zorder>monkey</zorder>
    <zorder>label_2</zorder>
-   <zorder>label_16</zorder>
-   <zorder>label_8</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
