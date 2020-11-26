@@ -17,14 +17,14 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>30</x>
+      <x>20</x>
       <y>20</y>
-      <width>141</width>
-      <height>51</height>
+      <width>211</width>
+      <height>81</height>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">font: 16pt &quot;Arial&quot;;
+     <string notr="true">font: 26pt &quot;Arial&quot;;
 color:white</string>
     </property>
     <property name="text">
@@ -35,13 +35,22 @@ color:white</string>
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>80</y>
-      <width>141</width>
-      <height>51</height>
+      <y>110</y>
+      <width>201</width>
+      <height>81</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <pointsize>26</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
     <property name="styleSheet">
-     <string notr="true">font: 16pt &quot;Arial&quot;;color:white</string>
+     <string notr="true">font: 26pt &quot;Arial&quot;;color:white</string>
     </property>
     <property name="text">
      <string>字體選擇:</string>
@@ -50,10 +59,10 @@ color:white</string>
    <widget class="QDoubleSpinBox" name="doubleSpinBox">
     <property name="geometry">
      <rect>
-      <x>160</x>
-      <y>20</y>
-      <width>151</width>
-      <height>51</height>
+      <x>240</x>
+      <y>0</y>
+      <width>211</width>
+      <height>91</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -79,10 +88,10 @@ background-color: #FFFACD</string>
    <widget class="QComboBox" name="comboBox">
     <property name="geometry">
      <rect>
-      <x>160</x>
-      <y>80</y>
-      <width>151</width>
-      <height>51</height>
+      <x>240</x>
+      <y>100</y>
+      <width>211</width>
+      <height>91</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -118,8 +127,8 @@ background-color: #FFFACD</string>
    <widget class="QLabel" name="label_6">
     <property name="geometry">
      <rect>
-      <x>290</x>
-      <y>230</y>
+      <x>250</x>
+      <y>350</y>
       <width>141</width>
       <height>38</height>
      </rect>
@@ -137,10 +146,10 @@ background-color: #FFFACD</string>
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>340</x>
-      <y>80</y>
-      <width>151</width>
-      <height>51</height>
+      <x>510</x>
+      <y>100</y>
+      <width>211</width>
+      <height>91</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -156,9 +165,9 @@ background-color: #FFFACD;
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>270</y>
-      <width>1795</width>
-      <height>741</height>
+      <y>390</y>
+      <width>1831</width>
+      <height>621</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -167,10 +176,13 @@ background-color: #FFFACD;
      </property>
      <item>
       <widget class="QLabel" name="input">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="maximumSize">
         <size>
-         <width>400</width>
-         <height>400</height>
+         <width>600</width>
+         <height>600</height>
         </size>
        </property>
        <property name="text">
@@ -188,8 +200,8 @@ background-color: #FFFACD;
       <widget class="QLabel" name="target">
        <property name="maximumSize">
         <size>
-         <width>400</width>
-         <height>400</height>
+         <width>600</width>
+         <height>600</height>
         </size>
        </property>
        <property name="text">
@@ -207,8 +219,8 @@ background-color: #FFFACD;
       <widget class="QLabel" name="slim">
        <property name="maximumSize">
         <size>
-         <width>400</width>
-         <height>400</height>
+         <width>600</width>
+         <height>600</height>
         </size>
        </property>
        <property name="text">
@@ -240,8 +252,8 @@ background-color: #FFFACD;
    <widget class="QLabel" name="label_9">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>120</y>
+      <x>140</x>
+      <y>240</y>
       <width>371</width>
       <height>221</height>
      </rect>
@@ -259,8 +271,8 @@ background-color: #FFFACD;
    <widget class="QLabel" name="label_10">
     <property name="geometry">
      <rect>
-      <x>830</x>
-      <y>230</y>
+      <x>850</x>
+      <y>340</y>
       <width>141</width>
       <height>38</height>
      </rect>
@@ -278,10 +290,10 @@ background-color: #FFFACD;
    <widget class="QLabel" name="label_11">
     <property name="geometry">
      <rect>
-      <x>720</x>
-      <y>100</y>
-      <width>391</width>
-      <height>241</height>
+      <x>740</x>
+      <y>210</y>
+      <width>401</width>
+      <height>261</height>
      </rect>
     </property>
     <property name="text">
@@ -297,8 +309,8 @@ background-color: #FFFACD;
    <widget class="QLabel" name="label_12">
     <property name="geometry">
      <rect>
-      <x>1280</x>
-      <y>70</y>
+      <x>1380</x>
+      <y>190</y>
       <width>381</width>
       <height>291</height>
      </rect>
@@ -316,8 +328,8 @@ background-color: #FFFACD;
    <widget class="QLabel" name="label_13">
     <property name="geometry">
      <rect>
-      <x>1360</x>
-      <y>240</y>
+      <x>1450</x>
+      <y>350</y>
       <width>201</width>
       <height>31</height>
      </rect>
@@ -335,10 +347,10 @@ background-color: #FFFACD;
    <widget class="QLabel" name="label_14">
     <property name="geometry">
      <rect>
-      <x>-350</x>
-      <y>-130</y>
-      <width>691</width>
-      <height>431</height>
+      <x>-1010</x>
+      <y>-470</y>
+      <width>1761</width>
+      <height>1121</height>
      </rect>
     </property>
     <property name="text">
