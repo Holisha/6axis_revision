@@ -118,11 +118,11 @@
 
 ## Demo
 - To run the demo of evaluating process
-    1. Copy `dataset/` in `demo.tar.gz` to `6axis_revision/` .
+    1. Extract `demo.tar.gz`  
+    
+    2. put `dataset/` under `6axis_revision/` 
    
-    2. Copy `logs/` in `demo.tar.gz` to `demo/` .
-
-    3. Move to `demo/` folder.
+    3. put `logs/` under `demo/` .
 
     4. Run the following command in shell.
         ```shell
