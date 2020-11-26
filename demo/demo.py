@@ -10,7 +10,7 @@ sys.path.append(r'../preprocessing')
 sys.path.append(r'../model')
 
 # self defined
-from demo_utils import (argument_setting, timer, copy2usb, translation)
+from demo_utils import (argument_setting, timer, demo_post)
 from preprocessing import preprocessor
 from postprocessing import (postprocessor, verification)
 from model import FeatureExtractor
@@ -122,14 +122,12 @@ def efficient_demo(args,noise=0,test_char=42):
     )
 
     print('\n===================================================')
-    # construction env first
-    model, critetion, extractor = model_env(args)
 
     # construction dataset
     data_loader = data_env(args)
 
     exe_stat.append(
-        demo_eval(model, data_loader, critetion, args, extractor)
+        demo_eval(args.model, data_loader, args.critetion, args, args.extractor)
     )
 
     print('\n===================================================')
@@ -145,15 +143,7 @@ def efficient_demo(args,noise=0,test_char=42):
     if args.usb_path != None:
         print('\n===================================================')
         exe_stat.append(
-            translation(
-                f'{args.save_path}/test_char/test_all_output.txt'
-            )
-        )
-        exe_stat.append(
-            copy2usb(
-                f'{args.save_path}/test_char/test_all_output.txt',
-                f'{args.usb_path}/test_all_output.txt'
-            )
+            demo_post(args)
         )
 
     print('\n===================================================')
@@ -245,15 +235,7 @@ def demo(args,noise=0,test_char=42):
     if args.usb_path != None:
         print('\n===================================================')
         exe_stat.append(
-            translation(
-                f'{args.save_path}/test_char/test_all_output.txt'
-            )
-        )
-        exe_stat.append(
-            copy2usb(
-                f'{args.save_path}/test_char/test_all_output.txt',
-                f'{args.usb_path}/test_all_output.txt'
-            )
+            demo_post(args)
         )
 
     print('\n===================================================')
@@ -280,7 +262,7 @@ def demo_main(args, noise=0, word_idx=42):
         translation = timer(translation)
 
     # execution main function
-    demo_func = efficient_demo if args.efficient else demo
+    demo_func = efficient_demo if not args.nonefficient else demo
     if args.gui:
         demo_func(args,noise,word_idx)
     else:
