@@ -14,7 +14,7 @@ word_idx=42
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        QtWidgets.QMainWindow.setFixedSize(self,1600,800)
+        QtWidgets.QMainWindow.setFixedSize(self,1600,400)
         self.webview = WebEngineView()
         self.webview.load(QtCore.QUrl(meetingUrl))
         self.setCentralWidget(self.webview)
@@ -96,7 +96,10 @@ if __name__ == "__main__":
         w = loadUi('demo.ui')
         windows.append(w)
         ui=ExComboBox(w)
+        w.label.setScaledContents(True)
         w.pushButton.clicked.connect(lambda: go_web(args))
+        # w.showFullScreen()
+        # w.setFixedSize(800,800)
         w.show()
         app.exec_()
     else:
