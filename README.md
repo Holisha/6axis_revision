@@ -133,7 +133,9 @@
     
     2. put `dataset/` under `6axis_revision/` 
    
-    3. put `logs/` under `demo/` .
+    3. put `logs/` under `demo/` 
+
+    4. cd `demo/`
 
     4. Run the following command in shell.
         ```shell
