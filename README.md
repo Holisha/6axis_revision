@@ -131,14 +131,13 @@
 - To run the demo of evaluating process
     1. Extract `demo.tar.gz`  
     
-    2. put `dataset/` under `6axis_revision/` 
+    2. Put `dataset/` under `6axis_revision/` 
    
-    3. put `logs/` under `demo/` 
-
-    4. cd `demo/`
+    3. Put `logs/` under `demo/` 
 
     4. Run the following command in shell.
         ```shell
+        cd `demo/`
         python demo.py
         ```
 
