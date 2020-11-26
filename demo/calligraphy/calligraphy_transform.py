@@ -148,7 +148,7 @@ class calligraphy_transform():
         
         if plot:
             plt.savefig(f'{save_path}.png')
-            print(f'{save_path}.png')
+            # print(f'{save_path}.png')
             plt.close()
             # plt.show()
             

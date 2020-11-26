@@ -22,6 +22,16 @@
 ## Version 7
 
 ### 11/26 - jefflin
+
+- Add combine input and output txt files
+    - `new`: In `demo.py` and `demo_utils`:
+        - add combine input and output txt files
+    - `update`: In `project.py` and `demo.py`:
+        - move construction env to reduce execution time
+    - `update`: In `demo.py` and `demo_utils`:
+        - improve demo post-processing
+    - `other`: In `calligraphy_transform.py`: comment print
+
 - Add translation to demo processing
     - `update`: In `demo.py` and `demo_utils.py`: update parameters
     - `new`: In `demo.py` and `demo_utils.py`:

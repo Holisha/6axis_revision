@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5 import QtCore,QtGui,QtWidgets,QtWebEngineWidgets
-from demo import demo_main
+from demo import demo_main, model_env
 from calligraphy.code import draw_pic
 from demo_utils import argument_setting
 
@@ -86,7 +86,11 @@ def go_web(args):
 
 if __name__ == "__main__":
     args = argument_setting()
-    
+
+    # construction env first
+    if not args.nonefficient:
+        args.model, args.critetion, args.extractor = model_env(args)
+
     if args.gui:
         app = QApplication(sys.argv)
         w = loadUi('demo.ui')
