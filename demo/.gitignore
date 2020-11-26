@@ -1,6 +1,2 @@
-dataset/
 logs/
-*.tar.gz
 output/
-test_output/
-events.out.tfevents*

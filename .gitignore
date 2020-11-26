@@ -8,6 +8,7 @@ gui.py
 # log
 logs/*
 config.*
+events.out.tfevents*
 
 # temporary file
 tmp.*
