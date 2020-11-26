@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1300</width>
-    <height>913</height>
+    <width>3022</width>
+    <height>1417</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -118,8 +118,8 @@ background-color: #FFFACD</string>
    <widget class="QLabel" name="label_6">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>180</y>
+      <x>290</x>
+      <y>230</y>
       <width>141</width>
       <height>38</height>
      </rect>
@@ -155,10 +155,10 @@ background-color: #FFFACD;
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>220</y>
-      <width>1216</width>
-      <height>402</height>
+      <x>30</x>
+      <y>270</y>
+      <width>1795</width>
+      <height>741</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -224,25 +224,6 @@ background-color: #FFFACD;
      </item>
     </layout>
    </widget>
-   <widget class="QLabel" name="label_4">
-    <property name="geometry">
-     <rect>
-      <x>170</x>
-      <y>140</y>
-      <width>101</width>
-      <height>81</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap>imgs/mountain.png</pixmap>
-    </property>
-    <property name="scaledContents">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_5">
     <property name="geometry">
      <rect>
@@ -259,10 +240,10 @@ background-color: #FFFACD;
    <widget class="QLabel" name="label_9">
     <property name="geometry">
      <rect>
-      <x>70</x>
-      <y>130</y>
-      <width>301</width>
-      <height>131</height>
+      <x>180</x>
+      <y>120</y>
+      <width>371</width>
+      <height>221</height>
      </rect>
     </property>
     <property name="text">
@@ -278,8 +259,8 @@ background-color: #FFFACD;
    <widget class="QLabel" name="label_10">
     <property name="geometry">
      <rect>
-      <x>530</x>
-      <y>180</y>
+      <x>830</x>
+      <y>230</y>
       <width>141</width>
       <height>38</height>
      </rect>
@@ -297,10 +278,10 @@ background-color: #FFFACD;
    <widget class="QLabel" name="label_11">
     <property name="geometry">
      <rect>
-      <x>420</x>
-      <y>80</y>
-      <width>371</width>
-      <height>201</height>
+      <x>720</x>
+      <y>100</y>
+      <width>391</width>
+      <height>241</height>
      </rect>
     </property>
     <property name="text">
@@ -316,8 +297,8 @@ background-color: #FFFACD;
    <widget class="QLabel" name="label_12">
     <property name="geometry">
      <rect>
-      <x>830</x>
-      <y>20</y>
+      <x>1280</x>
+      <y>70</y>
       <width>381</width>
       <height>291</height>
      </rect>
@@ -335,8 +316,8 @@ background-color: #FFFACD;
    <widget class="QLabel" name="label_13">
     <property name="geometry">
      <rect>
-      <x>910</x>
-      <y>180</y>
+      <x>1360</x>
+      <y>240</y>
       <width>201</width>
       <height>31</height>
      </rect>
@@ -389,17 +370,16 @@ background-color: #FFFACD;
      <bool>true</bool>
     </property>
    </widget>
+   <zorder>label_9</zorder>
    <zorder>label_11</zorder>
    <zorder>label_15</zorder>
    <zorder>label_14</zorder>
-   <zorder>label_4</zorder>
    <zorder>label</zorder>
    <zorder>doubleSpinBox</zorder>
    <zorder>comboBox</zorder>
    <zorder>pushButton</zorder>
    <zorder>layoutWidget</zorder>
    <zorder>label_5</zorder>
-   <zorder>label_9</zorder>
    <zorder>label_6</zorder>
    <zorder>label_10</zorder>
    <zorder>label_12</zorder>
