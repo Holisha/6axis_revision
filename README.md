@@ -1,6 +1,5 @@
 # 6 Axis Revision 
 
-<<<<<<< HEAD
 - [6 Axis Revision](#6-axis-revision)
   - [Introduction](#introduction)
   - [Folder structure](#folder-structure)
@@ -10,12 +9,10 @@
     - [model parameter](#model-parameter)
   - [Pretained model](#pretained-model)
   - [Eval](#eval)
-=======
 - [TOC]
 - Version: 5.0
     - update at 2020/8/30
 
->>>>>>> a865e98bdc97a7f22a2ba8d106269b90d5458f3e
 ## Introduction
 
 - This project is aiming at revise calligraphy words based on CNN method.
