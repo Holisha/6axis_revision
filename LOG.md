@@ -1,11 +1,14 @@
 # project log
 
+<<<<<<< HEAD
 - [toc]
 
 ## TODO
 
 - remove try-except block
 
+=======
+>>>>>>> a865e98bdc97a7f22a2ba8d106269b90d5458f3e
 ## event type:
 
 - format: `event`: `where`: `what`
@@ -19,7 +22,12 @@
 - `doc`: add comment
 - `other`: TBD
 
+<<<<<<< HEAD
 ## Version 7
+
+### 11/27 - fan
+
+- doc: modified and detailed `README.md`
 
 ### 11/26 - fan
 
@@ -293,9 +301,15 @@
   - `fixed`: train_error.py: fix out2csv bug
   - `fixed`: In DBPN/init.py add ADBPN to call 
   - `update`: In .gitignore: Add `output-v5-1c779cab/` folder
+=======
+## Version 6
+
+## Version 5
+>>>>>>> a865e98bdc97a7f22a2ba8d106269b90d5458f3e
 
 ### 8/30 - fan
 
+- Merge to master branch
 - Add new model ADBPN and remove output dir
 	- `new`: In model/DBPN/models.py: add new model ADBPN
 	- `new`: In utils.py: now can call new model by `--model-name ADBPN`

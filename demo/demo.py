@@ -2,7 +2,7 @@ import sys,os
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5 import QtCore,QtGui,QtWidgets,QtWebEngineWidgets
+from PyQt5 import QtCore,QtGui,QtWidgets
 from project import demo_main, model_env
 from calligraphy.code import draw_pic
 from demo_utils import argument_setting
@@ -11,22 +11,22 @@ windows = []
 meetingUrl="https://meet.google.com/ose-krmk-zzg"
 noise=0
 word_idx=42
-class MainWindow(QtWidgets.QMainWindow):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        QtWidgets.QMainWindow.setFixedSize(self,1600,400)
-        self.webview = WebEngineView()
-        self.webview.load(QtCore.QUrl(meetingUrl))
-        self.setCentralWidget(self.webview)
-class WebEngineView(QtWebEngineWidgets.QWebEngineView):
-    windows = [] #创建一个容器存储每个窗口，不然会崩溃，因为是createwindow函数里面的临时变量
-    def createWindow(self, QWebEnginePage_WebWindowType):
-        newtab =   WebEngineView()
-        newwindow= MainWindow()
-        newwindow.setCentralWidget(newtab)
-        newwindow.show()
-        self.windows.append(newwindow)
-        return newtab
+# class MainWindow(QtWidgets.QMainWindow):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         QtWidgets.QMainWindow.setFixedSize(self,1600,400)
+#         self.webview = WebEngineView()
+#         self.webview.load(QtCore.QUrl(meetingUrl))
+#         self.setCentralWidget(self.webview)
+# class WebEngineView(QtWebEngineWidgets.QWebEngineView):
+#     windows = [] #创建一个容器存储每个窗口，不然会崩溃，因为是createwindow函数里面的临时变量
+#     def createWindow(self, QWebEnginePage_WebWindowType):
+#         newtab =   WebEngineView()
+#         newwindow= MainWindow()
+#         newwindow.setCentralWidget(newtab)
+#         newwindow.show()
+#         self.windows.append(newwindow)
+#         return newtab
         
 class ExComboBox(object):
     def __init__(self,w):
