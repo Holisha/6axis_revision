@@ -21,25 +21,16 @@
     |   .gitignore
     |   LOG.md
     |   README.md
+    |   requirements.txt
     |
     +---dataset
     |   +---6axis
-    |   |       char00001_stroke.txt
-    |   |       ...
     |   |
     |   +---target
-    |   |   +---0001
-    |   |   |   +---01
-    |   |   |           0001_01.npy
-    |   |   |
-    |   |   +---0002 ...
     |   |
     |   +---test
-    |   |   +---0042
-    |   |       +---01
-    |   |       |       0042_01_0001.npy
-    |   |       |
-    |   |       +---02 ...
+    |   |
+    |   +---train
     |   |
     +---demo
     |   |   .gitignore
@@ -62,7 +53,6 @@
     |   |           tools.py
     |   |           
     |   +---imgs
-    |   |       ...
     |   |       
     |   +---logs
     |       +---FSRCNN
@@ -73,7 +63,10 @@
     |       sampleV4.json
     |       sampleV4.yaml
     |       
+    +---output-train
+    |
     +---src
+        |   .gitignore
         |   __init__.py
         |   dataset.py
         |   eval.py
@@ -85,6 +78,8 @@
         |   
         +---light
         |       fsrcnn.py
+        |       
+        +---logs
         |       
         +---model
         |   |   __init__.py
@@ -133,13 +128,14 @@
 - To run the demo of evaluating process
     1. Extract folder `dataset/` in `demo.tar.gz` under `6axis_revision/`
     2. Extract folder `logs/` in `demo.tar.gz` under `demo/`
-    3. Change directory to `demo/`.
-    4. Run the following command in shell.
+    3. See [Folder structure](#Folder-structure) to make sure.
+    4. Change directory to `demo/`.
+    5. Run the following command in shell.
     ```shell
     python demo.py
     ```
-    5. Input the character number and the range of noise.
-    6. Program will display the test loss on the screen.
+    6. Input the character number and the range of noise.
+    7. Program will display the test loss on the screen.
 - You could add `--gui` argument to run for GUI, also add `--usb-path` to store the demo files to USB or others path . Example:
 ```shell
 python demo.py --gui --usb-path USB_PATH
@@ -150,12 +146,13 @@ python demo.py --gui --usb-path USB_PATH
 - Training process is to train the model.
 - To run the training process
     1. Extract folder `train/` in `full-inter-train.tar.gz` under `dataset/`
-    2. Change directory to `src/`.
-    3. Run the following command in shell to execute the default environment.
-        ```shell
-        python train.py --doc ../doc/sample_trainV7.yaml
-        ```
-    4. Program will display the training loss on the screen.
+    2. See [Folder structure](#Folder-structure) to make sure.
+    3. Change directory to `src/`.
+    4. Run the following command in shell to execute the default environment.
+    ```shell
+    python train.py --doc ../doc/sample_trainV7.yaml
+    ```
+    5. Program will display the training loss on the screen.
 - The training result, including input, output and target of Robot command file, and 2D visualization compare picture, will store in `output-train/`.
 - You could run the flollowing command to track and visualizing metrics such as loss
   ```
