@@ -23,6 +23,11 @@
 
 ### 11/29 - jefflin
 
+- Add sample YAML, update README.md and fix `demo_post` bug
+    - `new`: Add `sample_trainV7.yaml`
+    - `update`: Update `demo/README.md`
+    - `update`: In `train.py`: Fix `demo_post` bug
+
 - Update README.md
 
 - Update traing envirnoment

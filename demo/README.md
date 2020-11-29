@@ -1,4 +1,6 @@
 # Automatic processing for 6axis_revision Project
+> <span style="color:red">**Please see the new verion in `6axis_revision/README.md` . Here is the old and WRONG version.**</span>
+
 > 開發及維護人員: jefflin
 
 > 最新更新時間: 2020/11/17

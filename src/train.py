@@ -115,10 +115,6 @@ def train_argument(inhert=False):
     parser.add_argument('--out-num', type=int, default=5,
                         help='Set the number of model porcess data to get in one epoch. (default: 5)')
 
-    # demo postprocessing Setting
-    parser.add_argument('--demo-post', action='store_true', default=False,
-                        help='Just post-process the demo required files (default: False)')
-
     # for the compatiable
     if inhert is True:
         return parser
@@ -410,5 +406,7 @@ if __name__ == '__main__':
 
     # config
     model_config(train_args, save=False)     # print model configuration after training
+
+    train_args.demo_post = False
 
     postprocessor(train_args)

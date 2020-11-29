@@ -6,7 +6,7 @@
   - [Requirements and Dependencies](#requirements-and-dependencies)
   - [Demo](#demo)
   - [Training](#training)
-    - [model parameter](#model-parameter)
+    - [Model parameter](#model-parameter)
   - [Pretained model](#pretained-model)
   - [Eval](#eval)
 
@@ -128,14 +128,14 @@
 - To run the demo of evaluating process
     1. Extract folder `dataset/` in `demo.tar.gz` under `6axis_revision/`
     2. Extract folder `logs/` in `demo.tar.gz` under `demo/`
-    3. See [Folder structure](#Folder-structure) to make sure.
-    4. Change directory to `demo/`.
-    5. Run the following command in shell.
+       - You could see [Folder structure](#Folder-structure) to make sure.
+    3. Change directory to `demo/`.
+    4. Run the following command in shell.
     ```shell
     python demo.py
     ```
-    6. Input the character number and the range of noise.
-    7. Program will display the test loss on the screen.
+    5. Input the character number and the range of noise.
+    6. Program will display the test loss on the screen.
 - You could add `--gui` argument to run for GUI, also add `--usb-path` to store the demo files to USB or others path . Example:
 ```shell
 python demo.py --gui --usb-path USB_PATH
@@ -146,15 +146,19 @@ python demo.py --gui --usb-path USB_PATH
 - Training process is to train the model.
 - To run the training process
     1. Extract folder `train/` in `full-inter-train.tar.gz` under `dataset/`
-    2. See [Folder structure](#Folder-structure) to make sure.
-    3. Change directory to `src/`.
-    4. Run the following command in shell to execute the default environment.
-    ```shell
-    python train.py --doc ../doc/sample_trainV7.yaml
-    ```
-    5. Program will display the training loss on the screen.
+       - You could see [Folder structure](#Folder-structure) to make sure.
+    2. Change directory to `src/`.
+    3. Run the following command in shell to execute the default environment.
+        ```shell
+        python train.py --doc ../doc/sample_trainV7.yaml
+        ```
+        - Default environment:
+          - Model: FSRCNN
+          - Epochs: 10
+          - Dataset: Dataset for Demo ( 900 characters )
+    4. Program will display the training loss on the screen.
 - The training result, including input, output and target of Robot command file, and 2D visualization compare picture, will store in `output-train/`.
-- You could run the flollowing command to track and visualizing metrics such as loss
+- You could run the following command to track and visualizing metrics such as loss. ( Also Run in `src/` )
   ```
   tensorboard --logdir ./logs/
   ```
@@ -163,9 +167,9 @@ python demo.py --gui --usb-path USB_PATH
     ```
     python train.py --gpu-id 0 ...
     ```
-- Please check `doc/sample_trainV7.yaml` in detail
+- Please check `doc/sample_trainV7.yaml` in detail.
     
-### model parameter
+### Model parameter
 
 - learning rate:
     - FSRCNN: 1e-3
