@@ -9,9 +9,6 @@
     - [model parameter](#model-parameter)
   - [Pretained model](#pretained-model)
   - [Eval](#eval)
-- [TOC]
-- Version: 5.0
-    - update at 2020/8/30
 
 ## Introduction
 
@@ -162,7 +159,7 @@ python demo.py --gui --usb-path USB_PATH
     ```
 
 - please check `doc/sampleV4.yaml` in detail
-
+    
 ### model parameter
 
 - learning rate:
