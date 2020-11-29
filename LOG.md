@@ -22,6 +22,9 @@
 ## Version 7
 
 ### 11/29 - jefflin
+
+- Update README.md
+
 - Update traing envirnoment
     - `new`: In `train.py`: add `--demo-post` argument
     - `fixed`: in `postprocessor.py`: fix input_path bug
