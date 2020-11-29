@@ -8,7 +8,7 @@ from axis2img import axis2img
 from csv2txt import csv2txt
 from post_utils import get_len, argument_setting
 
-def postprocessor_dir(dir_path, csv_list, path, input_path, args):
+def postprocessor_dir(dir_path, csv_list, path, args):
     """Do postprocessor to the directory
 
     Args:
@@ -82,6 +82,11 @@ def postprocessor_dir(dir_path, csv_list, path, input_path, args):
     # save test char file
     if test_target.shape[0] != 0:
 
+        if args.input_path == None:
+            input_path = '/home/jeff/6axis/'
+        else:
+            input_path = args.input_path
+
         # 採用刪除法，較快
         drop_list = compare(test_target.round(4), dir_path, input_path, args)
         test_target, test_input, test_output = inverse_len(test_target, test_input, test_output, drop_list)
@@ -138,7 +143,7 @@ def compare(test_target, path, input_path, args):
     return drop_list
 
 def inverse_len(test_target, test_input, test_output, drop_list):
-
+	
     test_target = test_target.drop(drop_list).reset_index(drop=True)
     test_input = test_input.drop(drop_list).reset_index(drop=True)
     test_output = test_output.drop(drop_list).reset_index(drop=True)
@@ -152,10 +157,6 @@ def postprocessor(args):
         path (string, optional): the path of the output directory.
     """
     path = args.save_path
-    if args.input_path == None:
-        input_path = '/home/jeff/6axis/'
-    else:
-        input_path = args.input_path
 
     # check the path exists or not
     if not os.path.exists(path):
@@ -168,7 +169,7 @@ def postprocessor(args):
         csv_files = sorted(list(filter(lambda x: re.match(r'(.*).csv', x), files)))
 
         # postprocess
-        postprocessor_dir(root, csv_files, path, input_path, args)
+        postprocessor_dir(root, csv_files, path, args)
 
         print(f'{root}\tfinished...')
 
