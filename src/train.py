@@ -407,4 +407,6 @@ if __name__ == '__main__':
     # config
     model_config(train_args, save=False)     # print model configuration after training
 
+    train_args.demo_post = False
+
     postprocessor(train_args)

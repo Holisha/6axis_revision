@@ -6,9 +6,10 @@
   - [Requirements and Dependencies](#requirements-and-dependencies)
   - [Demo](#demo)
   - [Training](#training)
-    - [model parameter](#model-parameter)
+    - [Model parameter](#model-parameter)
   - [Pretained model](#pretained-model)
   - [Eval](#eval)
+
 ## Introduction
 
 - This project is aiming at revise calligraphy words based on CNN method.
@@ -20,25 +21,16 @@
     |   .gitignore
     |   LOG.md
     |   README.md
+    |   requirements.txt
     |
     +---dataset
     |   +---6axis
-    |   |       char00001_stroke.txt
-    |   |       ...
     |   |
     |   +---target
-    |   |   +---0001
-    |   |   |   +---01
-    |   |   |           0001_01.npy
-    |   |   |
-    |   |   +---0002 ...
     |   |
     |   +---test
-    |   |   +---0042
-    |   |       +---01
-    |   |       |       0042_01_0001.npy
-    |   |       |
-    |   |       +---02 ...
+    |   |
+    |   +---train
     |   |
     +---demo
     |   |   .gitignore
@@ -61,7 +53,6 @@
     |   |           tools.py
     |   |           
     |   +---imgs
-    |   |       ...
     |   |       
     |   +---logs
     |       +---FSRCNN
@@ -72,7 +63,10 @@
     |       sampleV4.json
     |       sampleV4.yaml
     |       
+    +---output-train
+    |
     +---src
+        |   .gitignore
         |   __init__.py
         |   dataset.py
         |   eval.py
@@ -84,6 +78,8 @@
         |   
         +---light
         |       fsrcnn.py
+        |       
+        +---logs
         |       
         +---model
         |   |   __init__.py
@@ -128,10 +124,11 @@
     ```
 
 ## Demo
-
+- Demo process includes `Pre-processing` (Building Testing Dataset)、`Evaluating` and `Post-processing`.
 - To run the demo of evaluating process
     1. Extract folder `dataset/` in `demo.tar.gz` under `6axis_revision/`
     2. Extract folder `logs/` in `demo.tar.gz` under `demo/`
+       - You could see [Folder structure](#Folder-structure) to make sure.
     3. Change directory to `demo/`.
     4. Run the following command in shell.
     ```shell
@@ -146,20 +143,33 @@ python demo.py --gui --usb-path USB_PATH
 - The evaluating result, including input, output and target of Robot command file, and 2D visualization compare picture, will store in `demo/output/test_char/`.
 
 ## Training
-
-- To train with document file
-    ```
-    python train.py --doc
-    ```
-
+- Training process is to train the model.
+- To run the training process
+    1. Extract folder `train/` in `full-inter-train.tar.gz` under `dataset/`
+       - You could see [Folder structure](#Folder-structure) to make sure.
+    2. Change directory to `src/`.
+    3. Run the following command in shell to execute the default environment.
+        ```shell
+        python train.py --doc ../doc/sample_trainV7.yaml
+        ```
+        - Default environment:
+          - Model: FSRCNN
+          - Epochs: 10
+          - Dataset: Dataset for Demo ( 900 characters )
+    4. Program will display the training loss on the screen.
+- The training result, including input, output and target of Robot command file, and 2D visualization compare picture, will store in `output-train/`.
+- You could run the following command to track and visualizing metrics such as loss. ( Also Run in `src/` )
+  ```
+  tensorboard --logdir ./logs/
+  ```
+  - Open http://localhost:6006/ in Web browser.
 - To train with argument vector
     ```
     python train.py --gpu-id 0 ...
     ```
-
-- please check `doc/sampleV4.yaml` in detail
+- Please check `doc/sample_trainV7.yaml` in detail.
     
-### model parameter
+### Model parameter
 
 - learning rate:
     - FSRCNN: 1e-3
