@@ -21,6 +21,18 @@
 
 ## Version 7
 
+### 12/1 - fan
+
+- refact: rename `project.py` to `demo_env.py`, combine global variable and refactor demo function
+	- `new`: In `demo.py`: Add `CalligrahpyUI` for modulation
+		- remain old version which is commented for safety
+		- now will execute `CalligraphyUI` by defaults.
+	- `fixed`: now can play `loading.gif`
+		- `bug`: `.gif` will be stopped by execution other function
+	- `rename`: rename  package `project.py` to `demo_env.py`
+	- `rename`: In `demo_utils.py`: rename flag `--nonefficient` to `--non-efficient`
+	- `update`: In `demo_env.py`: Add `from_terminal` to let terminal input and gui input apart for reability
+
 ### 11/29 - jefflin
 
 - Add sample YAML, update README.md and fix `demo_post` bug
