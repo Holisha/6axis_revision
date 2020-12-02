@@ -24,8 +24,8 @@
 ### 12/2 - fan
 
 - fix: move timer function to global, now can measure execution time through `demo_env.py` rather than `demo.py`
-	- `fixed`: In remove `timer` block in `demo_main`
-	- `new`: In `demo_env`: add first stroke position in `demo_post` to prevent from over-rotating
+	- `fixed`: In `demo_env` remove `timer` block in `demo_main`
+	- `new`: In `demo_utils`: add first stroke position in `demo_post` to prevent from over-rotating
 
 ### 12/1 - fan
 
