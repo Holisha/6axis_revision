@@ -1,5 +1,5 @@
 import sys
-sys.path.append('..')
+sys.path.append('../src')
 import time
 import pandas as pd
 from argparse import ArgumentParser
@@ -109,7 +109,7 @@ def argument_setting():
                         help='compute execution time function by function (default: False)')
     parser.add_argument('--content-loss', default=False, action='store_true',
                         help='compute content loss (default: False)')
-    parser.add_argument('--nonefficient', default=False, action='store_true',
+    parser.add_argument('--non-efficient', default=False, action='store_true',
                         help='improve demo execution time (default: False)')
     parser.add_argument('--gui', default=False, action='store_true',
                         help='Demo with gui (default: False)')

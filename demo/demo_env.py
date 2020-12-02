@@ -84,34 +84,47 @@ def data_env(args):
     
     return data_loader
 
-@timer
-def efficient_demo(args,noise=0,test_char=42):
+
+def from_terminal(args):
+    """extract input from terminal
+    For demo through terminal only.
+
+    Args:
+        args : demo arguments
+
+    Returns:
+        test_char [int]: index of test character
+        noise [list]: [negative noise, noise]
+    """
     # Input the number of the character
-    if args.gui:
-        args.test_char = test_char
-    else:
-        test_char = 0
-        while test_char < 1 or test_char > args.char_max:
-            test_char = int(input(f"Input the number of character (1-{args.char_max}):"))
-            if test_char < 1 or test_char > args.char_max:
-                print("Please input the number in the correct range!")
-            else:
-                args.test_char = test_char
-                break
+    test_char = 0
+    while test_char < 1 or test_char > args.char_max:
+        test_char = int(input(f"Input the number of character (1-{args.char_max}):"))
+        if test_char < 1 or test_char > args.char_max:
+            print("Please input the number in the correct range!")
+        else:
+            test_char = test_char
+            break
     
     # Input the upper limit of the noise range
-    if args.gui:
-        args.noise = [-1 * noise, noise]
-    else:
-        noise = -1
-        while noise < 0 or noise > args.noise_max:
-            noise = float(input(f"Input the upper limit of the noise range (0-{args.noise_max}):"))
-            if noise < 0 or noise > args.noise_max:
-                print("Please input the number in the correct range!")
-            else:
-                args.noise = [-1 * noise, noise]
-                break
+    noise = -1
+    while noise < 0 or noise > args.noise_max:
+        noise = float(input(f"Input the upper limit of the noise range (0-{args.noise_max}):"))
+        if noise < 0 or noise > args.noise_max:
+            print("Please input the number in the correct range!")
+        else:
+            noise = [-1 * noise, noise]
+            break
+
+    return test_char, noise
+
+@timer
+def efficient_demo(args):
+    # set char idx and noise through terminal
+    if args.gui is False:
+        args.test_char, args.noise = from_terminal(args)
     
+    # remove file under path
     if os.path.exists(args.test_path):
         shutil.rmtree(args.test_path)
     if os.path.exists(args.save_path):
@@ -127,7 +140,7 @@ def efficient_demo(args,noise=0,test_char=42):
     data_loader = data_env(args)
 
     exe_stat.append(
-        demo_eval(args.model, data_loader, args.critetion, args, args.extractor)
+        demo_eval(args.model, data_loader, args.criterion, args, args.extractor)
     )
 
     print('\n===================================================')
@@ -153,6 +166,7 @@ def efficient_demo(args,noise=0,test_char=42):
 def demo_test(args):
     if args.doc:
         args = config_loader(args.doc, args)
+    
     # config
     # model_config(args, save=False)     # print model configuration of evaluation
 
@@ -180,33 +194,10 @@ def demo_test(args):
     test(model, test_loader, criterion, args)
 
 @timer
-def demo(args,noise=0,test_char=42):
-
-    # Input the number of the character
-    if args.gui:
-        args.test_char = test_char
-    else:
-        test_char = 0
-        while test_char < 1 or test_char > args.char_max:
-            test_char = int(input(f"Input the number of character (1-{args.char_max}):"))
-            if test_char < 1 or test_char > args.char_max:
-                print("Please input the number in the correct range!")
-            else:
-                args.test_char = test_char
-                break
-    
-    # Input the upper limit of the noise range
-    if args.gui:
-        args.noise = [-1 * noise, noise]
-    else:
-        noise = -1
-        while noise < 0 or noise > args.noise_max:
-            noise = float(input(f"Input the upper limit of the noise range (0-{args.noise_max}):"))
-            if noise < 0 or noise > args.noise_max:
-                print("Please input the number in the correct range!")
-            else:
-                args.noise = [-1 * noise, noise]
-                break
+def demo(args):
+    # set char idx and noise through terminal
+    if args.gui is False:
+        args.test_char, args.noise = from_terminal(args)
 
     if os.path.exists(args.test_path):
         shutil.rmtree(args.test_path)
@@ -241,9 +232,10 @@ def demo(args,noise=0,test_char=42):
     print('\n===================================================')
     print(f'Testing number {args.test_char} with noise {args.noise}, Done!!!')
 
-def demo_main(args, noise=0, word_idx=42):
-    # argument setting
-    # args = argument_setting()
+def demo_main(args):
+    # setting under terminal and efficient mode
+    if args.gui is False and args.non_efficient is False:
+        args.model, args.criterion, args.extractor = model_env(args)
 
     # config
     # model_config(args, save=False)   # print model configuration of evaluation
@@ -262,11 +254,8 @@ def demo_main(args, noise=0, word_idx=42):
         translation = timer(translation)
 
     # execution main function
-    demo_func = efficient_demo if not args.nonefficient else demo
-    if args.gui:
-        demo_func(args,noise,word_idx)
-    else:
-        demo_func(args)
+    demo_func = efficient_demo if not args.non_efficient else demo
+    demo_func(args)
 
     # timer statistics
     if args.timer:
