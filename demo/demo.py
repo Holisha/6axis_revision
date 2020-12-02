@@ -55,6 +55,7 @@ class CalligrahpyUI(QMainWindow):
 
         # init value
         self.args = args
+        self.args.test_char = self.comboBox.currentText()
         
         # model construction
         self.args.model, self.args.criterion, self.args.extractor = model_env(args)
