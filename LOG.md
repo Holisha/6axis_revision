@@ -21,6 +21,12 @@
 
 ## Version 7
 
+### 12/2 - fan
+
+- fix: move timer function to global, now can measure execution time through `demo_env.py` rather than `demo.py`
+	- `fixed`: In `demo_env` remove `timer` block in `demo_main`
+	- `new`: In `demo_utils`: add first stroke position in `demo_post` to prevent from over-rotating
+
 ### 12/1 - fan
 
 - refact: rename `project.py` to `demo_env.py`, combine global variable and refactor demo function
