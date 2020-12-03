@@ -200,7 +200,8 @@ def demo_post(args):
         ['movl', '0', '-120', '330', '440', '175', '0', '-179', '100.0'],
     ])
     init_pos[9] = demo_data.iloc[-1, 9]
-    # demo_data = demo_data.append(demo_data.iloc[0, :], ignore_index=True)
+
+    # append first pos and initial position
     demo_data = demo_data.append(
         [demo_data.iloc[0, :], init_pos], ignore_index=True)
 

@@ -239,20 +239,6 @@ def demo_main(args):
 
     # config
     # model_config(args, save=False)   # print model configuration of evaluation
-    
-    # attach timer function
-    if args.timer:
-        global preprocessor, demo_test, demo_eval, postprocessor, verification
-        preprocessor = timer(preprocessor)
-
-        # differnet demo env
-        demo_test = timer(demo_test)
-        demo_eval = timer(demo_eval)
-
-        postprocessor = timer(postprocessor)
-        verification = timer(verification)
-        # copy2usb = timer(copy2usb)
-        # translation = timer(translation)
 
     # execution main function
     demo_func = efficient_demo if not args.non_efficient else demo
@@ -261,7 +247,11 @@ def demo_main(args):
     # timer statistics
     if args.timer:
         import pandas as pd
-        stat = pd.DataFrame(exe_stat, index=['preprocessor', 'demo_efficient', 'postprocessor', 'verification', 'translation', 'copy2usb'], columns=['time'])
+        index = ['preprocessor', 'demo_efficient', 'postprocessor', 'verification']
+        if args.usb_path:
+            index.append('demo_post')
+
+        stat = pd.DataFrame(exe_stat, index=index, columns=['time'])
 
         stat['percent'] = stat / stat.sum() * 100
 
@@ -274,4 +264,19 @@ def demo_main(args):
 if __name__ == '__main__':
     # argument setting
     args = argument_setting()
+
+    # attach time measurement function
+    if args.timer:
+        preprocessor = timer(preprocessor)
+
+        # differnet demo env
+        demo_test = timer(demo_test)
+        demo_eval = timer(demo_eval)
+
+        postprocessor = timer(postprocessor)
+        verification = timer(verification)
+
+        if args.usb_path:
+            demo_post = timer(demo_post)
+        
     demo_main(args)
