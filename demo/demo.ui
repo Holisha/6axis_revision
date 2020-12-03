@@ -152,8 +152,8 @@ background-color: #FFFACD</string>
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>530</x>
-      <y>200</y>
+      <x>1000</x>
+      <y>130</y>
       <width>211</width>
       <height>91</height>
      </rect>
@@ -391,8 +391,8 @@ background-color: #FFFACD;
    <widget class="QCheckBox" name="checkBox">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>200</y>
+      <x>510</x>
+      <y>90</y>
       <width>461</width>
       <height>91</height>
      </rect>
@@ -409,7 +409,7 @@ height:80px;
 }</string>
     </property>
     <property name="text">
-     <string>是否要輸出input和output</string>
+     <string>input + output</string>
     </property>
     <property name="iconSize">
      <size>
@@ -422,6 +422,58 @@ height:80px;
     </property>
     <property name="tristate">
      <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_2">
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>190</y>
+      <width>461</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 24pt &quot;Arial&quot;;
+background-color: rgb(254, 255, 188);
+QCheckBox::indicator{
+width:80px;
+height:80px;
+}</string>
+    </property>
+    <property name="text">
+     <string>output only</string>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>80</width>
+      <height>80</height>
+     </size>
+    </property>
+    <property name="checked">
+     <bool>false</bool>
+    </property>
+    <property name="tristate">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>20</y>
+      <width>191</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 75 26pt &quot;Arial&quot;;</string>
+    </property>
+    <property name="text">
+     <string>輸出結果:</string>
     </property>
    </widget>
    <zorder>label_9</zorder>
@@ -440,6 +492,8 @@ height:80px;
    <zorder>label_13</zorder>
    <zorder>label_2</zorder>
    <zorder>checkBox</zorder>
+   <zorder>checkBox_2</zorder>
+   <zorder>label_3</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
