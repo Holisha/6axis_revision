@@ -67,15 +67,15 @@ class CalligrahpyUI(QMainWindow):
 
         ## check box
         self.combine=True
-        cb = self.checkBox
+        self.checkBox.stateChanged.connect(self.nameCheckBox)
         # cb.setStyleSheet("font: 24pt 'Arial';QCheckBox::indicator { width: 70px; height: 70px;}")
-        cb.stateChanged.connect(self.nameCheckBox)
+        self.checkBox_2.stateChanged.connect(self.nameCheckBox)
 
         # event binding
         self.comboBox.currentIndexChanged.connect(self.set_word)
         self.pushButton.clicked.connect(self.data_eval)
         # self.pushButton.clicked.connect(self.p_test)
-
+    
     def set_word(self):
         # current text
         cur_text = self.comboBox.currentText()
@@ -94,13 +94,17 @@ class CalligrahpyUI(QMainWindow):
         # load target image
         self.target.setPixmap(QPixmap(word_path))
     def nameCheckBox(self,checked):
-        checkBox = self.sender()
+        # checkBox = self.sender()
         if checked:
-            self.combine=True
-            print("Checked: " + checkBox.text())
-        else:
-            self.combine=False
-            print("Unchecked: " + checkBox.text())
+            if self.sender() == self.checkBox:
+                self.combine=True
+                self.checkBox_2.setChecked(False)
+                print("Checked: " + self.checkBox.text())
+            elif self.sender() == self.checkBox_2:
+                self.combine=False
+                self.checkBox.setChecked(False)
+                print("Checked: " + self.checkBox_2.text())    
+
 
     def p_test(self):
         print('clicked')
