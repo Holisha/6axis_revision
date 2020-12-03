@@ -123,7 +123,7 @@ def efficient_demo(args):
     # set char idx and noise through terminal
     if args.gui is False:
         args.test_char, args.noise = from_terminal(args)
-    
+    print("combine??? ",args.combine)
     # remove file under path
     if os.path.exists(args.test_path):
         shutil.rmtree(args.test_path)
@@ -242,6 +242,7 @@ def demo_main(args):
     
     # attach timer function
     if args.timer:
+        global preprocessor, demo_test, demo_eval, postprocessor, verification
         preprocessor = timer(preprocessor)
 
         # differnet demo env
@@ -250,8 +251,8 @@ def demo_main(args):
 
         postprocessor = timer(postprocessor)
         verification = timer(verification)
-        copy2usb = timer(copy2usb)
-        translation = timer(translation)
+        # copy2usb = timer(copy2usb)
+        # translation = timer(translation)
 
     # execution main function
     demo_func = efficient_demo if not args.non_efficient else demo

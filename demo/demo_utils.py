@@ -178,7 +178,7 @@ def translation(source):
 
 def combine2txt(input, output):
 
-    input[2] = input[2].sub(60)
+    input[2] = input[2].sub(90)
     data = input.append(output, ignore_index=True)
 
     return data
@@ -186,7 +186,6 @@ def combine2txt(input, output):
 def demo_post(args):
 
     test_all_output = translation(f'{args.save_path}/test_char/test_all_output.txt')
-
     if args.combine:
         test_all_input = translation(f'{args.save_path}/test_char/test_all_input.txt')
 
@@ -197,9 +196,13 @@ def demo_post(args):
         demo_data = test_all_output
 
     # initial position
-    init_pos = pd.DataFrame([['movl', '0', '-120', '330', '440', '175', '0', '180', '100.0']])
+    init_pos = pd.DataFrame([
+        ['movl', '0', '-120', '330', '440', '175', '0', '-179', '100.0'],
+    ])
     init_pos[9] = demo_data.iloc[-1, 9]
-    demo_data = demo_data.append(init_pos, ignore_index=True)
+    # demo_data = demo_data.append(demo_data.iloc[0, :], ignore_index=True)
+    demo_data = demo_data.append(
+        [demo_data.iloc[0, :], init_pos], ignore_index=True)
 
     # store to USB
     demo_data.to_csv(f'{args.usb_path}/demo_output.txt', header=False, index=False, sep=' ')

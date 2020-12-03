@@ -65,6 +65,12 @@ class CalligrahpyUI(QMainWindow):
         self.demo_func = efficient_demo
         # self.data_env = data_env
 
+        ## check box
+        self.combine=True
+        cb = self.checkBox
+        # cb.setStyleSheet("font: 24pt 'Arial';QCheckBox::indicator { width: 70px; height: 70px;}")
+        cb.stateChanged.connect(self.nameCheckBox)
+
         # event binding
         self.comboBox.currentIndexChanged.connect(self.set_word)
         self.pushButton.clicked.connect(self.data_eval)
@@ -87,6 +93,14 @@ class CalligrahpyUI(QMainWindow):
 
         # load target image
         self.target.setPixmap(QPixmap(word_path))
+    def nameCheckBox(self,checked):
+        checkBox = self.sender()
+        if checked:
+            self.combine=True
+            print("Checked: " + checkBox.text())
+        else:
+            self.combine=False
+            print("Unchecked: " + checkBox.text())
 
     def p_test(self):
         print('clicked')
@@ -100,9 +114,11 @@ class CalligrahpyUI(QMainWindow):
         # activate progress bar
         # self.progress_bar.start()
 
+        # combine or not
+        self.args.combine =self.combine
         # pass data to model
         self.demo_func(self.args)
-
+        
         # load result img
         self.result_vis()
 
@@ -156,7 +172,7 @@ def go_web(args):
     # newwindow.setCentralWidget(newtab)
     # newwindow.show()
     # windows.append(newwindow)
-    
+
 
 if __name__ == "__main__":
     args = argument_setting()
@@ -172,15 +188,5 @@ if __name__ == "__main__":
         w.show()
         app.exec_()
 
-        # app = QApplication(sys.argv)
-        # w = loadUi('demo.ui')
-        # windows.append(w)
-        # ui=ExComboBox(w)
-        # w.label.setScaledContents(True)
-        # w.pushButton.clicked.connect(lambda: go_web(args))
-        # # w.showFullScreen()
-        # # w.setFixedSize(800,800)
-        # w.show()
-        # app.exec_()
     else:
         demo_main(args)
